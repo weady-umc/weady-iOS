@@ -16,9 +16,7 @@
 ## 👥 멤버
 | 팀원 1 | 팀원 2 | 팀원 3 | 팀원 4 | 팀원 5 |
 |:------:|:------:|:------:|:------:|:------:|
-| <img src="" width=120px alt="고석현"/> | <img src="https://avatars.githubusercontent.com/u/112809954?v=4
-" width=120px alt="김지우"/> | <img src="" width=120px alt="김영택"/> | <img src="" width=120px alt="엄민서"/> | <img src="" width=120px alt="양윤서"/> |
-|:------:|:------:|:------:|:------:|:------:|
+| <img src="" width=120px alt="고석현"/> | <img src="https://avatars.githubusercontent.com/u/112809954?v=4" width=120px alt="김지우"/> | <img src="" width=120px alt="김영택"/> | <img src="" width=120px alt="엄민서"/> | <img src="" width=120px alt="양윤서"/> |
 | [고석현](https://github.com/dev-koh) | [김지우](https://github.com/keemeoow) | [김영택](https://github.com/kim0taek) | [엄민서](https://github.com/seo1v) | [양윤서](https://github.com/yys-63) |
 
 <br>
