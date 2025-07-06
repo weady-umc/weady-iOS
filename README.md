@@ -1,36 +1,31 @@
-# 🚀 프로젝트 이름
+# 🚀 웨디
 
-![배너 이미지 또는 로고](링크)
+![image](https://github.com/user-attachments/assets/e16b2cc8-1d66-4f6b-9cb6-eee0b9fcb07f)
 
-> 간단한 한 줄 소개 – 프로젝트의 핵심 가치 또는 기능
+## 📱 소개
+
+> 오늘 날씨에 맞춰 나의 취향에 맞는 하루를 추천해주는 큐레이션 서비스
 
 [![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)]()
 [![Xcode](https://img.shields.io/badge/Xcode-16.0-blue.svg)]()
-[![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 ---
 
 <br>
 
 ## 👥 멤버
-| 팀원 1 | 팀원 2 | 팀원 3 | 팀원 4 |
-|:------:|:------:|:------:|:------:|
-| 사진1 | 사진2 | 사진3 | 사진4 |
-| PL | FE | FE | FE |
-| [GitHub](깃허브 링크) | [GitHub](깃허브 링크) | [GitHub](깃허브 링크) | [GitHub](깃허브 링크) |
-
-<br>
-
-
-## 📱 소개
-
-> 프로젝트의 주요 목적과 사용자가 얻게 될 경험을 설명해주세요.
+| 팀원 1 | 팀원 2 | 팀원 3 | 팀원 4 | 팀원 5 |
+|:------:|:------:|:------:|:------:|:------:|
+| <img src="" width=120px alt="고석현"/> | <img src="https://avatars.githubusercontent.com/u/112809954?v=4
+" width=120px alt="김지우"/> | <img src="" width=120px alt="김영택"/> | <img src="" width=120px alt="엄민서"/> | <img src="" width=120px alt="양윤서"/> |
+|:------:|:------:|:------:|:------:|:------:|
+| [고석현](https://github.com/dev-koh) | [김지우](https://github.com/keemeoow) | [김영택](https://github.com/kim0taek) | [엄민서](https://github.com/seo1v) | [양윤서](https://github.com/yys-63) |
 
 <br>
 
 ## 📆 프로젝트 기간
-- 전체 기간: `YYYY.MM.DD - YYYY.MM.DD`
-- 개발 기간: `YYYY.MM.DD - YYYY.MM.DD`
+- 전체 기간: `2025.06.01 - 2025.08.24`
+- 개발 기간: `2025.06.01 - 2025.08.24`
 
 <br>
 
@@ -56,7 +51,6 @@ Swift 6.0
 <img src="https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white" />
 <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white" />
 <img src="https://img.shields.io/badge/SPM-FA7343?style=for-the-badge&logo=swift&logoColor=white" />
-<img src="https://img.shields.io/badge/Fastlane-n?style=for-the-badge&logo=fastlane&logoColor=black" />
 </div>
 
 ### Development
@@ -72,7 +66,6 @@ Swift 6.0
 
 ### Communication
 <div align="left">
-<img src="https://img.shields.io/badge/Miro-FFFC00.svg?style=for-the-badge&logo=Miro&logoColor=050038" />
 <img src="https://img.shields.io/badge/Notion-white.svg?style=for-the-badge&logo=Notion&logoColor=000000" />
 <img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=Discord&logoColor=white" />
 <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white" />
