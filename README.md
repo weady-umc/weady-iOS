@@ -81,7 +81,7 @@ Swift 6.0
 * `hotfix/xx` - 출시 버전에서 발생한 버그를 수정하는 브랜치
 * `chore/xx` - 빌드 작업, 패키지 매니저 설정 등
 * `design/xx` - 디자인 변경
-* `bugfix/xx` - 디자인 변경
+* `bugfix/xx` - 버그 수정
 
 
 
