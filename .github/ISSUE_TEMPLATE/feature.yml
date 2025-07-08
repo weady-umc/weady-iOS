@@ -1,6 +1,6 @@
 name: ✨ 기능 추가
 description: 새로 구현하고 싶은 기능이 있다면 적어주세요.
-title: "✨ Feature: "
+title: "Feature/#이슈번호 : "
 labels: ["feature"]
 body:
   - type: textarea
@@ -20,4 +20,4 @@ body:
         - [ ] UI 레이아웃
         - [ ] API 연동
     validations:
-      required: false
+      required: true

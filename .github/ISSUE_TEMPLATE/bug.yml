@@ -1,6 +1,6 @@
 name: 🐛 버그 수정
 description: 발견한 문제를 빠르게 메모해두세요!
-title: "🐛 Bug: "
+title: "Bug/#이슈번호 : "
 labels: ["bug"]
 body:
   - type: textarea
