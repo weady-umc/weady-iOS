@@ -32,6 +32,15 @@ extension Color {
     static let white100 = Color(hex: "#FFFFFF")
     static let white200 = Color(hex: "#FAFAFA")
     static let white300 = Color(hex: "#F5F5F5")
+    
+    // icon
+    static let sun = Color(hex: "388E3C")
+    static let rain1 = Color(hex: "8BC7FF")
+    static let rain2 = Color(hex: "F4FEFF")
+    
+    // Default
+    static let systemblue = Color(hex: "007AFF")
+    static let systemred = Color(hex: "FF3B30")
 }
 
 // MARK: - Hex 지원 생성자
