@@ -18,11 +18,7 @@
 				Sources/Feature/Auth/Views/Untitled.swift,
 				Sources/Feature/Clothes/Views/Untitled.swift,
 				Sources/Feature/Curation/Views/Untitled.swift,
-				Sources/Feature/Home/Views/Untitled.swift,
-				Sources/Feature/Profile/MyPage/Views/Untitled.swift,
 				Sources/Feature/Profile/NotificationSettings/Views/Untitled.swift,
-				Sources/Feature/Weadyboard/Views/Untitled.swift,
-				Sources/Feature/Weadychive/Views/Untitled.swift,
 			);
 			target = 808ED0FA2E1D9EFF00442DA8 /* weady */;
 		};
@@ -272,6 +268,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = weady/Info.plist;
@@ -285,7 +282,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.seo1v.weady;
+				PRODUCT_BUNDLE_IDENTIFIER = com.project.weady;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -300,6 +297,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = weady/Info.plist;
@@ -313,7 +311,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.seo1v.weady;
+				PRODUCT_BUNDLE_IDENTIFIER = com.project.weady;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
