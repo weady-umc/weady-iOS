@@ -11,7 +11,7 @@ import SwiftUI
 struct weadyApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NotificationView()
         }
     }
 }

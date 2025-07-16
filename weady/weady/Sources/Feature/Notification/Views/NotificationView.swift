@@ -8,38 +8,40 @@ import SwiftUI
 
 struct NotificationView: View {
     @StateObject private var viewModel = NotificationViewModel()
-
+    
     var body: some View {
-        VStack(spacing: 0) {
-            if viewModel.notifications.isEmpty {
-                EmptyNotificationView()// 알림 없는 화면
-            } else {
-                List {
-                    ForEach(viewModel.notifications) { notification in
-                        VStack(spacing: 0) {
-                            NotificationRow(// 알림 있는 화면
-                                notification: notification,
-                                onDelete: {
-                                    viewModel.deleteNotification(notification.id)
-                                },
-                                onTap: {
-                                    viewModel.markAsRead(notification.id)
-                                }
-                            )
-                            Divider()
-                                .padding(.leading, 20)
-                        }
-                        .listRowInsets(EdgeInsets()) // 좌우 inset 제거
-                        .listRowBackground(notification.isRead ? Color.white : Color(UIColor.systemGray6))
-                        //안읽음 -> 배경 색상
+        if viewModel.notifications.isEmpty {
+            EmptyNotificationView()
+                .navigationTitle("알림")
+        } else {
+            List {
+                ForEach(viewModel.notifications, id: \.id) { notification in
+                    VStack(spacing: 0) {
+                        NotificationRow(
+                            notification: notification,
+                            onDelete: {
+                                viewModel.deleteNotification(notification.id)
+                            },
+                            onTap: {
+                                viewModel.markAsRead(notification.id)
+                            }
+                        )
+                        Divider()
+                            .frame(height: 0.7)
+                            .background(Color.gray600)
                     }
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(notification.isRead ? Color.white : Color(UIColor.systemGray6))
                 }
-                .listStyle(PlainListStyle())
             }
+            .listStyle(PlainListStyle())
+            
+            .navigationTitle("알림")
         }
-        .navigationTitle("알림")
     }
 }
+
 
 #Preview {
     NotificationView()
@@ -71,7 +73,7 @@ private struct NotificationRow: View {
 
     var body: some View {
         let timeText = timeAgo(notification.time)//알림경과시간
-
+        
         HStack(spacing: 12) {
             if let imageName = notification.imageName {
                 Image(imageName)
@@ -83,30 +85,29 @@ private struct NotificationRow: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 formattedTitle
-
+                
                 if notification.showTime {
                     Text(timeText)
                         .font(AppTextStyle.metaRegular8.font)
                         .foregroundColor(.black100)
                 }
             }
-
+            
             Spacer()
-
+            // 오른쪽 X 마크
             VStack(spacing: 4) {
                 Button(action: onDelete) {
                     Image("xmark")
                         .resizable()
                         .frame(width: 25, height: 25)
                 }
-                // 오른쪽 X 마크
-
+                .contentShape(Rectangle())
+                
+                // 읽음 -> 흰 배경, 안읽음 -> 회색배경
                 Text(notification.isRead ? "읽음" : "안읽음")
                     .font(AppTextStyle.metaRegular8.font)
                     .foregroundColor(.gray)
             }
-            // 읽음 -> 흰 배경, 안읽음 -> 회색배경
-            // TODO: 배경 색상 바꿔야함
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 20)

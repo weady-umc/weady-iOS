@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct NotificationItem: Identifiable, Codable {
-    let id: UUID = UUID()
+struct NotificationItem: Identifiable, Codable, Equatable {
+    let id: UUID
     let title: String //닉네임
     let subtitle: String? //몇시간 전
     let imageName: String? // 알림 썸네일 아이콘
