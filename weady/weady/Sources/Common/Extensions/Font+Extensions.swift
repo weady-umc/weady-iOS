@@ -89,7 +89,7 @@ enum AppTextStyle {
     }
 }
 
-extension Text {
+extension View {
     func fontName(_ style: AppTextStyle) -> some View {
         let spacing = style.lineHeight - style.fontSize
         let tracking = style.fontSize * style.letterSpacingPercent / 100
