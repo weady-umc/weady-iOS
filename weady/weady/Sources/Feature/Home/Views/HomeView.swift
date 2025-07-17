@@ -34,7 +34,7 @@ struct HomeView: View {
     
     private var TopView: some View {
         Text("키코님, \n 오늘은 이런 하루 어때요?")
-            .foregroundColor(.black100)
+            .foregroundStyle(Color.black100)
             .fontName(.titleSemibold24)
     }
     
@@ -50,7 +50,7 @@ struct HomeView: View {
             VStack{
                 HStack{
                     Text("15º")
-                        .foregroundColor(.white100)
+                        .foregroundStyle(Color.white100)
                         .fontName(.homeRegular30)
                     
                     VStack{
@@ -61,12 +61,12 @@ struct HomeView: View {
                                 .frame(width: 8, height: 11.43)
                             
                             Text("성미산로 성산동")
-                                .foregroundColor(.white100)
+                                .foregroundStyle(Color.white100)
                                 .fontName(.homeMedium11)
                         }
                         
                         Text("최저 10º | 최고 22º")
-                            .foregroundColor(.white100)
+                            .foregroundStyle(Color.white100)
                             .fontName(.metaRegular10)
                         
                     }
@@ -132,4 +132,3 @@ struct HomeView: View {
 #Preview {
     HomeView()
 }
-    

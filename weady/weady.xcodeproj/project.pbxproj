@@ -12,6 +12,7 @@
 		CD000A752E24092C00A75F3A /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CD489A572E2412D7009C5543 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDF98AD02E27ECE400446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CDF98C732E29348900446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -86,6 +87,11 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		CDF98C752E29348900446374 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -150,6 +156,10 @@
 				{
 					ProductGroup = CD000A772E24092C00A75F3A /* Products */;
 					ProjectRef = CD000A752E24092C00A75F3A /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CDF98C752E29348900446374 /* Products */;
+					ProjectRef = CDF98C732E29348900446374 /* weady.xcodeproj */;
 				},
 				{
 					ProductGroup = CDF98AD22E27ECE400446374 /* Products */;
