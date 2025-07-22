@@ -151,26 +151,32 @@ struct CurationListView: View {
     let ids: [Int]
     // 컬럼 구성: 2열 그리드
     var body: some View {
-        let columns = [
-            GridItem(.flexible(), spacing: 2),
-            GridItem(.flexible(), spacing: 2)
-        ]
+        //스크랩된 큐레이션 없는 경우
+        if ids.isEmpty {
+            Text("hello world") // 하위뷰 A
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            let columns = [
+                GridItem(.flexible(), spacing: 2),
+                GridItem(.flexible(), spacing: 2)
+            ]
 
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 2) {
-                ForEach(ids, id: \.self) { index in
-                    Button(action: {
-                        // TODO: - 해당 큐레이션 상세 화면으로 이동
-                    }) {
-                        Image(index % 2 == 0 ? "curation1" : "curation2")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(height: 240)
-                            .clipped()
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 2) {
+                    ForEach(ids, id: \.self) { index in
+                        Button(action: {
+                            // TODO: - 해당 큐레이션 상세 화면으로 이동
+                        }) {
+                            Image(index % 2 == 0 ? "curation1" : "curation2")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(height: 240)
+                                .clipped()
+                        }
                     }
                 }
+                .padding(.horizontal, 2)
             }
-            .padding(.horizontal, 2)
         }
     }
 }
@@ -180,27 +186,33 @@ struct WeadyboardListView: View {
     let ids: [Int]
     // 컬럼 구성: 3열 그리드
     var body: some View {
-        let columns = [
-            GridItem(.flexible(), spacing: 2),
-            GridItem(.flexible(), spacing: 2),
-            GridItem(.flexible(), spacing: 2)
-        ]
+        if ids.isEmpty {
+            //스크랩된 웨디보드가 없는 경우
+            Text("hello world") // 하위뷰 B
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            let columns = [
+                GridItem(.flexible(), spacing: 2),
+                GridItem(.flexible(), spacing: 2),
+                GridItem(.flexible(), spacing: 2)
+            ]
 
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 2) {
-                ForEach(ids, id: \.self) { index in
-                    Button(action: {
-                        // TODO: - 해당 웨디보드 상세 화면으로 이동
-                    }) {
-                        Image("weadyboard\((index % 7) + 1)") // weadyboard1 ~ weadyboard7 순환
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(height: 164)
-                            .clipped()
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 2) {
+                    ForEach(ids, id: \.self) { index in
+                        Button(action: {
+                            // TODO: - 해당 웨디보드 상세 화면으로 이동
+                        }) {
+                            Image("weadyboard\((index % 7) + 1)") // weadyboard1 ~ weadyboard7 순환
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(height: 164)
+                                .clipped()
+                        }
                     }
                 }
+                .padding(.horizontal, 2)
             }
-            .padding(.horizontal, 2)
         }
     }
 }
@@ -336,4 +348,3 @@ struct DeleteView: View {
 
 
 #Preview{WeadychiveView()}
-
