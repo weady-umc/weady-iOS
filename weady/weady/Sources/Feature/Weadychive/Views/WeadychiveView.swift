@@ -19,6 +19,8 @@ struct WeadychiveView: View {
     @State private var navigateToDeleteView: Bool = false   // 삭제 뷰로 네비게이션 여부
     @State private var scrappedCurationIDs: [Int] = Array(0..<10) // 임시 더미 데이터: 0부터 9까지의 ID
     @State private var scrappedWeadyboardIDs: [Int] = Array(0..<30) // 임시 더미 데이터: 0부터 29까지의 ID
+//    @State private var scrappedCurationIDs: [Int] = [] // 임시 더미 데이터: 빈 배열로 "스크랩된 큐레이션 없음" 테스트
+//    @State private var scrappedWeadyboardIDs: [Int] = [] // 임시 더미 데이터: 빈 배열로 "스크랩 웨디보드 없음" 테스트
 
     // MARK: - Body
     var body: some View {
@@ -75,7 +77,7 @@ struct TopBar: View {
             Text("웨디카이브")
                 .fontName(.headingSemibold20)
             Rectangle()
-              .foregroundColor(.clear)
+              .foregroundStyle(.clear)
               .frame(width: 0.5, height: 12)
               .background(Color(red: 0.07, green: 0.07, blue: 0.07))
             Text("내가 담은 하루들")
@@ -83,7 +85,7 @@ struct TopBar: View {
             Spacer()
             Image(systemName: "ellipsis")
                 .font(.system(size: 20))
-                .foregroundColor(.black100)
+                .foregroundStyle(.black)
                 .onTapGesture {
                     showSheet = true
                 }
@@ -120,7 +122,7 @@ struct TopTabIndicatorView: View {
                     VStack(spacing: 14) {
                         Text(tab.rawValue)
                             .fontName(.captionSemibold14)
-                            .foregroundColor(selectedTab == tab ? .black100 : .gray800)
+                            .foregroundStyle(selectedTab == tab ? Color.black100 : Color.gray800)
 
                         ZStack {
                             if selectedTab == tab {
@@ -153,7 +155,7 @@ struct CurationListView: View {
     var body: some View {
         //스크랩된 큐레이션 없는 경우
         if ids.isEmpty {
-            Text("hello world") // 하위뷰 A
+            NoCurationView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             let columns = [
@@ -188,7 +190,7 @@ struct WeadyboardListView: View {
     var body: some View {
         if ids.isEmpty {
             //스크랩된 웨디보드가 없는 경우
-            Text("hello world") // 하위뷰 B
+            NoWeadyboardView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             let columns = [
@@ -235,7 +237,7 @@ struct SheetView: View {
                 }
             } label: {
                 Text("스크랩 취소하기")
-                    .foregroundColor(.red)
+                    .foregroundStyle(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 50)
@@ -290,7 +292,7 @@ struct DeleteView: View {
         VStack(spacing: 0) {
             HStack {
                 Button { dismiss() } label: {
-                    Image(systemName: "chevron.left").foregroundColor(.black)
+                    Image(systemName: "chevron.left").foregroundStyle(.black)
                 }
                 Spacer()
                 Text("취소할 항목").font(.headline)
@@ -331,7 +333,7 @@ struct DeleteView: View {
                                 Image(systemName: selectedItems.contains(index) ? "checkmark.circle.fill" : "circle")
                                     .resizable()
                                     .frame(width: 24, height: 24)
-                                    .foregroundColor(.white)
+                                    .foregroundStyle(.white)
                                     .background(Color.black.opacity(0.6))
                                     .clipShape(Circle())
                                     .padding(6)
@@ -346,5 +348,69 @@ struct DeleteView: View {
     }
 }
 
+
+
+
+// MARK: - NoCurationView (스크랩된 큐레이션 없는 경우)
+struct NoCurationView: View {
+    var body: some View {
+        VStack {
+            VStack(spacing:20) {
+                Text("추천 큐레이션에서 마음에 드는 하루를 담아보세요!")
+                    .fontName(.metaMedium12)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+
+                Button(action: {
+                    // TODO: - 큐레이션 탐색 화면으로 이동
+                    //WeadychiveView()
+                }) {
+                    Text("큐레이션 보러가기")
+                        .fontName(.captionSemibold14)
+                        .foregroundStyle(.white)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 20)
+                        .background(Color.gray900)
+                        .cornerRadius(8)
+                }
+            }
+            .padding(.top, 141)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
+    }
+}
+
+// MARK: - NoWeadyboardView (스크랩된 웨디보드 없는 경우)
+struct NoWeadyboardView: View {
+    var body: some View {
+        VStack {
+            VStack(spacing: 20) {
+                Text("웨디보드에서는 다른 사람의 하루도 아카이빙할 수 있어요!")
+                    .fontName(.metaMedium12)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+
+                Button(action: {
+                    // TODO: - 웨디보드 탐색 화면으로 이동
+                    //WeadyboardView()
+                }) {
+                    Text("웨디보드 보러가기")
+                        .fontName(.captionSemibold14)
+                        .foregroundStyle(.white)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 20)
+                        .background(Color.gray900)
+                        .cornerRadius(8)
+                }
+            }
+            .padding(.top, 141)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
+    }
+}
 
 #Preview{WeadychiveView()}
