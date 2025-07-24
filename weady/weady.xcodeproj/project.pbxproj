@@ -17,7 +17,6 @@
 				Info.plist,
 				Sources/Feature/Auth/Views/Untitled.swift,
 				Sources/Feature/Clothes/Views/Untitled.swift,
-				Sources/Feature/Curation/Views/Untitled.swift,
 				Sources/Feature/Profile/NotificationSettings/Views/Untitled.swift,
 			);
 			target = 808ED0FA2E1D9EFF00442DA8 /* weady */;
