@@ -12,15 +12,13 @@ import SwiftUI
 
 //MARK: - Main 웨디카이브 뷰
 struct WeadychiveView: View {
+    @StateObject private var viewModel = WeadychiveViewModel()
     
-    // MARK: - Properties
+    // MARK: - 프로퍼티
     @State private var selectedTopTab: TopTab = .curation // 기본 선택 탭
     @State private var showSheet = false // 시트 표시 여부
     @State private var navigateToDeleteView: Bool = false   // 삭제 뷰로 네비게이션 여부
-    @State private var scrappedCurationIDs: [Int] = Array(0..<10) // 임시 더미 데이터: 0부터 9까지의 ID
-    @State private var scrappedWeadyboardIDs: [Int] = Array(0..<30) // 임시 더미 데이터: 0부터 29까지의 ID
-//    @State private var scrappedCurationIDs: [Int] = [] // 임시 더미 데이터: 빈 배열로 "스크랩된 큐레이션 없음" 테스트
-//    @State private var scrappedWeadyboardIDs: [Int] = [] // 임시 더미 데이터: 빈 배열로 "스크랩 웨디보드 없음" 테스트
+    // Now managed by ViewModel
 
     // MARK: - Body
     var body: some View {
@@ -35,9 +33,17 @@ struct WeadychiveView: View {
             Group {
                 switch selectedTopTab {
                 case .curation:
-                    CurationListView(ids: scrappedCurationIDs)
+                    if viewModel.hasScrappedCurations {
+                        CurationListView(items: viewModel.scrappedCurationItems) // ViewModel 연동
+                    } else {
+                        NoCurationView()
+                    }
                 case .weadyboard:
-                    WeadyboardListView(ids: scrappedWeadyboardIDs)
+                    if viewModel.hasScrappedWeadyboards {
+                        WeadyboardListView(items: viewModel.scrappedWeadyboardItems) // ViewModel 연동
+                    } else {
+                        NoWeadyboardView()
+                    }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -52,13 +58,13 @@ struct WeadychiveView: View {
         .navigationDestination(isPresented: $navigateToDeleteView) {
             if selectedTopTab == .curation {
                 DeleteView(type: .curation,
-                           items: $scrappedCurationIDs) { deleted in
-                    scrappedCurationIDs.removeAll { deleted.contains($0) }
+                           items: .constant(viewModel.scrappedCurationItems.map(\.id))) { deleted in // Model 연동
+                    viewModel.deleteCurationItems(with: deleted) // ViewModel 연동
                 }
             } else {
                 DeleteView(type: .weadyboard,
-                           items: $scrappedWeadyboardIDs) { deleted in
-                    scrappedWeadyboardIDs.removeAll { deleted.contains($0) }
+                           items: .constant(viewModel.scrappedWeadyboardItems.map(\.id))) { deleted in // Model 연동
+                    viewModel.deleteWeadyboardItems(with: deleted) // ViewModel 연동
                 }
             }
         }
@@ -136,9 +142,9 @@ struct TopTabIndicatorView: View {
                                     .frame(height: 1)
                             }
                         }
-                        .frame(maxWidth: .infinity) // Capsule spans full width of tab
+                        .frame(maxWidth: .infinity)  
                     }
-                    .frame(maxWidth: .infinity) // Each button takes equal width
+                    .frame(maxWidth: .infinity)
                 }
             }
         }
@@ -150,11 +156,11 @@ struct TopTabIndicatorView: View {
 
 //MARK: -큐레이션 스크롤뷰
 struct CurationListView: View {
-    let ids: [Int]
+    let items: [CurationItem] // Model 타입 사용
     // 컬럼 구성: 2열 그리드
     var body: some View {
         //스크랩된 큐레이션 없는 경우
-        if ids.isEmpty {
+        if items.isEmpty {
             NoCurationView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
@@ -165,11 +171,11 @@ struct CurationListView: View {
 
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 2) {
-                    ForEach(ids, id: \.self) { index in
+                    ForEach(items) { item in
                         Button(action: {
                             // TODO: - 해당 큐레이션 상세 화면으로 이동
                         }) {
-                            Image(index % 2 == 0 ? "curation1" : "curation2")
+                            Image(item.imageName)
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(height: 240)
@@ -185,10 +191,10 @@ struct CurationListView: View {
 
 //MARK: -웨디보드 스크롤뷰
 struct WeadyboardListView: View {
-    let ids: [Int]
+    let items: [WeadyboardItem] // Model 타입 사용
     // 컬럼 구성: 3열 그리드
     var body: some View {
-        if ids.isEmpty {
+        if items.isEmpty {
             //스크랩된 웨디보드가 없는 경우
             NoWeadyboardView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -201,11 +207,11 @@ struct WeadyboardListView: View {
 
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 2) {
-                    ForEach(ids, id: \.self) { index in
+                    ForEach(items) { item in
                         Button(action: {
                             // TODO: - 해당 웨디보드 상세 화면으로 이동
                         }) {
-                            Image("weadyboard\((index % 7) + 1)") // weadyboard1 ~ weadyboard7 순환
+                            Image(item.imageName) // weadyboard 이미지 이름 사용
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(height: 164)
@@ -237,7 +243,8 @@ struct SheetView: View {
                 }
             } label: {
                 Text("스크랩 취소하기")
-                    .foregroundStyle(.red)
+                    .foregroundColor(Color(red: 1, green: 0.23, blue: 0.19)) //피그마에 맞는 시스템 레드로 바꿈
+                //그냥 피그마에 있는 속성 그대로 가져옴. (extension에서 못찾음)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 50)
