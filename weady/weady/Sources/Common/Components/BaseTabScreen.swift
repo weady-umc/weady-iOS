@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BaseTabScreen: View {
-    @State private var selectedTab: TabType = .home
+    @Binding var selectedTab: TabType
 
     var body: some View {
         VStack(spacing: 0) {
@@ -26,7 +26,6 @@ struct BaseTabScreen: View {
             }
             .frame(maxHeight: .infinity)
             
-            BaseTabView(selectedTab: $selectedTab)
         }
         .ignoresSafeArea(edges: .bottom)
     }
