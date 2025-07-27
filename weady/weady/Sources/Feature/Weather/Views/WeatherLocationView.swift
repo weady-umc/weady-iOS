@@ -11,9 +11,14 @@ struct WeatherLocationView: View {
     @Bindable private var viewModel: WeatherLocationViewModel = .init()
     @Environment(\.dismiss) private var dismiss
     @Environment(\.editMode) private var editMode
+    @Environment(NavigationRouter.self) var router
+
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: Binding(
+            get: { router.path },
+            set: { router.path = $0 }
+        )) {
             ZStack(alignment: .top) {
                 Color.white.ignoresSafeArea()
                 VStack{
@@ -29,8 +34,6 @@ struct WeatherLocationView: View {
                     Spacer().frame(height: 27)
                     
                     favLocations
-                        
-                        
                     
                 }
                 .navigationTitle("위치")
@@ -46,6 +49,14 @@ struct WeatherLocationView: View {
                         }
                     }
                 }
+                .navigationDestination(for: Route.self) { route in
+                        switch route {
+                        case .weatheraddlocation:
+                            WeatherLocationAddView()
+                        default:
+                            HomeView()
+                        }
+                    }
                 
                 Divider()
                     .frame(height: 1)
@@ -75,6 +86,9 @@ struct WeatherLocationView: View {
                 .background(RoundedRectangle(cornerRadius: 5)
                     .fill(Color.white400)
                     )
+                .onTapGesture {
+                    router.push(.weatheraddlocation)
+                    }
             
             
         
@@ -125,19 +139,21 @@ struct WeatherLocationView: View {
                 List{
                     ForEach(viewModel.favoriteLocations, id: \.id) { weather in
                         HStack {
+                            
                             if editMode?.wrappedValue == .active {
                                 Button(action: {
-                                    if let index = viewModel.favoriteLocations.firstIndex(of: weather) {
-                                        viewModel.favoriteLocations.remove(at: index)
-                                    }
+                                    deleteItem(weather)
                                 }) {
                                     Image("deleteicon")
                                         .resizable()
                                                         .frame(width: 44, height: 44)
                                                         .padding(.leading, 4)
                                 }
+                                
+                                
                                                             }
                             WeatherCardView(data: weather, isCurrentLocation: false, editMode: editMode?.wrappedValue == .active)
+                                
                             
                             
                                 
@@ -150,9 +166,7 @@ struct WeatherLocationView: View {
                         
                             }
                         
-                        .onMove {source, destination in viewModel.favoriteLocations.move(fromOffsets: source, toOffset: destination)
-                            
-                        }
+                    //.onMove {source, destination in viewModel.favoriteLocations.move(fromOffsets: source, toOffset: destination)}
                 }
                                     .listStyle(.plain)
                                
@@ -172,4 +186,5 @@ struct WeatherLocationView: View {
 
 #Preview {
     WeatherLocationView()
+        .environment(NavigationRouter())
 }

@@ -26,7 +26,7 @@ struct WeatherCardView: View {
                 VStack(alignment: .leading){
                     HStack{
                         if isCurrentLocation{
-                            Image("placeIcon?")
+                            Image("placeIcon")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 7, height: 10)

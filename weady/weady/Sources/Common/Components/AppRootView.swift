@@ -25,6 +25,8 @@ struct AppRootView: View {
                         WeadychiveView()
                     case .mypage:
                         MyPageView()
+                    case .weatheraddlocation:
+                            WeatherLocationAddView()
                     }
                 }
         }
