@@ -72,11 +72,11 @@ struct WeadyboardPostView: View {
             isTabBarHidden = false
         }
         .sheet(isPresented: $showCommentSheet) {
-            CommentBottomSheet()
+            WeadyboardPostCommentSheet()
                 .presentationDetents([.height(624)])
         }
         .sheet(isPresented: $showMoreSheet) {
-            PostMoreActionSheet(showReportSheet: $showReportSheet)
+            WeadyboardPostMoreActionSheet(showReportSheet: $showReportSheet)
                 .presentationDetents([.height(255)])
         }
         .sheet(isPresented: $showReportSheet) {
