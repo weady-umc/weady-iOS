@@ -10,6 +10,8 @@ import SwiftUI
 struct HomeView: View {
     var body: some View {
         
+        Spacer().frame(height: 105)
+        
         TopView
         
         Button{
@@ -24,18 +26,24 @@ struct HomeView: View {
             ClothesView
         }
         
+        Spacer().frame(height: 29)
+        
         Button{
             
         } label: {
             PlaceView
         }
         
+        
     }
     
+    
     private var TopView: some View {
-        Text("키코님, \n 오늘은 이런 하루 어때요?")
+        Text("키코님, \n오늘은 이런 하루 어때요?")
             .foregroundStyle(Color.black100)
             .fontName(.titleSemibold24)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.leading, 24)
     }
     
     private var WeatherView: some View {
@@ -94,7 +102,9 @@ struct HomeView: View {
                 .frame(width: 60, height: 60)
             
             Text("오늘처럼 구름이 많고 쌀쌀한 날엔 \n 얇은 겉옷을 추천드려요.")
-                
+                .fontName(.bodyLight16)
+                .foregroundStyle(Color.black100)
+                .multilineTextAlignment(.leading)
             
             Image("rightArrow")
         }
@@ -102,7 +112,7 @@ struct HomeView: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color.white200)
         )
-        .frame(width: 375, height: 50)
+        .frame(width: 335, height: 100)
     }
     
     private var PlaceView: some View {
@@ -111,6 +121,10 @@ struct HomeView: View {
             HStack{
                 
                 Text("지금 날씨에 어울리는 장소만 담았어요")
+                    .fontName(.bodySemibold16)
+                    .foregroundStyle(Color.black100)
+                
+                
                 
                 Image("rightArrow")
                     .resizable()
