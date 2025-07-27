@@ -10,12 +10,13 @@ import SwiftUI
 struct WeatherCardView: View {
     let data: WeatherData
     let isCurrentLocation: Bool
+    let editMode: Bool
     
     var body: some View {
         ZStack{
             Image(data.backgroundImage)
                 .resizable()
-                .frame(width: 335, height: 82)
+                .frame(width: editMode ? 299 : 335, height: 82)
                 .background(
                     RoundedRectangle(cornerRadius: 5)
                         .fill(.clear)
@@ -56,9 +57,11 @@ struct WeatherCardView: View {
                             .foregroundStyle(Color.white100)
                     }
                 }
+                .padding(.trailing, editMode ? 30 : 0)
+                
             }
             .padding(.horizontal, 20)
-            .frame(width: 335)
+            .frame(width: editMode ? 299 : 335)
             
                 
         }
@@ -75,7 +78,7 @@ struct WeatherCardView: View {
         backgroundImage: "weather_cloudy"
     )
     
-    WeatherCardView(data: example, isCurrentLocation: false)
+    WeatherCardView(data: example, isCurrentLocation: false, editMode: false)
 }
 
 

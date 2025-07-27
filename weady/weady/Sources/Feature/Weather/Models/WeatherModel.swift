@@ -30,11 +30,32 @@ enum WeatherModel: Int, CaseIterable, Identifiable {
     }
 }
 
-struct WeatherData: Identifiable {
+struct WeatherData: Identifiable, Equatable {
     var id = UUID()
     var location: String
     var temperature: String
     var highTemperature: String
     var lowTemperature: String
     var backgroundImage: String
+}
+
+struct WeatherAddData {
+    var id = UUID()
+    var weatherBackground: String
+    var place: String
+    var temperature: Int
+    var weatherIcon: String
+    var description: String
+    var lowTemperature: Int
+    var highTemperature: Int
+    var rainProbability: Int
+    
+    var hourlyWeather: [HourlyWeather]
+}
+
+struct HourlyWeather: Identifiable {
+    var id = UUID()
+    var time: String
+    var iconName: String
+    var temp: String
 }
