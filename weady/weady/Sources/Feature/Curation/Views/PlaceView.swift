@@ -4,19 +4,20 @@ import SwiftUI
 
 struct PlaceView: View {
     // TODO: - 날씨 태그 색상/문구는 이후 enum 처리 예정
-    let locationTags = ["내주변", "성수", "광화문 종로", "합정 망원", "홍대 신촌", "명동 을지로", "문래 여의도", "강남 역삼", "잠실 송파" , "이태원 한남"]
+    let locationTags = ["내주변", "강남 서초", "잠실 송파", "여의도 영등포", "건대 성수", "광화문 종로", "홍대 합정", "용산 이태원", "인천 송도" , "수원 광교", "성남 분당"]
     // TODO: - 더미 데이터는 이후 API 또는 기본 장소 몇개 추가 생성시 바뀔 예정
     let dummyCurationData: [String: [String]] = [
         "내주변": ["place1", "place2", "place3", "place4"],
-        "성수": ["place2", "place1", "place4", "place3"],
-        "광화문 종로": ["place3", "place2", "place1", "place4"],
-        "합정 망원": ["place4", "place3", "place2", "place1"],
-        "홍대 신촌": ["place1", "place4", "place3", "place2"],
-        "명동 을지로": ["place2", "place1", "place4", "place3"],
-        "문래 여의도": ["place3", "place2", "place1", "place4"],
-        "강남 역삼": ["place4", "place3", "place2", "place1"],
-        "잠실 송파": ["place1", "place4", "place3", "place2"],
-        "이태원 한남": ["place2", "place1", "place4", "place3"]
+        "강남 서초": ["place2", "place1", "place4", "place3"],
+        "잠실 송파": ["place3", "place2", "place1", "place4"],
+        "여의도 영등포": ["place4", "place3", "place2", "place1"],
+        "건대 성수": ["place1", "place4", "place3", "place2"],
+        "광화문 종로": ["place2", "place1", "place4", "place3"],
+        "홍대 합정": ["place3", "place2", "place1", "place4"],
+        "용산 이태원": ["place4", "place3", "place2", "place1"],
+        "인천 송도": ["place1", "place4", "place3", "place2"],
+        "수원 광교": ["place2", "place1", "place4", "place3"],
+        "성남 분당": ["place3", "place2", "place1", "place4"]
         // 나머지 태그들도 원한다면 이후 추가
     ]
     
