@@ -15,9 +15,18 @@ struct WeatherLocationAddView: View {
             Image("\(viewModel.weather.weatherBackground)")
                 .resizable()
                 .scaledToFit()
-                .ignoresSafeArea()
+                .frame(width: 335, height: 694)
             
             VStack{
+                
+                Button(action: {
+                    
+                }) {
+                    Image("closeIcon")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 20, height: 20)
+                }
                 HStack{
                     Image("placeIcon")
                         .resizable()
@@ -51,6 +60,22 @@ struct WeatherLocationAddView: View {
                         
                         Text("\(viewModel.weather.rainProbability)")
                             .foregroundStyle(Color.white100)
+                        
+                        Button(action: {})
+                        {
+                            ZStack{
+                                
+                                
+                                Image("whitebackground")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 280, height: 55)
+                                
+                                Text("즐겨찾기 추가")
+                                    .fontName(.captionSemibold14)
+                                    .foregroundStyle(Color.black100)
+                            }
+                        }
                     }
                     
                 }
