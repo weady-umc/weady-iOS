@@ -16,17 +16,19 @@ struct SettingView: View {
                 ForEach(viewModel.sections) { section in
                     SettingSectionView(section: section)
                 }
-
-                Spacer()
             }
-            .padding(.top, 131)
-            .ignoresSafeArea(.container, edges: .top)
-            .navigationBarTitleDisplayMode(.inline) // 타이틀 간결하게 표시
+            .padding(.bottom, 200)
+            .navigationTitle("설정 및 개인정보")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
             .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("설정 및 개인정보")
-                        .font(AppTextStyle.bodySemibold16.font)
-                        .foregroundColor(.black)
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        //router 쓰기?
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.black)
+                    }
                 }
             }
         }

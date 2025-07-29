@@ -134,6 +134,8 @@ struct MyInfoView: View {
             .padding(.horizontal, 20)
             .padding(.top, 44)
         
+        .navigationTitle("내 정보 관리")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -145,9 +147,6 @@ struct MyInfoView: View {
                 }
             }
         }
-        .navigationTitle("내 정보 관리")
-        .navigationBarTitleDisplayMode(.inline)
-        .background(Color.white)
     }
 }
 
