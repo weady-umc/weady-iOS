@@ -15,8 +15,17 @@ struct WeatherSearchView: View {
         NavigationStack{
             
             VStack{
+                
+                Spacer().frame(height: 13)
+                
+                Divider()
+                    .frame(height: 1)
+                
                 searchBar
                 
+                
+                Spacer()
+                    
             }
             .navigationTitle("위치")
             .navigationBarTitleDisplayMode(.inline)
@@ -32,35 +41,39 @@ struct WeatherSearchView: View {
                 }
             }
             
-            Divider()
-                .frame(height: 1)
+           
         }
     }
     
     private var searchBar: some View {
-        
-        HStack(spacing: 10)
-        {
-            Spacer(minLength: 10)
+        VStack{
             
-            Image("searchIcon")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 17.5, height: 17.6)
+            Spacer().frame(height: 14)
             
-            TextField("", text: $viewModel.searchText, prompt: Text("검색을 통해 즐겨찾기를 추가할 수 있어요")
-                .foregroundStyle(Color.gray200)
-            )
+            HStack(spacing: 10)
+            {
+                Spacer(minLength: 10)
+                
+                Image("searchIcon")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 17.5, height: 17.6)
+                
+                TextField("", text: $viewModel.searchText, prompt: Text("검색을 통해 즐겨찾기를 추가할 수 있어요")
+                    .foregroundStyle(Color.gray200)
+                )
                 .font(AppTextStyle.captionRegular14.font)
                 .foregroundStyle(Color.gray200)
                 .multilineTextAlignment(.leading)
-        }
-                .frame(width: 335, height: 40)
+            }
+            .frame(width: 335, height: 40)
             
-                .background(RoundedRectangle(cornerRadius: 5)
-                    .fill(Color.white400)
-                    )
-        
+            .background(RoundedRectangle(cornerRadius: 5)
+                .fill(Color.white400)
+            )
+            
+        }
+        .frame(alignment: .top)
     }
 }
 

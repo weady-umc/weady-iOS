@@ -51,8 +51,8 @@ struct WeatherLocationView: View {
                 }
                 .navigationDestination(for: Route.self) { route in
                         switch route {
-                        case .weatheraddlocation:
-                            WeatherLocationAddView()
+                        case .weathersearch:
+                            WeatherSearchView()
                         default:
                             HomeView()
                         }
@@ -136,6 +136,7 @@ struct WeatherLocationView: View {
                 }
                 
             } else {
+                //list 딴거 쓰기 list 쓰면 전체가 다 버튼으로 인식이됨
                 List{
                     ForEach(viewModel.favoriteLocations, id: \.id) { weather in
                         HStack {
@@ -148,7 +149,11 @@ struct WeatherLocationView: View {
                                         .resizable()
                                                         .frame(width: 44, height: 44)
                                                         .padding(.leading, 4)
+                                                        .border(Color.red)
                                 }
+                                
+                                
+                                
                                 
                                 
                                                             }
@@ -159,14 +164,16 @@ struct WeatherLocationView: View {
                                 
                         }
                         
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(alignment: .leading)
                                 .listRowInsets(EdgeInsets()) // 여백 제거
                                 .listRowSeparator(.hidden)
                                 .padding(.bottom, 8)
+                                .border(.red)
                         
                             }
+    
                         
-                    //.onMove {source, destination in viewModel.favoriteLocations.move(fromOffsets: source, toOffset: destination)}
+                    .onMove {source, destination in viewModel.favoriteLocations.move(fromOffsets: source, toOffset: destination)}
                 }
                                     .listStyle(.plain)
                                
@@ -174,6 +181,7 @@ struct WeatherLocationView: View {
             
         }
         .frame(width: editMode?.wrappedValue == .active ? 375 : 335)
+        .border(Color.red)
 
     }
     func deleteItem(_ weather: WeatherData) {

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WeatherLocationAddView: View {
     @Bindable var viewModel = WeatherAddViewModel()
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         ZStack{
@@ -20,7 +21,7 @@ struct WeatherLocationAddView: View {
             VStack{
                 
                 Button(action: {
-                    
+                    dismiss()
                 }) {
                     Image("closeIcon")
                         .resizable()
@@ -81,6 +82,7 @@ struct WeatherLocationAddView: View {
                 }
                 
             }
+            .navigationBarBackButtonHidden(true)
         }
     }
     
@@ -114,6 +116,9 @@ struct WeatherLocationAddView: View {
                 }
                 
             }
+            //.scrollTargetBehavior(.viewAligned)
+            //이 부분은 스크롤 안보여줘도됨 스벅코드에 올라와잇음
+            //navigationbackswip 스벅코드에 올라와잇음
         }
     }
 }
