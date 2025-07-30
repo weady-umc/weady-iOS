@@ -22,38 +22,39 @@ struct PlaceView: View {
     ]
     
     @State private var selectedTag: String = "내주변"
+    @State private var currentWeather: SkyStatus = .CLEAR
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // 상단 텍스트
-            Group {
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing : 0) {
-                        // TODO: - 날씨에 맞는 태그 텍스트 수정 예정.
-                        Text("살랑살랑 봄 날씨")
-                            // TODO: - 컬러칩 기본 세팅 안되어있음
-                            .foregroundColor(Color(red: 0.92, green: 0.59, blue: 0.59))
-                            .fontName(.headingBold20)
-                        
-                        Text("에는,")
-                          
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                // 상단 텍스트
+                Group {
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing : 0) {
+                            // TODO: - 날씨에 맞는 태그 텍스트 수정 예정.
+                            Text(currentWeather.descriptionText)
+                                .foregroundColor(SkyStatus.CLEAR.fontColor)
+                                .fontName(.headingBold20)
+                            
+                            Text("에는,")
+                                .fontName(.headingBold20)
+                        }
+                        Text("이런 코스들을 추천해 드려요")
                             .fontName(.headingBold20)
                     }
-                    Text("이런 코스들을 추천해 드려요.")
-                        
-                        .fontName(.headingBold20)
+                }
+                .padding(.horizontal, 16)
+
+                LocationTagScrollView(locationTags: locationTags, selectedTag: $selectedTag)
+
+                ScrollView {
+                    let dummyImageNames = dummyCurationData[selectedTag] ?? []
+                    let dummyIDs = Array(0..<dummyImageNames.count).map { "\($0)" }
+                    CurationCardListView(selectedTag: selectedTag, imageNames: dummyImageNames, cardIDs: dummyIDs)
                 }
             }
-            .padding(.horizontal, 16)
-
-            LocationTagScrollView(locationTags: locationTags, selectedTag: $selectedTag)
-
-            ScrollView {
-                let dummyImageNames = dummyCurationData[selectedTag] ?? []
-                CurationCardListView(selectedTag: selectedTag, imageNames: dummyImageNames)
-            }
+            .padding(.top, 20)
         }
-        .padding(.top, 20)
     }
 }
 
@@ -102,13 +103,12 @@ struct LocationTagScrollView: View {
 struct CurationCardListView: View {
     let selectedTag: String
     let imageNames: [String]
+    let cardIDs: [String]
 
     var body: some View {
         VStack(spacing: 12) {
-            ForEach(imageNames, id: \.self) { imageName in
-                Button(action: {
-                    // TODO: - 해당 큐레이션 상세로 이동
-                }) {
+            ForEach(Array(zip(imageNames, cardIDs)), id: \.1) { (imageName, cardID) in
+                NavigationLink(destination: DetailCurationView(cardID: cardID)) {
                     ZStack(alignment: .bottomLeading) {
                         Image(imageName)
                             .resizable()
@@ -126,6 +126,79 @@ struct CurationCardListView: View {
     }
 }
 
+struct DetailCurationView: View {
+    let cardID: String
+
+    var body: some View {
+        VStack {
+            Text("Detail View for Card ID: \(cardID)")
+                .font(.title)
+                .padding()
+            // TODO: - Moya를 통해 해당 cardID의 상세 데이터 요청 및 렌더링
+        }
+        .navigationTitle("상세 큐레이션")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 #Preview {
     PlaceView()
+}
+
+
+
+enum SkyStatus {
+    case CLEAR, PARTLY_CLOUDY, CLOUDY, RAIN, SNOW
+
+    var fontColor: Color {
+        switch self {
+        case .CLEAR:
+            return Color(red: 0.92, green: 0.59, blue: 0.59)
+        case .PARTLY_CLOUDY:
+            return .secondary
+        case .CLOUDY:
+            return .gray
+        case .RAIN:
+            return .blue
+        case .SNOW:
+            return .mint
+        }
+    }
+
+    var descriptionText: String {
+        switch self {
+        case .CLEAR:
+            return "맑은 하늘"
+        case .PARTLY_CLOUDY:
+            return "구름 조금"
+        case .CLOUDY:
+            return "흐린 날씨"
+        case .RAIN:
+            return "비 오는 날"
+        case .SNOW:
+            return "눈 오는 날"
+        }
+    }
+}
+
+enum Season {
+    case spring, summer, autumn, winter
+}
+
+extension Season {
+    static func currentSeason(date: Date = Date()) -> Season {
+        let calendar = Calendar.current
+        let month = calendar.component(.month, from: date)
+
+        switch month {
+        case 3...5:
+            return .spring
+        case 6...8:
+            return .summer
+        case 9...11:
+            return .autumn
+        default:
+            return .winter // 12, 1, 2
+        }
+    }
 }
