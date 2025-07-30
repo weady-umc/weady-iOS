@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct UploadFashionModel {
+struct FashionModel {
     var style: String
     var brand: String
     var item: String

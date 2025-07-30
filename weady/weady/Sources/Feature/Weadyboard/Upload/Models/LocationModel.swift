@@ -1,6 +1,6 @@
 import Foundation
 import SwiftUI
 
-struct UploadLocationModel {
+struct LocationModel {
     var placeName: String
 }
