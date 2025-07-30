@@ -16,24 +16,33 @@ struct DetailCurationView: View {
     }
 
     var body: some View {
-        VStack(spacing: 16) {
-            Spacer()
-            DetailCurationImageCarousel(currentIndex: $currentIndex, imageNames: imageNames)
-            Spacer()
-            DetailCurationMapButton()
-            Spacer()
+        ZStack(alignment: .top) {
+            VStack(spacing: 25) {
+                DetailCurationImageCarousel(currentIndex: $currentIndex, imageNames: imageNames)
+                DetailCurationMapButton()
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 100)
         }
-        .padding(.horizontal, 16)
-        .navigationBarTitleDisplayMode(.inline)
+//        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+//        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(Color.white)
+        
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
                     dismiss()
                 }) {
                     Image("backicon")
+                        .padding(.top, 50)
+                        .padding(10)
+                        .frame(width: 44, height: 44, alignment: .center)
+                        
                 }
             }
+            
 
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 0) {
@@ -42,6 +51,7 @@ struct DetailCurationView: View {
                     Text("서초구 노을 맛집 모음")
                         .fontName(.captionMedium14)
                 }
+                .padding(.top, 50)
             }
 
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -49,6 +59,7 @@ struct DetailCurationView: View {
                     // TODO: Scrap toggle logic
                 }) {
                     Image("scrap")
+                        .padding(.top, 50)
                 }
             }
         }
@@ -67,7 +78,7 @@ struct DetailCurationImageCarousel: View {
                     Image(imageNames[index])
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(width: UIScreen.main.bounds.width, height: 556)
+                        .frame(width: UIScreen.main.bounds.width, height: 600)
                         .clipped()
                         .tag(index)
                 }
