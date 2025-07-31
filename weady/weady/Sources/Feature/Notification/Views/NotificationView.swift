@@ -55,9 +55,9 @@ private struct EmptyNotificationView: View {
             Image("bell")
                 .resizable()
                 .frame(width: 40, height: 40)
-                .foregroundColor(.gray)
+                .foregroundStyle(Color.gray)
             Text("알림이 없습니다.")
-                .foregroundColor(.black100)
+                .foregroundStyle(Color.black100)
                 .font(AppTextStyle.bodyMedium16.font)
                 .padding(.top, 10)
             Spacer()
@@ -89,7 +89,7 @@ private struct NotificationRow: View {
                 if notification.showTime {
                     Text(timeText)
                         .font(AppTextStyle.metaRegular8.font)
-                        .foregroundColor(.black100)
+                        .foregroundStyle(Color.black100)
                 }
             }
             
@@ -106,7 +106,7 @@ private struct NotificationRow: View {
                 // 읽음 -> 흰 배경, 안읽음 -> 회색배경
                 Text(notification.isRead ? "읽음" : "안읽음")
                     .font(AppTextStyle.metaRegular8.font)
-                    .foregroundColor(.gray)
+                    .foregroundStyle(Color.gray)
             }
         }
         .padding(.vertical, 12)
@@ -140,7 +140,7 @@ private struct NotificationRow: View {
         else {
             return Text(notification.title)
                 .font(AppTextStyle.metaRegular12.font)
-                .foregroundColor(.black100)
+                .foregroundStyle(Color.black100)
         }
 
         let parts = notification.title.components(separatedBy: highlight)
@@ -148,13 +148,13 @@ private struct NotificationRow: View {
         return (
             Text(parts[0])
                 .font(AppTextStyle.metaRegular12.font)
-                .foregroundColor(.black100)
+                .foregroundStyle(Color.black100)
             + Text(highlight)
                 .font(AppTextStyle.metaSemibold12.font)
-                .foregroundColor(.black100)
+                .foregroundStyle(Color.black100)
             + Text(parts.count > 1 ? parts[1] : "")
                 .font(AppTextStyle.metaRegular12.font)
-                .foregroundColor(.black100)
+                .foregroundStyle(Color.black100)
         )
     }
 }
