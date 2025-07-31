@@ -14,4 +14,5 @@ public struct ApiResponse<T: Decodable>: Decodable {
     public let data: T?
 }
 
+// 응답 데이터가 아예 없는 경우 
 public struct EmptyResponse: Decodable {}

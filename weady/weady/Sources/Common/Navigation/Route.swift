@@ -12,6 +12,9 @@ enum Route: Hashable {
     case basetab
     case home
     case weadyboard
+    case weadyboardPost
+    case weadyboardPostWithItem(WeadyBoardItem)
+    case weadyboardPostReportDetail(ReportReason)
     case weadychive
     case mypage
 }

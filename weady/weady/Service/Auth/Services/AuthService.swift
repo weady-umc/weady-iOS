@@ -67,8 +67,6 @@ final class AuthService: NetworkManager {
     /// 로그인 요청
     public func login(data: LoginRequestDTO, provider: String, completion: @escaping (Result<LoginResponseDTO, NetworkError>) -> Void) {
         request(target: .postLogin(data: data, provider: provider), decodingType: LoginResponseDTO.self, completion: completion)
-        print("🔐 code: \(data.authorizationCode)")
-        print("📡 provider: \(provider)")
     }
     
     /// 로그아웃 요청
