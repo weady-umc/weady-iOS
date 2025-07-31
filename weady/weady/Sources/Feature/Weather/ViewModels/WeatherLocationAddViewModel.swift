@@ -6,23 +6,64 @@
 //
 
 import Foundation
+import Observation
 
 @Observable
 class WeatherAddViewModel {
-    var weather: WeatherAddData = WeatherAddData(
-        weatherBackground: "weatherAdd_rainy",
-        place: "서초구 양재1동",
-        temperature: 15,
-        weatherIcon: "weatherAddIcon_cloudy",
-        description: "구름 많음",
-        lowTemperature: 14,
-        highTemperature: 19,
-        rainProbability: 80,
-        hourlyWeather: [
-            HourlyWeather(time: "오전 9시", iconName: "sunIcon", temp: "15"),
-            HourlyWeather(time: "오전 10시", iconName: "cloudIcon", temp: "16"),
-            HourlyWeather(time: "오전 11시", iconName: "rainIcon", temp: "16"),
-            HourlyWeather(time: "오전 12시", iconName: "rainIcon", temp: "17")
-        ]
-    )
+    var weather: WeatherAddData? = nil
+    private let service = WeatherServices()
+    
+    func fetchWeather(locationId: Int) {
+        service.fetchShortWeather(locationId: locationId) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success(let data):
+                    self.weather = self.convertToWeatherAddData(from: data)
+                case .failure(let error):
+                    print("날씨 가져오기 실패: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    private func convertToWeatherAddData(from data: ShortWeatherData) -> WeatherAddData {
+        return WeatherAddData(
+            weatherBackground: mapSkyStatusToBackground(data.skyStatus),
+            place: "\(data.address1) \(data.address2) \(data.address3)",
+            temperature: Int(data.currentTmp),
+            weatherIcon: mapSkyStatusToIcon(data.skyStatus),
+            description: data.skyStatus,
+            lowTemperature: Int(data.minTmp),
+            highTemperature: Int(data.maxTmp),
+            rainProbability: Int(data.hourlyPrecipitations.first?.probability ?? 0),
+            hourlyWeather: data.hourlyForecasts.map {
+                HourlyWeather(
+                    time: "\($0.time)시",
+                    iconName: mapSkyStatusToIcon($0.skyStatus),
+                    temp: "\($0.tmp)"
+                )
+            }
+        )
+    }
+
+    private func mapSkyStatusToBackground(_ status: String) -> String {
+        switch status {
+        case "CLEAR": return "weatherAdd_sunny"
+        case "CLOUDY": return "weatherAdd_cloudy"
+        case "RAIN": return "weatherAdd_rainy"
+        default: return "weatherAdd_default"
+        }
+    }
+
+    private func mapSkyStatusToIcon(_ status: String) -> String {
+        switch status {
+        case "CLEAR": return "sunIcon"
+        case "CLOUDY": return "cloudIcon"
+        case "RAIN": return "rainIcon"
+        default: return "defaultIcon"
+        }
+    }
 }
+
+
