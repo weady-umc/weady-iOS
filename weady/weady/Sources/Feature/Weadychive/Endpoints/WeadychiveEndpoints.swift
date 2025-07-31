@@ -5,14 +5,6 @@
 //  Created by 고석현 on 7/31/25.
 //
 
-
-//
-//  WeadychiveEndpoints.swift
-//  weady
-//
-//  Created by 고석현 on 7/31/25.
-//
-
 import Foundation
 import Moya
 import KeychainSwift
@@ -24,6 +16,7 @@ enum WeadychiveEndpoints {
     case deleteCurationScrap(curationId: Int)
     case postBoardScrap(boardId: Int)
     case deleteBoardScrap(boardId: Int)
+    case getScrappedBoards(size: Int, page: Int)
 }
 
 extension WeadychiveEndpoints: TargetType {
@@ -46,12 +39,14 @@ extension WeadychiveEndpoints: TargetType {
             return "/api/v1/weadychive/curation/bookmarks/\(curationId)"
         case .postBoardScrap(let boardId), .deleteBoardScrap(let boardId):
             return "/api/v1/board/\(boardId)/bookmark"
+        case .getScrappedBoards:
+            return "/api/v1/weadychive/board/my"
         }
     }
 
     var method: Moya.Method {
         switch self {
-        case .getCurationDetail, .getScrappedCurations:
+        case .getCurationDetail, .getScrappedCurations, .getScrappedBoards:
             return .get
         case .postCurationScrap, .postBoardScrap:
             return .post
@@ -62,13 +57,19 @@ extension WeadychiveEndpoints: TargetType {
 
     var task: Task {
         switch self {
-        case .getCurationDetail, .getScrappedCurations,
-             .deleteCurationScrap, .deleteBoardScrap:
+        case .getCurationDetail, .getScrappedCurations:
             return .requestPlain
         case .postCurationScrap(let curationId):
-            return .requestJSONEncodable(["curationId": curationId])
-        case .postBoardScrap:
-            return .requestPlain
+            return .requestJSONEncodable(ScrapCurationRequestDto(curationId: curationId))
+        case .deleteCurationScrap(let curationId):
+            return .requestJSONEncodable(ScrapCurationRequestDto(curationId: curationId))
+        case .postBoardScrap(let boardId), .deleteBoardScrap(let boardId):
+            return .requestJSONEncodable(ScrapBoardRequestDto(boardId: boardId))
+        case .getScrappedBoards(let size, let page):
+            return .requestParameters(
+                parameters: ["size": size, "page": page],
+                encoding: URLEncoding.default
+            )
         }
     }
 
