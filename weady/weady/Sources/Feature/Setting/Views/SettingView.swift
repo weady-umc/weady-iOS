@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingView: View {
     @StateObject private var viewModel = SettingViewModel()
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationView {
@@ -24,10 +25,10 @@ struct SettingView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        //router 쓰기?
+                        dismiss()
                     }) {
                         Image(systemName: "chevron.left")
-                            .foregroundColor(.black)
+                            .foregroundStyle(Color.black100)
                     }
                 }
             }
@@ -42,7 +43,7 @@ struct SettingSectionView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text(section.header)
                 .font(AppTextStyle.homeSemibold12.font)
-                .foregroundColor(.gray800)
+                .foregroundStyle(Color.gray800)
                 .padding(.horizontal, 20)
 
             let items = section.items
@@ -80,7 +81,7 @@ struct SettingRow: View {
         HStack {
             Text(title)
                 .font(AppTextStyle.captionSemibold14.font)
-                .foregroundColor(.black)
+                .foregroundStyle(Color.black100)
                 .padding(.vertical, 14)
             //피그마에서는 10pt간격인데 임의로 수정
             
@@ -89,7 +90,7 @@ struct SettingRow: View {
             if let rightText = rightText {
                 Text(rightText)
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundStyle(Color.gray200)
             } else if showsChevron {
                 Image("Vector")
                     .resizable()

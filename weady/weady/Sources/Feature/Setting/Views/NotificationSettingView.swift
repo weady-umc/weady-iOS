@@ -36,7 +36,7 @@ struct NotificationSettingView: View {
                 if let footer = NotificationType.snowRain.footerText {
                     Text(footer)
                         .font(AppTextStyle.metaMedium10.font)
-                        .foregroundColor(.gray900)
+                        .foregroundStyle(Color.gray900)
                         .padding(.vertical, 8)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -55,14 +55,14 @@ struct NotificationSettingView: View {
                             HStack {
                                 Text("시간")
                                     .font(AppTextStyle.metaMedium12.font)
-                                    .foregroundColor(.black100)
+                                    .foregroundStyle(Color.black100)
                                 Spacer()
                                 HStack(spacing: 13) {
                                     Text(viewModel.snowRainTimeText)
                                         .font(AppTextStyle.captionRegular14.font)
-                                        .foregroundColor(.gray200)
+                                        .foregroundStyle(Color.gray200)
                                     Image(systemName: "chevron.right")
-                                        .foregroundColor(.gray200)
+                                        .foregroundStyle(Color.gray200)
                                 }
                             }
                         }
@@ -75,14 +75,14 @@ struct NotificationSettingView: View {
                             HStack {
                                 Text("조건")
                                     .font(AppTextStyle.metaMedium12.font)
-                                    .foregroundColor(.black100)
+                                    .foregroundStyle(Color.black100)
                                 Spacer()
                                 HStack(spacing: 13) {
                                     Text("설정 요일")
                                         .font(AppTextStyle.captionRegular14.font)
-                                        .foregroundColor(.gray200)
+                                        .foregroundStyle(Color.gray200)
                                     Image(systemName: "chevron.right")
-                                        .foregroundColor(.gray200)
+                                        .foregroundStyle(Color.gray200)
                                 }
                             }
                         }
@@ -108,14 +108,14 @@ struct NotificationSettingView: View {
                             HStack {
                                 Text("시간")
                                     .font(AppTextStyle.metaMedium12.font)
-                                    .foregroundColor(.black100)
+                                    .foregroundStyle(Color.black100)
                                 Spacer()
                                 HStack(spacing: 13) {
                                     Text(viewModel.dailyTimeText)
                                         .font(AppTextStyle.captionRegular14.font)
-                                        .foregroundColor(.gray200)
+                                        .foregroundStyle(Color.gray200)
                                     Image(systemName: "chevron.right")
-                                        .foregroundColor(.gray200)
+                                        .foregroundStyle(Color.gray200)
                                 }
                             }
                         }
@@ -128,14 +128,14 @@ struct NotificationSettingView: View {
                             HStack {
                                 Text("조건")
                                     .font(AppTextStyle.metaMedium12.font)
-                                    .foregroundColor(.black100)
+                                    .foregroundStyle(Color.black100)
                                 Spacer()
                                 HStack(spacing: 13) {
                                     Text("설정 요일")
                                         .font(AppTextStyle.captionRegular14.font)
-                                        .foregroundColor(.gray200)
+                                        .foregroundStyle(Color.gray200)
                                     Image(systemName: "chevron.right")
-                                        .foregroundColor(.gray200)
+                                        .foregroundStyle(Color.gray200)
                                 }
                             }
                         }
@@ -180,7 +180,7 @@ struct NotificationSettingView: View {
                     dismiss()
                 } label: {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                        .foregroundStyle(Color.black)
                 }
             }
         }
@@ -232,7 +232,7 @@ struct NotificationSettingView: View {
             HStack {
                 Text(type.title)
                     .font(AppTextStyle.captionRegular14.font)
-                    .foregroundColor(type == .personalInfoAgree ? Color.gray300 : Color.black)
+                    .foregroundStyle(type == .personalInfoAgree ? Color.gray300 : Color.black)
                     .underline(type == .personalInfoAgree, color: Color.gray300)
                 Spacer()
                 Toggle("", isOn: viewModel.binding(for: type))
@@ -263,7 +263,7 @@ private struct SectionView<Content: View>: View {
         VStack(alignment: .leading, spacing: 0) {
             Text(title)
                 .font(AppTextStyle.captionSemibold14.font)
-                .foregroundColor(.black)
+                .foregroundStyle(Color.black)
             content
         }
         .padding(.top, 32.5)
@@ -302,14 +302,14 @@ private struct TimePickerSheet: View {
             HStack {
                 Button("취소") { dismissAction() }
                     .font(AppTextStyle.captionMedium14.font)
-                    .foregroundColor(.black100)
+                    .foregroundStyle(Color.black100)
                     .buttonStyle(.plain)
                 
                 Spacer()
                 
                 Button("선택") { dismissAction() }
                     .font(AppTextStyle.captionMedium14.font)
-                    .foregroundColor(.black100)
+                    .foregroundStyle(Color.black100)
                     .buttonStyle(.plain)
             }
             .padding()
@@ -343,7 +343,7 @@ private struct ConditionPickerSheet: View {
             HStack {
                 Button("취소") { dismissAction() }
                     .font(AppTextStyle.captionMedium14.font)
-                    .foregroundColor(.black100)
+                    .foregroundStyle(Color.black100)
                     .buttonStyle(.plain)
                 
                 Spacer()
@@ -353,7 +353,7 @@ private struct ConditionPickerSheet: View {
                     dismissAction()
                 }
                 .font(AppTextStyle.captionMedium14.font)
-                .foregroundColor(.black100)
+                .foregroundStyle(Color.black100)
                 .buttonStyle(.plain)
             }
             .padding()
@@ -367,7 +367,7 @@ private struct ConditionPickerSheet: View {
                     HStack {
                         Text(day.title)
                             .font(AppTextStyle.bodyMedium16.font)
-                            .foregroundColor(tempSelection.contains(day) ? .gray900 : .gray800)
+                            .foregroundStyle(tempSelection.contains(day) ? Color.gray900 : Color.gray800)
                         Spacer()
                         Image(
                             tempSelection.contains(day)

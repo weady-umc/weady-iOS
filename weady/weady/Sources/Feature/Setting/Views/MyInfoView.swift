@@ -23,12 +23,12 @@ struct MyInfoView: View {
                     VStack(alignment: .leading) {
                         Text("아이디(이메일)")
                             .font(AppTextStyle.homeSemibold12.font)
-                            .foregroundColor(.gray900)
+                            .foregroundStyle(Color.gray900)
                         Spacer().frame(height: 14)
 
                         Text(viewModel.userInfo.email)
                             .font(AppTextStyle.metaSemibold12.font)
-                            .foregroundColor(.black)
+                            .foregroundStyle(Color.black)
                         Spacer().frame(height: 14)
 
                         Divider()
@@ -36,7 +36,7 @@ struct MyInfoView: View {
                         if viewModel.userInfo.isSocialLogin {
                             Text("카카오로 가입한 계정이에요.")
                                 .font(AppTextStyle.metaMedium8.font)
-                                .foregroundColor(.gray800)
+                                .foregroundStyle(Color.gray800)
                         }
                     }
                 }
@@ -53,12 +53,12 @@ struct MyInfoView: View {
                         VStack(alignment: .leading) {
                             Text("성명")
                                 .font(AppTextStyle.homeSemibold12.font)
-                                .foregroundColor(.gray900)
+                                .foregroundStyle(Color.gray900)
                             Spacer().frame(height: 14)
 
                             Text(viewModel.userInfo.name)
                                 .font(AppTextStyle.metaSemibold12.font)
-                                .foregroundColor(.black)
+                                .foregroundStyle(Color.black)
                             Spacer().frame(height: 14)
 
                             Divider()
@@ -67,12 +67,12 @@ struct MyInfoView: View {
                         VStack(alignment: .leading) {
                             Text("연락처")
                                 .font(AppTextStyle.homeSemibold12.font)
-                                .foregroundColor(.gray900)
+                                .foregroundStyle(Color.gray900)
                             Spacer().frame(height: 14)
 
                             Text(viewModel.userInfo.phone)
                                 .font(AppTextStyle.metaSemibold12.font)
-                                .foregroundColor(.black)
+                                .foregroundStyle(Color.black)
                             Spacer().frame(height: 14)
 
                             Divider()
@@ -84,7 +84,7 @@ struct MyInfoView: View {
                         }) {
                             Text("본인 인증으로 정보 수정하기")
                                 .font(AppTextStyle.metaMedium12.font)
-                                .foregroundColor(.gray900)
+                                .foregroundStyle(Color.gray900)
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .overlay(
@@ -92,7 +92,7 @@ struct MyInfoView: View {
                                         .stroke(Color.gray, lineWidth: 1)
                                 )
                         }
-                        .foregroundColor(.gray900)
+                        .foregroundStyle(Color.gray900)
                     }
                 }
 
@@ -102,7 +102,7 @@ struct MyInfoView: View {
                 VStack(alignment: .leading) {
                     Text("성별")
                         .font(AppTextStyle.homeSemibold12.font)
-                        .foregroundColor(.gray900)
+                        .foregroundStyle(Color.gray900)
 
                     HStack(spacing: 23) {
                         ForEach(Gender.allCases, id: \.self) { gender in
@@ -143,7 +143,7 @@ struct MyInfoView: View {
                     dismiss()
                 }) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                        .foregroundStyle(Color.black)
                 }
             }
         }
