@@ -69,7 +69,7 @@ struct ScrappedBoardByUserResponseDto: Codable {
     let weatherTagId: Int64
 }
 
-// MARK: - 부가 DTOs
+// MARK: - 부가 DTOs (웨디보드랑 겹침) 
 
 struct PageableObject: Codable {
     let paged: Bool
