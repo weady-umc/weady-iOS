@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+
 		CDF990FC2E3B849100446374 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = CDF990FB2E3B849100446374 /* Moya */; };
 		CDF990FF2E3B865100446374 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = CDF990FE2E3B865100446374 /* KeychainSwift */; };
+
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,10 +26,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				Sources/Feature/Auth/Views/Untitled.swift,
-				Sources/Feature/Clothes/Views/Untitled.swift,
-				Sources/Feature/Curation/Views/Untitled.swift,
-				Sources/Feature/Profile/NotificationSettings/Views/Untitled.swift,
 			);
 			target = 808ED0FA2E1D9EFF00442DA8 /* weady */;
 		};
@@ -49,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+
 				CDF990FF2E3B865100446374 /* KeychainSwift in Frameworks */,
 				CDF990FC2E3B849100446374 /* Moya in Frameworks */,
 			);
@@ -113,8 +112,10 @@
 			);
 			name = weady;
 			packageProductDependencies = (
+
 				CDF990FB2E3B849100446374 /* Moya */,
 				CDF990FE2E3B865100446374 /* KeychainSwift */,
+
 			);
 			productName = weady;
 			productReference = 808ED0FB2E1D9EFF00442DA8 /* weady.app */;
@@ -145,8 +146,10 @@
 			mainGroup = 808ED0F22E1D9EFF00442DA8;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+
 				CDF990FA2E3B849100446374 /* XCRemoteSwiftPackageReference "Moya" */,
 				CDF990FD2E3B865100446374 /* XCRemoteSwiftPackageReference "keychain-swift" */,
+
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 808ED0FC2E1D9EFF00442DA8 /* Products */;
@@ -416,7 +419,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+
 		CDF990FA2E3B849100446374 /* XCRemoteSwiftPackageReference "Moya" */ = {
+
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Moya/Moya";
 			requirement = {
@@ -424,7 +429,9 @@
 				minimumVersion = 15.0.3;
 			};
 		};
+
 		CDF990FD2E3B865100446374 /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
+
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/evgenyneu/keychain-swift";
 			requirement = {
@@ -435,6 +442,7 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+
 		CDF990FB2E3B849100446374 /* Moya */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = CDF990FA2E3B849100446374 /* XCRemoteSwiftPackageReference "Moya" */;
@@ -443,6 +451,7 @@
 		CDF990FE2E3B865100446374 /* KeychainSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = CDF990FD2E3B865100446374 /* XCRemoteSwiftPackageReference "keychain-swift" */;
+
 			productName = KeychainSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
