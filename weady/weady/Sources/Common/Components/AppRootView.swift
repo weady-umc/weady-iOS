@@ -15,6 +15,8 @@ struct AppRootView: View {
             BaseTabScreen()
                 .navigationDestination(for: Route.self) { route in
                     switch route {
+                    case .login:
+                        LoginView()
                     case .basetab:
                         BaseTabScreen()
                     case .home:
