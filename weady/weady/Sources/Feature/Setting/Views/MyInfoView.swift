@@ -66,12 +66,12 @@ struct MyInfoView: View {
 
                         VStack(alignment: .leading) {
                             Text("연락처")
-                                .font(AppTextStyle.homeSemibold12.font)
+                                .fontName(.homeSemibold12)
                                 .foregroundStyle(Color.gray900)
                             Spacer().frame(height: 14)
 
                             Text(viewModel.userInfo.phone)
-                                .font(AppTextStyle.metaSemibold12.font)
+                                .fontName(.metaSemibold12)
                                 .foregroundStyle(Color.black)
                             Spacer().frame(height: 14)
 
@@ -83,13 +83,13 @@ struct MyInfoView: View {
                             viewModel.verifyIdentity()
                         }) {
                             Text("본인 인증으로 정보 수정하기")
-                                .font(AppTextStyle.metaMedium12.font)
+                                .fontName(.metaMedium12)
                                 .foregroundStyle(Color.gray900)
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 6)
-                                        .stroke(Color.gray, lineWidth: 1)
+                                        .stroke(Color.gray, lineWidth: 0.5)
                                 )
                         }
                         .foregroundStyle(Color.gray900)
@@ -101,7 +101,7 @@ struct MyInfoView: View {
                 // 성별 선택
                 VStack(alignment: .leading) {
                     Text("성별")
-                        .font(AppTextStyle.homeSemibold12.font)
+                        .fontName(.homeSemibold12)
                         .foregroundStyle(Color.gray900)
 
                     HStack(spacing: 23) {
@@ -118,7 +118,7 @@ struct MyInfoView: View {
                                 }
 
                                 Text(gender.label)
-                                    .font(AppTextStyle.metaSemibold12.font)
+                                    .fontName(.metaSemibold12)
                                     .foregroundStyle(.black)
                             }
                             .onTapGesture {

@@ -42,7 +42,7 @@ struct SettingSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(section.header)
-                .font(AppTextStyle.homeSemibold12.font)
+                .fontName(.homeSemibold12)
                 .foregroundStyle(Color.gray800)
                 .padding(.horizontal, 20)
 
@@ -80,7 +80,7 @@ struct SettingRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(AppTextStyle.captionSemibold14.font)
+                .fontName(.captionSemibold14)
                 .foregroundStyle(Color.black100)
                 .padding(.vertical, 14)
             //피그마에서는 10pt간격인데 임의로 수정

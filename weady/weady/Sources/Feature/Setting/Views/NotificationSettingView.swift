@@ -54,12 +54,12 @@ struct NotificationSettingView: View {
                         } label: {
                             HStack {
                                 Text("시간")
-                                    .font(AppTextStyle.metaMedium12.font)
+                                    .fontName(.metaMedium12)
                                     .foregroundStyle(Color.black100)
                                 Spacer()
                                 HStack(spacing: 13) {
                                     Text(viewModel.snowRainTimeText)
-                                        .font(AppTextStyle.captionRegular14.font)
+                                        .fontName(.captionRegular14)
                                         .foregroundStyle(Color.gray200)
                                     Image(systemName: "chevron.right")
                                         .foregroundStyle(Color.gray200)
@@ -74,12 +74,12 @@ struct NotificationSettingView: View {
                         } label: {
                             HStack {
                                 Text("조건")
-                                    .font(AppTextStyle.metaMedium12.font)
+                                    .fontName(.metaMedium12)
                                     .foregroundStyle(Color.black100)
                                 Spacer()
                                 HStack(spacing: 13) {
                                     Text("설정 요일")
-                                        .font(AppTextStyle.captionRegular14.font)
+                                        .fontName(.captionRegular14)
                                         .foregroundStyle(Color.gray200)
                                     Image(systemName: "chevron.right")
                                         .foregroundStyle(Color.gray200)
@@ -107,7 +107,7 @@ struct NotificationSettingView: View {
                         } label: {
                             HStack {
                                 Text("시간")
-                                    .font(AppTextStyle.metaMedium12.font)
+                                    .fontName(.metaMedium12)
                                     .foregroundStyle(Color.black100)
                                 Spacer()
                                 HStack(spacing: 13) {
@@ -127,12 +127,12 @@ struct NotificationSettingView: View {
                         } label: {
                             HStack {
                                 Text("조건")
-                                    .font(AppTextStyle.metaMedium12.font)
+                                    .fontName(.metaMedium12)
                                     .foregroundStyle(Color.black100)
                                 Spacer()
                                 HStack(spacing: 13) {
                                     Text("설정 요일")
-                                        .font(AppTextStyle.captionRegular14.font)
+                                        .fontName(.captionRegular14)
                                         .foregroundStyle(Color.gray200)
                                     Image(systemName: "chevron.right")
                                         .foregroundStyle(Color.gray200)
@@ -231,7 +231,7 @@ struct NotificationSettingView: View {
         VStack(spacing: 0) {
             HStack {
                 Text(type.title)
-                    .font(AppTextStyle.captionRegular14.font)
+                    .fontName(.captionRegular14)
                     .foregroundStyle(type == .personalInfoAgree ? Color.gray300 : Color.black)
                     .underline(type == .personalInfoAgree, color: Color.gray300)
                 Spacer()
@@ -262,7 +262,7 @@ private struct SectionView<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(title)
-                .font(AppTextStyle.captionSemibold14.font)
+                .fontName(.captionSemibold14)
                 .foregroundStyle(Color.black)
             content
         }
@@ -366,7 +366,7 @@ private struct ConditionPickerSheet: View {
                 ) { day in
                     HStack {
                         Text(day.title)
-                            .font(AppTextStyle.bodyMedium16.font)
+                            .fontName(.bodyMedium16)
                             .foregroundStyle(tempSelection.contains(day) ? Color.gray900 : Color.gray800)
                         Spacer()
                         Image(
