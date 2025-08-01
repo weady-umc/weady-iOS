@@ -12,5 +12,5 @@ struct ReissueRequestDTO: Encodable {
 }
 
 struct LoginRequestDTO: Encodable {
-    let authorizationCode: String
+    let accessToken: String
 }

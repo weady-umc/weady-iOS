@@ -32,8 +32,8 @@ final class AuthService: NetworkManager {
         return ReissueRequestDTO(refreshToken: refreshToken)
     }
     
-    public func makeLoginDTO(authorizationCode: String) -> LoginRequestDTO {
-        return LoginRequestDTO(authorizationCode: authorizationCode)
+    public func makeLoginDTO(accessToken: String) -> LoginRequestDTO {
+        return LoginRequestDTO(accessToken: accessToken)
     }
     
     //MARK: - API funcs
@@ -65,8 +65,23 @@ final class AuthService: NetworkManager {
     }
     
     /// 로그인 요청
+//    public func login(data: LoginRequestDTO, provider: String, completion: @escaping (Result<LoginResponseDTO, NetworkError>) -> Void) {
+//        request(target: .postLogin(data: data, provider: provider), decodingType: LoginResponseDTO.self, completion: completion)
+//    }
     public func login(data: LoginRequestDTO, provider: String, completion: @escaping (Result<LoginResponseDTO, NetworkError>) -> Void) {
-        request(target: .postLogin(data: data, provider: provider), decodingType: LoginResponseDTO.self, completion: completion)
+        request(
+            target: .postLogin(data: data, provider: provider),
+            decodingType: LoginResponseDTO.self
+        ) { result in
+            switch result {
+            case .success(let data):
+                print("✅ accessToken: \(data.accessToken)")
+                print("✅ refreshToken: \(data.refreshToken)")
+                print("✅ isNewUser: \(data.isNewUser)")
+            case .failure(let error):
+                print("❌ 에러: \(error.localizedDescription)")
+            }
+        }
     }
     
     /// 로그아웃 요청

@@ -9,6 +9,8 @@ import SwiftUI
 import KakaoSDKCommon
 import KakaoSDKAuth
 import KakaoSDKUser
+import GoogleSignIn
+import GoogleSignInSwift
 
 @main
 struct weadyApp: App {
@@ -22,7 +24,7 @@ struct weadyApp: App {
     var body: some Scene {
         WindowGroup {
             SplashView()
-                .environment(router)
+            .environment(router)
                 .onOpenURL { url in
                     if AuthApi.isKakaoTalkLoginUrl(url) {
                         _ = AuthController.handleOpenUrl(url: url)

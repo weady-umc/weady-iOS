@@ -12,6 +12,12 @@ struct ReissueResponseDTO: Decodable {
     let refreshToken: String
 }
 
+struct KakaoLoginResponseDTO: Decodable {
+    let code: Int
+    let message: String
+    let data: LoginResponseDTO
+}
+
 struct LoginResponseDTO: Decodable {
     let accessToken: String
     let refreshToken: String

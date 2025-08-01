@@ -23,8 +23,8 @@ extension AuthEndpoints: TargetType {
         switch self {
         case .postReissue:
             return "/api/v1/auth/reissue"
-        case .postLogin(let provider, _):
-            return "/api/v1/auth/login/\(provider)"
+        case .postLogin(_, let provider):
+            return "/api/v1/auth/\(provider)"
         case .deleteLogout:
             return "/api/v1/auth/logout"
         }
@@ -40,22 +40,17 @@ extension AuthEndpoints: TargetType {
     }
 
     var task: Task {
-            switch self {
-            case .postReissue(let data):
-                return .requestJSONEncodable(data)
-            case .postLogin(let data, _):
-                return .requestJSONEncodable(data)
-            case .deleteLogout:
-                return .requestPlain
-            }
+        switch self {
+        case .postReissue(let data):
+            return .requestJSONEncodable(data)
+        case .postLogin(let data, _):
+            return .requestJSONEncodable(data)
+        case .deleteLogout:
+            return .requestPlain
         }
+    }
 
     var headers: [String: String]? {
-        switch self {
-        case .postReissue, .postLogin:
-            return ["Content-Type": "application/json"]
-        case .deleteLogout:
-            return ["Content-Type": "application/json"]
-        }
+        ["Content-Type": "application/json"]
     }
 }

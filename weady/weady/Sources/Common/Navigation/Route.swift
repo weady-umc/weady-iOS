@@ -9,6 +9,7 @@ import SwiftUI
 
 enum Route: Hashable {
     case login
+    case onboarding
     case basetab
     case home
     case weadyboard
