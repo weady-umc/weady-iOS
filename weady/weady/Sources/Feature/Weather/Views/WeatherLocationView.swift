@@ -149,7 +149,7 @@ struct WeatherLocationView: View {
                                         .resizable()
                                                         .frame(width: 44, height: 44)
                                                         .padding(.leading, 4)
-                                                        .border(Color.red)
+                                                        
                                 }
                                 
                                 
@@ -168,20 +168,20 @@ struct WeatherLocationView: View {
                                 .listRowInsets(EdgeInsets()) // 여백 제거
                                 .listRowSeparator(.hidden)
                                 .padding(.bottom, 8)
-                                .border(.red)
+                                
                         
                             }
     
                         
                     .onMove {source, destination in viewModel.favoriteLocations.move(fromOffsets: source, toOffset: destination)}
                 }
-                                    .listStyle(.plain)
+                        .listStyle(.plain)
                                
                                 }
             
         }
         .frame(width: editMode?.wrappedValue == .active ? 375 : 335)
-        .border(Color.red)
+        
 
     }
     func deleteItem(_ weather: WeatherData) {

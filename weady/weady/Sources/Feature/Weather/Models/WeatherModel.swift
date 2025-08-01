@@ -59,3 +59,4 @@ struct HourlyWeather: Identifiable {
     var iconName: String
     var temp: String
 }
+

@@ -57,3 +57,16 @@ struct MidTermForecast: Decodable {
     let maxTemp: Double
 }
 
+struct WeatherNowLocationResponse: Decodable {
+    let code: Int
+    let message: String
+    let data: NowLocationData
+}
+
+struct NowLocationData: Decodable {
+    let nowLocationId: Int
+    let address1: String
+    let address2: String
+    let address3: String
+    let address4: String
+}

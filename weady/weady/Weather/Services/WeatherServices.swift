@@ -7,9 +7,14 @@
 
 import Foundation
 import Moya
+import Combine
+import CombineMoya
 
 final class WeatherServices {
+    static let shared = WeatherServices()
     private let provider = MoyaProvider<WeatherEndpoints>()
+    
+    init() {}
 
     func fetchShortWeather(locationId: Int, completion: @escaping (Result<ShortWeatherData, Error>) -> Void) {
         provider.request(.getShortWeather(locationID: locationId)) { result in
@@ -44,5 +49,13 @@ final class WeatherServices {
             }
         }
     }
+    
+    func getNowLocation(x: Double, y: Double) -> AnyPublisher<WeatherNowLocationResponse, Error> {
+            return provider.requestPublisher(.getNowLocation(x: x, y: y))
+                .map(WeatherNowLocationResponse.self)
+                .mapError { $0 as Error }
+                .receive(on: DispatchQueue.main)
+                .eraseToAnyPublisher()
+        }
 
 }

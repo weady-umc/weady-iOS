@@ -23,6 +23,9 @@ struct WeatherSearchView: View {
                 
                 searchBar
                 
+                if !viewModel.searchResults.isEmpty {
+                    searchResultsList
+                }
                 
                 Spacer()
                     
@@ -33,7 +36,7 @@ struct WeatherSearchView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        //router 쓰기?
+                        //dismiss()
                     }) {
                         Image("backicon")
                             .foregroundColor(.black)
@@ -74,6 +77,21 @@ struct WeatherSearchView: View {
             
         }
         .frame(alignment: .top)
+    }
+    
+    private var searchResultsList: some View {
+        List(viewModel.searchResults) { place in
+            Text(place.placeName)
+                .font(.body)
+                .foregroundColor(.black)
+                .padding(.vertical, 6)
+                .onTapGesture {
+                    print("선택된 장소: \(place.placeName)")
+                     
+                }
+        }
+        .listStyle(.plain)
+        .frame(width: 335)
     }
 }
 

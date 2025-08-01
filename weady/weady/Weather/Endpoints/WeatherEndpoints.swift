@@ -12,6 +12,7 @@ import Moya
 enum WeatherEndpoints {
     case getShortWeather(locationID: Int)
     case getMidTermWeather(locationId: Int)
+    case getNowLocation(x: Double, y: Double)
 }
 
 extension WeatherEndpoints: TargetType {
@@ -29,6 +30,8 @@ extension WeatherEndpoints: TargetType {
             return "/weather/short/\(locationID)"
         case .getMidTermWeather(let locationID):
             return "/weather/mid-term/\(locationID)"
+        case .getNowLocation:
+            return "/api/v1/users/now-location"
         }
     }
     
@@ -36,6 +39,8 @@ extension WeatherEndpoints: TargetType {
         switch self {
         case .getShortWeather, .getMidTermWeather:
             return .get
+        case .getNowLocation:
+            return .post
         }
     }
     
@@ -43,6 +48,13 @@ extension WeatherEndpoints: TargetType {
         switch self {
         case .getShortWeather, .getMidTermWeather:
             return .requestPlain
+        case let .getNowLocation(x, y):
+            let body: [String: Any] = [
+                "longitude": x,
+                "latitude": y
+            ]
+            return .requestParameters(parameters: body, encoding: JSONEncoding.default)
+                
         }
         
     }
