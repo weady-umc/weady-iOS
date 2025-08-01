@@ -2,46 +2,44 @@ import SwiftUI
 import Observation
 
 struct WeatherCardView: View {
-    @Bindable var viewModel: WeatherViewModel          // ✅ ViewModel 직접 주입
-    var background: Color = .gray100                   // 스샷처럼 짙은 회색
+    @Bindable var viewModel: WeatherViewModel
 
-    private var model: WeatherModel { viewModel.current }
+    private var model: WeatherModel { viewModel.weatherModel }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
 
-            // 계절
+            //MARK: - 계절
             if let season = model.selectedSeason, !season.isEmpty {
                 Text(season)
-                    .font(.title3).fontWeight(.semibold)
+                    .fontName(.metaMedium12)
                     .foregroundColor(.white100)
             }
 
-            // 기온 범위(밴드 라벨 사용)
-            Text(viewModel.bandLabel(for: model.temperatureBandIndex))
-                .font(.title3).fontWeight(.semibold)
+            //MARK: - 기온
+            Text(viewModel.temperatureBand(for: model.temperatureBandIndex))
+                .fontName(.metaMedium12)
                 .foregroundColor(.white100)
 
-            // 아이콘 + 날씨 라벨
+            //MARK: - 날씨
             HStack(spacing: 12) {
                 let tag = viewModel.tag(for: model.selectedWeather)
 
                 Image(tag?.iconName ?? "cloud")
-                    .renderingMode(.template)     // 템플릿 에셋이면 흰색 적용
-                    .foregroundColor(.white100)
+                    .renderingMode(.template)
                     .frame(width: 28, height: 20)
                     .aspectRatio(contentMode: .fit)
 
                 Text(tag?.label ?? "-")
-                    .font(.title3).fontWeight(.semibold)
+                    .fontName(.metaMedium12)
                     .foregroundColor(.white100)
             }
         }
-        .padding(24)
+        .padding(.top, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(background)
+                .fill(Color.gray100)
         )
     }
 }

@@ -4,83 +4,47 @@ import CoreLocation
 
 @Observable
 final class WeatherViewModel {
+    
+    // MARK: - 모델
+    var weatherModel = WeatherModel() // 이제 자동 감지됨
 
-    var isManual: Bool = false
-    var isCurrentActive: Bool { !isManual }
-    var isManualActive:  Bool {  isManual }
+    // MARK: - 상태 판별
+    var isManual: Bool {
+        weatherModel.weatherType == .manual
+    }
 
-    // 현재 위치 기준 추가
-    var current = WeatherModel(
-        selectedSeason: "여름",
-        selectedWeather: "구름 많은 날",
-        temperatureBandIndex: 4,
-        locationName: "현재 위치",
-        coordinate: nil,
-        updatedAt: nil
-    )
-    // 직접 추가
-    var manual = WeatherModel(
-        selectedSeason: nil,
-        selectedWeather: nil,
-        temperatureBandIndex: 4,
-        locationName: nil,
-        coordinate: nil,
-        updatedAt: nil
-    )
+    var isCurrentLocation: Bool {
+        weatherModel.weatherType == .currentLocation
+    }
 
-    /* 의존성
-    private let locationProvider: LocationProvider
-    private let geocodingProvider: GeocodingProvider
-    private let weatherProvider: WeatherProvider
-     */
+    // MARK: - API 전송용 데이터
+    var apiSeason: String? { weatherModel.selectedSeason }
+    var apiWeather: String? { weatherModel.selectedWeather }
+    var apiTemperatureIndex: Int? { weatherModel.temperatureBandIndex }
 
-    // 태그/라벨
+    // MARK: - 태그
     let seasonTags = ["봄", "여름", "가을", "겨울"]
+
     let weatherTags: [WeatherTag] = [
-        .init(label: "맑은 날",     iconName: "sun"),
+        .init(label: "맑은 날", iconName: "sun"),
         .init(label: "구름 많은 날", iconName: "cloud"),
-        .init(label: "비 오는 날",  iconName: "cloudrain"),
-        .init(label: "흐린 날",     iconName: "cloud"),
-        .init(label: "눈 오는 날",  iconName: "snow"),
+        .init(label: "비 오는 날", iconName: "cloudrain"),
+        .init(label: "흐린 날", iconName: "cloud"),
+        .init(label: "눈 오는 날", iconName: "snow"),
         .init(label: "바람 많은 날", iconName: "wind")
     ]
-    let bandLabels = WeatherModel.temperatureBandLabels
-    
-    func bandLabel(for index: Int?) -> String {
-            let i = max(0, min(WeatherModel.temperatureBandLabels.count - 1, index ?? 0))
-            return WeatherModel.temperatureBandLabels[i]
-        }
-    
-    func tag(for label: String?) -> WeatherTag? {
-        guard let label else { return nil }
-        return weatherTags.first { $0.label == label }
+
+    // MARK: - 온도
+    var temperatureIndex: Int {
+        max(0, min(7, weatherModel.temperatureBandIndex ?? 4))
     }
 
-    /*
-    init(
-        locationProvider: LocationProvider,
-        geocodingProvider: GeocodingProvider,
-        weatherProvider: WeatherProvider
-    ) {
-        self.locationProvider = locationProvider
-        self.geocodingProvider = geocodingProvider
-        self.weatherProvider  = weatherProvider
-    }
-     */
-
-    // 태그 선택 함수
-    func toggleManualSeason(_ s: String) {
-        manual.selectedSeason = (manual.selectedSeason == s) ? nil : s
-    }
-    func toggleManualWeather(_ w: String) {
-        manual.selectedWeather = (manual.selectedWeather == w) ? nil : w
-    }
-    func setManualBand(_ i: Int) {
-        manual.temperatureBandIndex = max(0, min(7, i))
+    var temperatureBand: String {
+        WeatherModel.temperatureBand[temperatureIndex]
     }
 
-    func statusText(for idx: Int) -> String {
-        switch idx {
+    var temperatureStatus: String {
+        switch temperatureIndex {
         case 0: return "한파 수준의 날씨예요"
         case 1: return "매우 추운 날씨예요"
         case 2: return "쌀쌀한 날씨예요"
@@ -92,25 +56,53 @@ final class WeatherViewModel {
         }
     }
 
-    /* 현재 위치 기반 갱신 (좌표 → 날씨 API → 역지오코딩 이름 부여)
-    func refreshCurrentLocationWeather() async {
-        do {
-            let coord = try await locationProvider.currentLocation()
-            var model = try await weatherProvider.weather(at: coord)
-            model.coordinate = GeoPoint(coord)
+    // MARK: - 수동 설정
+    func toggleSeason(_ season: String) {
+        guard isManual else { return }
+        weatherModel.selectedSeason = (weatherModel.selectedSeason == season) ? nil : season
+    }
 
-            // 역지오코딩으로 더 읽기좋은 지역명
-            if let revName = try? await geocodingProvider.reverseGeocode(coord), let name = revName, !name.isEmpty {
-                model.locationName = name
-            } else if model.locationName == nil {
-                model.locationName = "현재 위치"
-            }
-            model.updatedAt = Date()
-            self.current = model
-        } catch {
-            print("현재 위치 날씨 갱신 실패: \(error)")
+    func toggleWeather(_ label: String) {
+        guard isManual else { return }
+        if let tag = tag(for: label) {
+            weatherModel.selectedWeather = (weatherModel.selectedWeather == tag.label) ? nil : tag.label
         }
     }
-     */
-}
 
+    func setTemperatureBand(_ index: Int) {
+        guard isManual else { return }
+        weatherModel.temperatureBandIndex = max(0, min(7, index))
+    }
+
+    // MARK: - 상태 전환
+    func switchToManual() {
+        weatherModel = WeatherModel(
+            temperatureBandIndex: 4,
+            weatherType: .manual
+        )
+    }
+
+    func switchToCurrentLocation(
+        name: String?,
+        coord: CLLocationCoordinate2D,
+        derivedSeason: String?,
+        derivedWeather: String?,
+        derivedTemperatureIndex: Int?
+    ) {
+        weatherModel = WeatherModel(
+            selectedSeason: derivedSeason,
+            selectedWeather: derivedWeather,
+            temperatureBandIndex: derivedTemperatureIndex ?? 4,
+            weatherType: .currentLocation,
+            locationName: name,
+            coordinate: GeoPoint(coord),
+            updatedAt: Date()
+        )
+    }
+
+    // MARK: - 태그 헬퍼
+    func tag(for label: String?) -> WeatherTag? {
+        guard let label else { return nil }
+        return weatherTags.first { $0.label == label }
+    }
+}
