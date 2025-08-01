@@ -9,6 +9,7 @@ import SwiftUI
 
 struct BaseTabView: View {
     @Binding var selectedTab: TabType
+    @Binding var isTabBarHidden: Bool
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,8 +35,12 @@ struct BaseTabView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 83)
+            .frame(height: 50)
+            .padding(.horizontal, 20)
             .background(Color.white100)
         }
     }
 }
+
+
+
