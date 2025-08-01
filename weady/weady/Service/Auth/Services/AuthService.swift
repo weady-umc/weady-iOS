@@ -65,9 +65,6 @@ final class AuthService: NetworkManager {
     }
     
     /// 로그인 요청
-//    public func login(data: LoginRequestDTO, provider: String, completion: @escaping (Result<LoginResponseDTO, NetworkError>) -> Void) {
-//        request(target: .postLogin(data: data, provider: provider), decodingType: LoginResponseDTO.self, completion: completion)
-//    }
     public func login(data: LoginRequestDTO, provider: String, completion: @escaping (Result<LoginResponseDTO, NetworkError>) -> Void) {
         request(
             target: .postLogin(data: data, provider: provider),
@@ -75,11 +72,10 @@ final class AuthService: NetworkManager {
         ) { result in
             switch result {
             case .success(let data):
-                print("✅ accessToken: \(data.accessToken)")
-                print("✅ refreshToken: \(data.refreshToken)")
-                print("✅ isNewUser: \(data.isNewUser)")
+                completion(.success(data))
+
             case .failure(let error):
-                print("❌ 에러: \(error.localizedDescription)")
+                completion(.failure(error))
             }
         }
     }

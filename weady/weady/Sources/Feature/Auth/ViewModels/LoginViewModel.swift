@@ -85,6 +85,11 @@ final class LoginViewModel: ObservableObject {
                         accessToken: response.accessToken,
                         refreshToken: response.refreshToken
                     )
+                    DispatchQueue.main.async {
+                        print("✅ accessToken: \(response.accessToken)")
+                        print("✅ refreshToken: \(response.refreshToken)")
+                        print("✅ isNewUser: \(response.isNewUser)")
+                    }
                     self?.isNewUser = response.isNewUser
                     self?.loginSucceeded = true
                     completion()

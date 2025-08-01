@@ -23,7 +23,7 @@ struct weadyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            SplashView()
+            AppRootView()
             .environment(router)
                 .onOpenURL { url in
                     if AuthApi.isKakaoTalkLoginUrl(url) {
