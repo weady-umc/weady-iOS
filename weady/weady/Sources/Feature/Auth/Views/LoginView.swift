@@ -14,17 +14,38 @@ import GoogleSignIn
 struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
     @Environment(NavigationRouter.self) private var router
+    @State private var currentPage = 0
     
-    // TODO: 아직 일러스트 완성되지 않아 수정 필요함
+    private let onboardingImages = [
+        "on1", "on2", "on3", "on4", "on5"
+    ]
+    
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 12) {
             Spacer()
             
-            Text("Weady")
-                .font(.largeTitle)
-                .bold()
+            // MARK: - 온보딩 슬라이드 이미지 삽입
+            TabView(selection: $currentPage) {
+                ForEach(onboardingImages.indices, id: \.self) { index in
+                    Image(onboardingImages[index])
+                        .resizable()
+                        .scaledToFit()
+                        .tag(index)
+                }
+            }
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .frame(width: 370)
+            .padding(.horizontal, 24)
             
-            Spacer()
+            HStack(spacing: 8) {
+                ForEach(onboardingImages.indices, id: \.self) { index in
+                    Circle()
+                        .fill(currentPage == index ? Color.gray300 : Color.gray400)
+                        .frame(width: 11, height: 11)
+                        .animation(.easeInOut, value: currentPage)
+                }
+            }
+            
             
             // MARK: - 카카오 로그인 버튼
             Button {

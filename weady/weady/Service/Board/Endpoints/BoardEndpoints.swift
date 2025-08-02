@@ -76,6 +76,11 @@ extension BoardEndpoints: TargetType {
     }
 
     var headers: [String: String]? {
-        return ["Content-Type": "application/json"]
+        var header: [String: String] = [
+            "Content-Type": "application/json"]
+        if let token = AuthManager.shared.getAccessToken() {
+            header["Authorization"] = "Bearer \(token)"
+        }
+        return header
     }
 }

@@ -12,14 +12,17 @@ struct SplashView: View {
     
     var body: some View {
         ZStack {
-            // 아직 로고 확정되기 전 임의로 설정함
-            Color(hex: "FFFAE7").ignoresSafeArea()
+            Color(hex: "000000").ignoresSafeArea()
             
-            VStack {
+            VStack(spacing: 8) {
                 Spacer()
                 Image("weady_logo")
                     .resizable()
-                    .frame(width: 250, height: 250)
+                    .frame(width: 185.3, height: 58.25)
+
+                Text("날씨에 딱 맞는 당신의 하루를 위하여")
+                    .fontName(.metaRegular12)
+                    .foregroundStyle(.appwhite100)
                 Spacer()
             }
         }

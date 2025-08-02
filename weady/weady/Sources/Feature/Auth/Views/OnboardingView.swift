@@ -10,6 +10,6 @@ import SwiftUI
 struct OnboardingView: View {
     
     var body: some View {
-        Text("온보딩뷰")
+        Text("화면 연결 필요")
     }
 }
