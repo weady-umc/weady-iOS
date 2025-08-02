@@ -100,7 +100,7 @@ struct GenderSelectionView: View {
         }
         .fullScreenCover(isPresented: $vm.didTapNext) {
             // 다음에 이동할 뷰
-            StyleSelectionView(nickname: vm.nickname)
+            StyleSelectionView()
         }
     }
 }

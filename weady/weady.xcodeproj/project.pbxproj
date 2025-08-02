@@ -6,6 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5620BA552E3D90E700056C83 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA542E3D90E700056C83 /* KeychainSwift */; };
+		5620BA5C2E3DAC7700056C83 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA5B2E3DAC7700056C83 /* CombineMoya */; };
+		5620BA5E2E3DAC7700056C83 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA5D2E3DAC7700056C83 /* Moya */; };
+		5620BA602E3DAC7700056C83 /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA5F2E3DAC7700056C83 /* ReactiveMoya */; };
+		5620BA622E3DAC7700056C83 /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA612E3DAC7700056C83 /* RxMoya */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		808ED0FB2E1D9EFF00442DA8 /* weady.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = weady.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -39,6 +47,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5620BA622E3DAC7700056C83 /* RxMoya in Frameworks */,
+				5620BA5C2E3DAC7700056C83 /* CombineMoya in Frameworks */,
+				5620BA602E3DAC7700056C83 /* ReactiveMoya in Frameworks */,
+				5620BA552E3D90E700056C83 /* KeychainSwift in Frameworks */,
+				5620BA5E2E3DAC7700056C83 /* Moya in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +94,11 @@
 			);
 			name = weady;
 			packageProductDependencies = (
+				5620BA542E3D90E700056C83 /* KeychainSwift */,
+				5620BA5B2E3DAC7700056C83 /* CombineMoya */,
+				5620BA5D2E3DAC7700056C83 /* Moya */,
+				5620BA5F2E3DAC7700056C83 /* ReactiveMoya */,
+				5620BA612E3DAC7700056C83 /* RxMoya */,
 			);
 			productName = weady;
 			productReference = 808ED0FB2E1D9EFF00442DA8 /* weady.app */;
@@ -110,6 +128,10 @@
 			);
 			mainGroup = 808ED0F22E1D9EFF00442DA8;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5620BA532E3D90E700056C83 /* XCRemoteSwiftPackageReference "keychain-swift" */,
+				5620BA5A2E3DAC7700056C83 /* XCRemoteSwiftPackageReference "Moya" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 808ED0FC2E1D9EFF00442DA8 /* Products */;
 			projectDirPath = "";
@@ -344,6 +366,53 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5620BA532E3D90E700056C83 /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/evgenyneu/keychain-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 24.0.0;
+			};
+		};
+		5620BA5A2E3DAC7700056C83 /* XCRemoteSwiftPackageReference "Moya" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Moya/Moya.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 15.0.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5620BA542E3D90E700056C83 /* KeychainSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5620BA532E3D90E700056C83 /* XCRemoteSwiftPackageReference "keychain-swift" */;
+			productName = KeychainSwift;
+		};
+		5620BA5B2E3DAC7700056C83 /* CombineMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5620BA5A2E3DAC7700056C83 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = CombineMoya;
+		};
+		5620BA5D2E3DAC7700056C83 /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5620BA5A2E3DAC7700056C83 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = Moya;
+		};
+		5620BA5F2E3DAC7700056C83 /* ReactiveMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5620BA5A2E3DAC7700056C83 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = ReactiveMoya;
+		};
+		5620BA612E3DAC7700056C83 /* RxMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5620BA5A2E3DAC7700056C83 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = RxMoya;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 808ED0F32E1D9EFF00442DA8 /* Project object */;
 }
