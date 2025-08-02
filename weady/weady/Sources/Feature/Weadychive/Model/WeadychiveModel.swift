@@ -7,18 +7,34 @@
 
 import Foundation
 
-struct CurationItem: Identifiable, Equatable, Hashable {
+struct CurationItem: Identifiable, Equatable, Hashable, Decodable {
     let id: Int
     let title: String
-    let imageName: String
-    let date: Date
-    let isBookmarked: Bool
+    let backgroundImgUrl: String
+    let createdAt: String
+    let isScrapped: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case id = "curationId"
+        case title = "curationTitle"
+        case backgroundImgUrl
+        case createdAt
+        case isScrapped
+    }
 }
 
-struct WeadyboardItem: Identifiable, Equatable, Hashable {
+struct WeadyboardItem: Identifiable, Equatable, Hashable, Decodable {
     let id: Int
-    let imageName: String
-    let author: String
-    let createdAt: Date
+    let imageUrl: String
+    let writerNickname: String
+    let createdAt: String
     let isScrapped: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case id = "boardId"
+        case imageUrl
+        case writerNickname
+        case createdAt
+        case isScrapped
+    }
 }

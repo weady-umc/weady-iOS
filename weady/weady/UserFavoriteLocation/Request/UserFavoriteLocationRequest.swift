@@ -1,16 +1,16 @@
+////
+////  UserFavoriteLocationRequest.swift
+////  weady
+////
+////  Created by Yoonseo on 7/31/25.
+////
 //
-//  UserFavoriteLocationRequest.swift
-//  weady
+//import Foundation
 //
-//  Created by Yoonseo on 7/31/25.
+//struct PostFavoriteLocationRequest: Encodable {
+//    let hCode: String
+//}
 //
-
-import Foundation
-
-struct PostFavoriteLocationRequest: Encodable {
-    let hCode: String
-}
-
-struct PatchDefaultFavoriteLocationRequest: Encodable {
-    let userFavoriteLocationId: Int
-}
+//struct PatchDefaultFavoriteLocationRequest: Encodable {
+//    let userFavoriteLocationId: Int
+//}

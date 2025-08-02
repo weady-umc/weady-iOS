@@ -9,6 +9,7 @@
 
 import Foundation
 import Moya
+import KeychainSwift
 
 final class WeadychiveService: NetworkManager {
     
@@ -64,5 +65,24 @@ final class WeadychiveService: NetworkManager {
     /// 사용자별 스크랩한 웨디보드 조회
     public func getScrappedBoardsByUser(size: Int, page: Int, completion: @escaping (Result<SliceScrappedBoardByUserResponseDto, NetworkError>) -> Void) {
         request(target: .getScrappedBoards(size: size, page: page), decodingType: SliceScrappedBoardByUserResponseDto.self, completion: completion)
+    }
+    
+    // MARK: - 테스트용 로그 출력 함수
+
+    public func testMoyaLogOutput() {
+        print("testMoyaLogOutput 실행됨")
+
+        let token = KeychainSwift().get("serverAccessToken")
+        print(" accessToken: \(token ?? " 없음")")
+
+        provider.request(.getScrappedCurations) { result in
+            switch result {
+            case .success(let response):
+                print(" 응답 수신: \(response.statusCode)")
+                print(String(data: response.data, encoding: .utf8) ?? " 본문 없음")
+            case .failure(let error):
+                print(" 요청 실패: \(error)")
+            }
+        }
     }
 }
