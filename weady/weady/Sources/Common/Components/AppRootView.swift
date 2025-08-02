@@ -40,6 +40,8 @@ struct AppRootView: View {
                     WeadyboardPostView(isTabBarHidden: $isTabBarHidden, item: item)
                 case .weadyboardPostReportDetail(let reason):
                     WeadyboardPostReportDetailView(reason: reason)
+                case .weadyboardUpload:
+                        UploadView() 
                 case .weadychive:
                     WeadychiveView()
                 case .mypage:

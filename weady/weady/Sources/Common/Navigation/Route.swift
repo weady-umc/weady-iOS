@@ -14,6 +14,7 @@ enum Route: Hashable {
     case weadyboardPost
     case weadyboardPostWithItem(WeadyBoardItem)
     case weadyboardPostReportDetail(ReportReason)
+    case weadyboardUpload
     case weadychive
     case mypage
 }

@@ -51,7 +51,6 @@ enum AppTextStyle {
         case .homeSemibold12: return .custom("Pretendard-SemiBold", size: 12)
         case .homeMedium11: return .custom("Pretendard-Medium", size: 11)
         case .homeRegular11: return .custom("Pretendard-Regular", size: 11)
-        case .homeSemibold12: return .custom("Pretendard-Semibold", size: 12)
         }
     }
 
@@ -66,7 +65,6 @@ enum AppTextStyle {
         case .metaMedium8, .metaRegular8: return 8
         case .homeRegular30: return 30
         case .homeMedium11, .homeRegular11: return 11
-        case .homeSemibold12:return 12
         }
     }
 
