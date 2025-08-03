@@ -60,6 +60,13 @@ struct WeatherInfoView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("완료") {
                     viewModel.applyWeatherToUploadModel(useCurrentLocation: viewModel.isUsingCurrentLocation)
+
+                    let selectedWeather = viewModel.isUsingCurrentLocation ? viewModel.currentWeather : viewModel.toWeatherModel()
+
+                    print("- 계절: \(selectedWeather?.season?.rawValue ?? "nil")")
+                    print("- 기온 : \(selectedWeather?.temperature?.tempRangeText ?? "nil")")
+                    print("- 날씨: \(selectedWeather?.weather.map { $0.rawValue } ?? [])")
+                    print("- 현재위치/직접추가: \(selectedWeather?.isManual ?? false)")
                     dismiss()
                 }
                 .fontName(.captionMedium14)

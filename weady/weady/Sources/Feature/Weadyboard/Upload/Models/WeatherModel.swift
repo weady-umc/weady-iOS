@@ -2,6 +2,7 @@ import Foundation
 
 // MARK: - 날씨 모델 (계절, 기온, 날씨, 현재위치/직접)
 struct WeatherModel: Codable {
+    var id: UUID = UUID()
     var season: SeasonType?
     var temperature: TemperatureBand?
     var weather: [WeatherType] = []
