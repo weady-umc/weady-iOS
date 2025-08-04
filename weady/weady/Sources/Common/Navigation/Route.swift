@@ -8,12 +8,14 @@
 import SwiftUI
 
 enum Route: Hashable {
+    case login
+    case onboarding
     case basetab
     case home
     case weadyboard
-    case weadyboardPost
-    case weadyboardPostWithItem(WeadyBoardItem)
-    case weadyboardPostReportDetail(ReportReason)
+    case weadyboardPost(boardId: Int)
+    case weadyboardPostWithItem(BoardPreviewDTO)
+    case weadyboardPostReportDetail(ReportReason, boardId: Int)
     case weadychive
     case mypage
 }

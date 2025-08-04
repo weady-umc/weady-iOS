@@ -9,13 +9,20 @@ import SwiftUI
 
 struct WeadyboardPostReportSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject var reportViewModel: WeadyboardReportViewModel
+    @Binding var navigationPath: NavigationPath
+
     var body: some View {
         VStack(spacing: 0) {
             
             WeadyboardPostReportTopBar()
-
-            ForEach(reportReasons, id: \.id) { reason in
-                NavigationLink(value: reason) {
+            
+            ForEach(reportReasons.indices, id: \.self) { index in
+                let reason = reportReasons[index]
+                Button {
+                    reportViewModel.selectedReasonIndex = index
+                    navigationPath.append(reason)
+                } label: {
                     HStack {
                         Text(reason.listTitle)
                             .fontName(.captionSemibold14)
