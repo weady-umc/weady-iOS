@@ -5,27 +5,24 @@
 //  Created by 김영택 on 8/2/25.
 //
 
-// Sources/Network/Services/TagService.swift
-// 또는 Sources/Common/Utilities/TagService.swift (타겟 멤버십은 weady)
-
 import Foundation
 import Moya
 
-final class TagService: NetworkManager<TagEndpoints> {
+final class TagService {
+    // 1) NetworkManager 프로토콜에 대한 구체 구현
+    private let network = DefaultNetworkManager<TagEndpoints>()
 
-    public override init(provider: MoyaProvider<TagEndpoints>? = nil) {
-        super.init(provider: provider)
-    }
-
-    /// 의류 스타일 카테고리 목록
-    public func getClothesStyleCategories(
+    /// 의류 스타일 카테고리 목록 
+    func getClothesStyleCategories(
         completion: @escaping (Result<[ClothesStyleCategoryResponseDTO], NetworkError>) -> Void
     ) {
-        request(
+        // 2) 프로토콜 익스텐션(request)을 그대로 호출
+        network.request(
             target: .getClothesStyleCategories,
             decodingType: [ClothesStyleCategoryResponseDTO].self,
             completion: completion
         )
     }
 }
+
 

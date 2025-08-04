@@ -44,14 +44,18 @@ extension TagEndpoints: TargetType {
     }
 
     var headers: [String: String]? {
-        // 필요하다면 토큰 포함
-        if let token = KeychainSwift().get("serverAccessToken") {
+        let token = KeychainSwift().get("serverAccessToken")
+        // 디버그 로그
+        print("🔑 [TagEndpoints] 조회된 토큰:", token ?? "nil")
+
+        if let token = token {
             return [
                 "Authorization": "Bearer \(token)",
-                "Content-Type":  "application/json"
+                "Content-Type": "application/json"
             ]
         } else {
             return ["Content-Type": "application/json"]
         }
     }
+
 }
