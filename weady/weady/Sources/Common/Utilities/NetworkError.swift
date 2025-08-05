@@ -1,4 +1,3 @@
-
 //
 //  NetworkError.swift
 //  weady

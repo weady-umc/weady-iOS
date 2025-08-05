@@ -28,3 +28,17 @@ extension View {
         self.clipShape(RoundedCorner(radius: radius, corners: corners))
     }
 }
+
+extension UIApplication {
+    func topViewController() -> UIViewController? {
+        let keyWindow = UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+            .first
+
+        var topVC = keyWindow?.rootViewController
+        while let presentedVC = topVC?.presentedViewController {
+            topVC = presentedVC
+        }
+        return topVC
+    }
+}
