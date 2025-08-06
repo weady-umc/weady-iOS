@@ -38,7 +38,7 @@ struct ApiResponseSliceScrappedBoardByUserResponseDto: Codable {
 struct CurationDto: Codable {
     let curationId: Int64
     let curationTitle: String
-    let backgroundImgUrl: String
+    let firstImgUrl: String
 }
 
 struct ScrapBoardResponseDto: Codable {

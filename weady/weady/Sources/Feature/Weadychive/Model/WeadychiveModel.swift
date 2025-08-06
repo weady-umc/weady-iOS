@@ -7,34 +7,30 @@
 
 import Foundation
 
+// MARK: - 큐레이션 아이템 (API의 CurationDto와 동일)
 struct CurationItem: Identifiable, Equatable, Hashable, Decodable {
-    let id: Int
+    let id: Int64
     let title: String
-    let backgroundImgUrl: String
-    let createdAt: String
-    let isScrapped: Bool
-
+    let firstImgUrl: String
+    
     enum CodingKeys: String, CodingKey {
         case id = "curationId"
         case title = "curationTitle"
-        case backgroundImgUrl
-        case createdAt
-        case isScrapped
+        case firstImgUrl
     }
 }
 
+// MARK: - 웨디보드 아이템 (API의 ScrappedBoardByUserResponseDto와 동일)
 struct WeadyboardItem: Identifiable, Equatable, Hashable, Decodable {
-    let id: Int
-    let imageUrl: String
-    let writerNickname: String
-    let createdAt: String
-    let isScrapped: Bool
-
+    let id: Int64
+    let username: String
+    let imgUrl: String
+    let weatherTagId: Int64
+    
     enum CodingKeys: String, CodingKey {
         case id = "boardId"
-        case imageUrl
-        case writerNickname
-        case createdAt
-        case isScrapped
+        case username
+        case imgUrl
+        case weatherTagId
     }
 }

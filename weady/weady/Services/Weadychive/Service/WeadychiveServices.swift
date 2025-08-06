@@ -67,22 +67,4 @@ final class WeadychiveService: NetworkManager {
         request(target: .getScrappedBoards(size: size, page: page), decodingType: SliceScrappedBoardByUserResponseDto.self, completion: completion)
     }
     
-    // MARK: - 테스트용 로그 출력 함수
-
-    public func testMoyaLogOutput() {
-        print("testMoyaLogOutput 실행됨")
-
-        let token = KeychainSwift().get("serverAccessToken")
-        print(" accessToken: \(token ?? " 없음")")
-
-        provider.request(.getScrappedCurations) { result in
-            switch result {
-            case .success(let response):
-                print(" 응답 수신: \(response.statusCode)")
-                print(String(data: response.data, encoding: .utf8) ?? " 본문 없음")
-            case .failure(let error):
-                print(" 요청 실패: \(error)")
-            }
-        }
-    }
 }
