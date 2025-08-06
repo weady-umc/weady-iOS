@@ -9,6 +9,7 @@
 
 import Foundation
 import Moya
+import KeychainSwift
 
 final class WeadychiveService: NetworkManager {
     
@@ -65,4 +66,5 @@ final class WeadychiveService: NetworkManager {
     public func getScrappedBoardsByUser(size: Int, page: Int, completion: @escaping (Result<SliceScrappedBoardByUserResponseDto, NetworkError>) -> Void) {
         request(target: .getScrappedBoards(size: size, page: page), decodingType: SliceScrappedBoardByUserResponseDto.self, completion: completion)
     }
+    
 }
