@@ -1,11 +1,3 @@
-////
-////  NoCurationView.swift
-////  weady
-////
-////  Created by 고석현 on 7/28/25.
-////
-//
-//import SwiftUI
 //
 //// MARK: - NoCurationView (스크랩된 큐레이션 없는 경우)
 //struct NoCurationView: View {
@@ -37,5 +29,5 @@
 //        .padding()
 //    }
 //}
-//
-//
+
+

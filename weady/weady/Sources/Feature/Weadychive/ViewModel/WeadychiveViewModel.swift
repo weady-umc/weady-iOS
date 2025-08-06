@@ -18,11 +18,11 @@ final class WeadychiveViewModel: ObservableObject {
     @Published var scrappedWeadyboardItems: [WeadyboardItem] = []
     
     var hasScrappedCurations: Bool {
-        !scrappedCurationItems.isEmpty
+        scrappedCurationItems.contains { !$0.firstImgUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
     }
     
     var hasScrappedWeadyboards: Bool {
-        !scrappedWeadyboardItems.isEmpty
+        scrappedWeadyboardItems.contains { !$0.imgUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
     }
     
     // MARK: - Service
@@ -157,7 +157,12 @@ final class WeadychiveViewModel: ObservableObject {
         service.getScrappedCurationsByUser { result in
             switch result {
             case .success(let response):
-                print("📥 응답 수신: \(response)")
+                print("📥 응답 수신 성공")
+                print("  유저명: \(response.userName)")
+                print("  큐레이션 개수: \(response.curations.count)")
+                for curation in response.curations {
+                    print("   - [\(curation.curationId)] \(curation.curationTitle), URL: \(curation.firstImgUrl)")
+                }
             case .failure(let error):
                 print("🚨 요청 실패: \(error)")
             }
