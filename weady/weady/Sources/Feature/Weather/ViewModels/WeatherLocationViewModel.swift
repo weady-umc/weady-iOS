@@ -9,9 +9,9 @@ import Foundation
 import SwiftUI
 import Observation
 
-@Observable
 
-class WeatherLocationViewModel{
+
+class WeatherLocationViewModel: ObservableObject {
     
     
     static let example = WeatherData(
@@ -23,7 +23,7 @@ class WeatherLocationViewModel{
         backgroundImage: "weather_cloudy"
     )
     
-    var favoriteLocations: [WeatherData] = [
+    @Published var favoriteLocations: [WeatherData] = [
         WeatherData(location: "용산구 한남동", temperature: "17", highTemperature: "23", lowTemperature: "13", backgroundImage: "weather_sunny"),
         WeatherData(location: "마포구 합정동", temperature: "19", highTemperature: "24", lowTemperature: "14", backgroundImage: "weather_cloudy"),
         WeatherData(location: "종로구 청운효자동", temperature: "18", highTemperature: "22", lowTemperature: "15", backgroundImage: "weather_rainy")

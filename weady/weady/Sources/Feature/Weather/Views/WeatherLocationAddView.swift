@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WeatherLocationAddView: View {
-    @Bindable var viewModel = WeatherAddViewModel()
+    @Bindable var viewModel = WeatherLocationAddViewModel()
     @Environment(\.dismiss) private var dismiss
     
     let locationId: Int

@@ -9,7 +9,7 @@ import Foundation
 import Observation
 
 @Observable
-class WeatherAddViewModel {
+class WeatherLocationAddViewModel {
     var weather: WeatherAddData? = nil
     private let service = WeatherServices()
     

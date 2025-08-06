@@ -15,12 +15,16 @@ struct KakaoPlace: Decodable, Identifiable {
     var id: String { placeName + x + y }
 
     let placeName: String
+    let addressName: String // 서울 서초구 양재1동 이런식으로 나오는 주소
     let x: String   // 경도
     let y: String   // 위도
+    
 
     enum CodingKeys: String, CodingKey {
         case placeName = "place_name"
+        case addressName = "address_name"
         case x, y
+
     }
 }
 

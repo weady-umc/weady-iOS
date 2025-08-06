@@ -57,7 +57,16 @@ struct WeatherCardView: View {
                             .foregroundStyle(Color.white100)
                     }
                 }
-                .padding(.trailing, editMode ? 30 : 0)
+                .padding(.trailing, editMode ? 10 : 0)
+                
+                if editMode {
+                                    Image(systemName: "line.3.horizontal")
+                                        .resizable()
+                                        .frame(width: 15.62, height: 12.02)
+                                        .foregroundStyle(Color.gray700.opacity(0.5))
+                                        .padding(.trailing, 0)
+                                        .contentShape(Rectangle()) // 터치 영역 확장
+                                }
                 
             }
             .padding(.horizontal, 20)
@@ -78,7 +87,7 @@ struct WeatherCardView: View {
         backgroundImage: "weather_cloudy"
     )
     
-    WeatherCardView(data: example, isCurrentLocation: false, editMode: false)
+    WeatherCardView(data: example, isCurrentLocation: false, editMode: true)
 }
 
 

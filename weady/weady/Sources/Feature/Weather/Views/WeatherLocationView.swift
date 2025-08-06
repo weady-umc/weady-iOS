@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WeatherLocationView: View {
-    @Bindable private var viewModel: WeatherLocationViewModel = .init()
+    @StateObject private var viewModel =  WeatherLocationViewModel()
     @Environment(\.dismiss) private var dismiss
     @Environment(\.editMode) private var editMode
     @Environment(NavigationRouter.self) var router
@@ -47,12 +47,16 @@ struct WeatherLocationView: View {
                             Image("backicon")
                                 .foregroundColor(.black)
                         }
+                        
                     }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                            EditButton()
+                        }
                 }
                 .navigationDestination(for: Route.self) { route in
                         switch route {
                         case .weathersearch:
-                            WeatherSearchView()
+                            WeatherSearchView(selectedPlace: .constant(nil))
                         default:
                             HomeView()
                         }
@@ -76,7 +80,7 @@ struct WeatherLocationView: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 17.5, height: 17.6)
             
-            Text("지금, 날씨가 궁금한 곳은?")
+            Text("위치, 주소 검색")
                 .fontName(.captionRegular14)
                 .foregroundStyle(Color.gray200)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -87,11 +91,10 @@ struct WeatherLocationView: View {
                     .fill(Color.white400)
                     )
                 .onTapGesture {
-                    router.push(.weatheraddlocation)
+                    router.push(.weathersearch)
+                     print("📌 search bar tapped")
                     }
-            
-            
-        
+                    
     }
     
     private var favLocations: some View {
@@ -130,57 +133,58 @@ struct WeatherLocationView: View {
                     
                     Spacer().frame(height: 11.3)
                     
-                    Text("즐겨찾는 위치를 추가해보세요.")
+                    Text("즐겨찾는 위치를 추가해보세요")
                         .fontName(.captionRegular14)
                         .foregroundStyle(Color.black100)
                 }
                 
             } else {
-                //list 딴거 쓰기 list 쓰면 전체가 다 버튼으로 인식이됨
-                List{
+                List {
                     ForEach(viewModel.favoriteLocations, id: \.id) { weather in
                         HStack {
-                            
                             if editMode?.wrappedValue == .active {
                                 Button(action: {
                                     deleteItem(weather)
                                 }) {
                                     Image("deleteicon")
                                         .resizable()
-                                                        .frame(width: 44, height: 44)
-                                                        .padding(.leading, 4)
-                                                        
+                                        .frame(width: 44, height: 44)
+                                        .padding(.leading, 4)
                                 }
+                                .buttonStyle(.plain)
                                 
                                 
-                                
-                                
-                                
-                                                            }
-                            WeatherCardView(data: weather, isCurrentLocation: false, editMode: editMode?.wrappedValue == .active)
-                                
-                            
-                            
-                                
-                        }
-                        
-                        .frame(alignment: .leading)
-                                .listRowInsets(EdgeInsets()) // 여백 제거
-                                .listRowSeparator(.hidden)
-                                .padding(.bottom, 8)
-                                
-                        
                             }
-    
+                            
+                            WeatherCardView(
+                                data: weather,
+                                isCurrentLocation: false,
+                                editMode: editMode?.wrappedValue == .active
+                            )
+                            
+                        }
+                        .frame(alignment: .leading)
+                        .listRowInsets(EdgeInsets()) // 여백 제거
+                        .listRowSeparator(.hidden)
+                        .padding(.bottom, 8)
+                    }
+                    .onMove { source, destination in
+                        print("Move from \(source) to \(destination)")
+                        viewModel.favoriteLocations.move(fromOffsets: source, toOffset: destination)
+                        print(viewModel.favoriteLocations.map { $0.location })
                         
-                    .onMove {source, destination in viewModel.favoriteLocations.move(fromOffsets: source, toOffset: destination)}
+                    
+                    }
+
                 }
-                        .listStyle(.plain)
-                               
-                                }
+                .listStyle(.plain)
+            }
+
+            
             
         }
         .frame(width: editMode?.wrappedValue == .active ? 375 : 335)
+        
         
 
     }

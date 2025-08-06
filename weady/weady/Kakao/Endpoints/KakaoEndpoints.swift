@@ -43,6 +43,8 @@ extension KakaoEndpoints: TargetType {
     }
 
     var headers: [String: String]? {
-        return ["Authorization": "KakaoAK \(API.kakaoRestAPIKey)"]
+        return ["Authorization": "KakaoAK \(API.kakaoRestAPIKey)",
+        "Content-Type": "application/json"
+                ]
     }
 }

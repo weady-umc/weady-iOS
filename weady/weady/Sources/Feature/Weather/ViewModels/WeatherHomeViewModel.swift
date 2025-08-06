@@ -1,5 +1,5 @@
 //
-//  WeatherVIewModel.swift
+//  WeatherHomeViewModel.swift
 //  weady
 //
 //  Created by Yoonseo on 7/18/25.
@@ -10,7 +10,7 @@ import SwiftUI
 import Observation
 
 @Observable
-class WeatherViewModel{
+class WeatherHomeViewModel{
     var selectedSegment: WeatherModel = .first
     
 }
