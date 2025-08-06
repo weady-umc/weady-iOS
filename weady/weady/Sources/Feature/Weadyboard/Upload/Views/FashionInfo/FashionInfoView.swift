@@ -31,7 +31,7 @@ struct FashionInfoView: View {
                 VStack(alignment: .leading, spacing: 5) {
                     FilterSection(title: "태그 추가") {
                         // 제품 검색 버튼 (제품 검색 시트뷰로 이동)
-                        SearchInputBar(text: $viewModel.searchQuery, viewModel: viewModel)
+                        SearchInputBtn(text: $viewModel.searchQuery, viewModel: viewModel)
                         
                         // 제품 직접 추가 버튼 (제품 직접 추가 시트뷰로 이동)
                         CustomTagBtn {
@@ -47,9 +47,11 @@ struct FashionInfoView: View {
                         Divider()
                         
                         // MARK: - 선택된 태그 리스트 (최대 3개까지 선택 가능)
-                        TagList(
-                            selectedTags: $viewModel.fashion.selectedTags,
-                            onRemoveItem: viewModel.removeTag
+                        SearchItemList(
+                            items: $viewModel.fashion.selectedTags,
+                            nameProvider: { (tag: FashionTag) in tag.brandName },
+                            detailProvider: { (tag: FashionTag) in tag.productName },
+                            onRemove: viewModel.removeTag
                         )
                     }
                 }

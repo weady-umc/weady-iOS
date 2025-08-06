@@ -1,7 +1,7 @@
 import SwiftUI
 
 // MARK: - 검색 입력창 (클릭 시, 검색 시트뷰로 이동)
-struct SearchInputBar: View {
+struct SearchInputBtn: View {
     @Binding var text: String
     var viewModel: FashionViewModel
 
@@ -46,21 +46,7 @@ struct SearchSheetView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 //MARK: - 검색창
-                HStack {
-                    Image(.searchIcon)
-                        .scaledToFit()
-                        .frame(width: 17, height: 17)
-
-                    TextField("브랜드명, 제품명을 입력하세요", text: $searchQuery)
-                        .fontName(.captionRegular14)
-                        .foregroundStyle(Color.gray300)
-                }
-                .padding(.horizontal, 10)
-                .frame(height: 40)
-                .background(Color.white400)
-                .cornerRadius(6)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 15)
+                SearchInputBar(searchText: $searchQuery, placeholder: "브랜드명, 제품명을 입력하세요")
 
                 //MARK: - 검색 결과 리스트
                 List {

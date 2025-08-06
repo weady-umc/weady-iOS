@@ -7,8 +7,10 @@ struct UploadView: View {
     // 날씨 정보 화면
     @State private var showWeatherInfo = false
     @State private var weatherViewModel = WeatherViewModel()
-
+    
     @State private var fashionViewModel = FashionViewModel()
+    
+    @State private var placeViewModel = PlaceViewModel()
 
     var body: some View {
         GeometryReader { geometry in
@@ -40,7 +42,7 @@ struct UploadView: View {
                         Divider()
 
                         NavBtn(title: "장소 정보 추가") {
-                            AnyView(Text("장소 정보 추가 화면"))
+                            AnyView(PlaceInfoView(viewModel: placeViewModel))
                         }
                         Divider()
 
