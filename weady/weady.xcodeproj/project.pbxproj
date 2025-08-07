@@ -12,6 +12,12 @@
 		5620BA5E2E3DAC7700056C83 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA5D2E3DAC7700056C83 /* Moya */; };
 		5620BA602E3DAC7700056C83 /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA5F2E3DAC7700056C83 /* ReactiveMoya */; };
 		5620BA622E3DAC7700056C83 /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA612E3DAC7700056C83 /* RxMoya */; };
+		5660B2742E419DE100A9C7F5 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 5660B2732E419DE100A9C7F5 /* KakaoSDKCommon */; };
+		5660B2772E41CD5300A9C7F5 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 5660B2762E41CD5300A9C7F5 /* Kingfisher */; };
+		566866E92E41D4C300187030 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 566866E82E41D4C300187030 /* KakaoSDKAuth */; };
+		566866EB2E41D4C300187030 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 566866EA2E41D4C300187030 /* KakaoSDKUser */; };
+		566866ED2E41D4EC00187030 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 566866EC2E41D4EC00187030 /* GoogleSignInSwift */; };
+		569ACB3C2E419ABC00C4D1A1 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 569ACB3B2E419ABC00C4D1A1 /* GoogleSignIn */; };
 		CDF990FC2E3B849100446374 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = CDF990FB2E3B849100446374 /* Moya */; };
 		CDF990FF2E3B865100446374 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = CDF990FE2E3B865100446374 /* KeychainSwift */; };
 /* End PBXBuildFile section */
@@ -51,9 +57,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				5620BA622E3DAC7700056C83 /* RxMoya in Frameworks */,
+				569ACB3C2E419ABC00C4D1A1 /* GoogleSignIn in Frameworks */,
 				5620BA5C2E3DAC7700056C83 /* CombineMoya in Frameworks */,
 				5620BA602E3DAC7700056C83 /* ReactiveMoya in Frameworks */,
+				5660B2772E41CD5300A9C7F5 /* Kingfisher in Frameworks */,
+				566866ED2E41D4EC00187030 /* GoogleSignInSwift in Frameworks */,
+				5660B2742E419DE100A9C7F5 /* KakaoSDKCommon in Frameworks */,
+				566866E92E41D4C300187030 /* KakaoSDKAuth in Frameworks */,
 				5620BA552E3D90E700056C83 /* KeychainSwift in Frameworks */,
+				566866EB2E41D4C300187030 /* KakaoSDKUser in Frameworks */,
 				5620BA5E2E3DAC7700056C83 /* Moya in Frameworks */,
 				CDF990FF2E3B865100446374 /* KeychainSwift in Frameworks */,
 				CDF990FC2E3B849100446374 /* Moya in Frameworks */,
@@ -126,6 +138,12 @@
 				5620BA612E3DAC7700056C83 /* RxMoya */,
 				CDF990FB2E3B849100446374 /* Moya */,
 				CDF990FE2E3B865100446374 /* KeychainSwift */,
+				569ACB3B2E419ABC00C4D1A1 /* GoogleSignIn */,
+				5660B2732E419DE100A9C7F5 /* KakaoSDKCommon */,
+				5660B2762E41CD5300A9C7F5 /* Kingfisher */,
+				566866E82E41D4C300187030 /* KakaoSDKAuth */,
+				566866EA2E41D4C300187030 /* KakaoSDKUser */,
+				566866EC2E41D4EC00187030 /* GoogleSignInSwift */,
 			);
 			productName = weady;
 			productReference = 808ED0FB2E1D9EFF00442DA8 /* weady.app */;
@@ -160,6 +178,9 @@
 				5620BA5A2E3DAC7700056C83 /* XCRemoteSwiftPackageReference "Moya" */,
 				CDF990FA2E3B849100446374 /* XCRemoteSwiftPackageReference "Moya" */,
 				CDF990FD2E3B865100446374 /* XCRemoteSwiftPackageReference "keychain-swift" */,
+				569ACB3A2E419ABC00C4D1A1 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				5660B2722E419DE100A9C7F5 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
+				5660B2752E41CD5300A9C7F5 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 808ED0FC2E1D9EFF00442DA8 /* Products */;
@@ -437,6 +458,30 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Moya/Moya.git";
 		};
+		5660B2722E419DE100A9C7F5 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kakao/kakao-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.24.6;
+			};
+		};
+		5660B2752E41CD5300A9C7F5 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.5.0;
+			};
+		};
+		569ACB3A2E419ABC00C4D1A1 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
 		CDF990FA2E3B849100446374 /* XCRemoteSwiftPackageReference "Moya" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Moya/Moya";
@@ -480,6 +525,36 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5620BA5A2E3DAC7700056C83 /* XCRemoteSwiftPackageReference "Moya" */;
 			productName = RxMoya;
+		};
+		5660B2732E419DE100A9C7F5 /* KakaoSDKCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5660B2722E419DE100A9C7F5 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKCommon;
+		};
+		5660B2762E41CD5300A9C7F5 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5660B2752E41CD5300A9C7F5 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		566866E82E41D4C300187030 /* KakaoSDKAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5660B2722E419DE100A9C7F5 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKAuth;
+		};
+		566866EA2E41D4C300187030 /* KakaoSDKUser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5660B2722E419DE100A9C7F5 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKUser;
+		};
+		566866EC2E41D4EC00187030 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 569ACB3A2E419ABC00C4D1A1 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		569ACB3B2E419ABC00C4D1A1 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 569ACB3A2E419ABC00C4D1A1 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
 		};
 		CDF990FB2E3B849100446374 /* Moya */ = {
 			isa = XCSwiftPackageProductDependency;

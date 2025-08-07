@@ -35,10 +35,9 @@ struct GenderSelectionView: View {
                     .foregroundStyle(Color.black100)
             }
             .padding(.horizontal, 32)
-            .padding(.top, 17)
             
             // 옵션 버튼
-            HStack(spacing: 9) {
+            HStack(spacing: 11) {
                 ForEach(GenderOption.allCases) { option in
                     Button {
                         vm.select(option)
@@ -46,8 +45,9 @@ struct GenderSelectionView: View {
                         Text(option.label)
                             .fontName(.captionMedium14)
                             .foregroundStyle(Color.black100)
-                            .frame(height: 50)
-                            .frame(width: 94)
+                            .padding(.vertical, 17)
+                            .padding(.leading, 23)
+                            .padding(.trailing, 28)
                             .background(Color.white)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
@@ -64,7 +64,7 @@ struct GenderSelectionView: View {
             .padding(.horizontal, 30)
             .padding(.top, 55)
             
-            Spacer().frame(height: 363)
+            Spacer()
             
             // 하단 버튼
             VStack(spacing: 20) {
@@ -96,11 +96,11 @@ struct GenderSelectionView: View {
         //다음 뷰 연결
         .fullScreenCover(isPresented: $vm.didTapSkip) {
             // 건너뛸 때 이동할 뷰
-            EmptyView()
+            StartView(nickname: vm.nickname)
         }
         .fullScreenCover(isPresented: $vm.didTapNext) {
             // 다음에 이동할 뷰
-            StyleSelectionView()
+            StyleSelectionView(nickname: vm.nickname)
         }
     }
 }

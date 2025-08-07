@@ -82,8 +82,8 @@ struct TermsAgreementView: View {
                         .cornerRadius(10)
                 }
                 .disabled(!viewModel.requiredAgreed)
-                .padding(.vertical, 23)
-            }
+                .padding(.bottom, 22)
+            }//VStack End
             .padding(.horizontal, 20)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

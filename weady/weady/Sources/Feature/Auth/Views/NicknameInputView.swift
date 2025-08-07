@@ -7,8 +7,23 @@
 
 import SwiftUI
 
+extension View {
+    /// 조건이 true일 때만 앞에 placeholder 보이도록
+    func placeholder<Content: View>(
+        when shouldShow: Bool,
+        alignment: Alignment = .leading,
+        @ViewBuilder placeholder: () -> Content
+    ) -> some View {
+        ZStack(alignment: alignment) {
+            placeholder().opacity(shouldShow ? 1 : 0)
+            self
+        }
+    }
+}
+
 struct NicknameInputView: View {
     @StateObject private var vm = NicknameInputViewModel()
+    @FocusState private var isFocused: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -30,33 +45,41 @@ struct NicknameInputView: View {
             .padding(.horizontal, 32)
             .padding(.top, 39)
             
-            // 닉네임 입력 필드
-            VStack(alignment: .leading, spacing: 12) {
-                //닉네임 입력하면 사라짐
+            // MARK: - 닉네임 입력 필드 (수동 플레이스홀더)
+            VStack(alignment: .leading, spacing: 0) {
+                TextField("", text: $vm.nickname)
+                    .focused($isFocused)
+                    .placeholder(when: vm.nickname.isEmpty && !isFocused) {
+                        Text("닉네임 입력")
+                            .font(AppTextStyle.bodyRegular16.font)
+                            .foregroundColor(Color.black100)
+                    }
+                    .font(AppTextStyle.bodyRegular16.font)
+                    .foregroundColor(Color.black100)
+                    .padding(.vertical, 12)
                 
-                Text("닉네임 입력")
-                    .fontName(.bodyRegular16)
-                    .foregroundStyle(Color.black100)
-                    .opacity(vm.nickname.isEmpty ? 1 : 0)
-                
-                
+                // 2) 밑줄
                 Rectangle()
                     .frame(height: 1)
                     .foregroundStyle(Color.gray200)
-                    .overlay(
-                        TextField("", text: $vm.nickname)
-                            .font(AppTextStyle.bodyRegular16.font)
-                            .textFieldStyle(.plain)
-                            .padding(.horizontal, 0)
-                            .padding(.vertical, 0)
-                            .padding(.bottom, 12)
-                        , alignment: .bottomLeading
-                    )
+                
+                // 3) 유효성 검사 에러 메시지
+                if vm.shouldShowValidationError {
+                    if vm.nickname.isEmpty {
+                        Text("최소 1자 이상 입력해 주세요.")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    } else if !vm.isValidNickname {
+                        Text("한글, 영문과 숫자로 15자 이내로 입력해 주세요.")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                }
             }
             .padding(.horizontal, 32)
             .padding(.top, 52)
             
-            Spacer().frame(height: 444)
+            Spacer()
             
             // 다음버튼
             Button { vm.next() } label: {
@@ -64,14 +87,13 @@ struct NicknameInputView: View {
                     .fontName(.bodyMedium16)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 11)
-                    .background(vm.canProceed ? Color.black100 : Color.gray800)
+                    .background(Color.black100)
                     .foregroundStyle(Color.white100)
                     .cornerRadius(10)
             }
-            .disabled(!vm.canProceed)
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
-        }
+        }//VStack End
         .fullScreenCover(isPresented: $vm.shouldNavigateNext) {
             PreferenceInputView(nickname: vm.nickname)
         }

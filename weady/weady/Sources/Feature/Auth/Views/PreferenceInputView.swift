@@ -39,7 +39,7 @@ struct PreferenceInputView: View {
             .padding(.horizontal, 32)
             .padding(.top, 39)
 
-            Spacer().frame(height: 104)
+            Spacer()
 
             // 3) 중앙 일러스트 버튼
             ZStack {
@@ -81,10 +81,10 @@ struct PreferenceInputView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
         }
-        // 5) Skip/Next 에 맞춘 fullScreenCover
+        //
         .fullScreenCover(isPresented: $vm.didTapSkip) {
             // 건너뛸 때 이동할 뷰
-            EmptyView()
+            StartView(nickname: vm.nickname)
         }
         .fullScreenCover(isPresented: $vm.didTapNext) {
             // 다음에 이동할 뷰
