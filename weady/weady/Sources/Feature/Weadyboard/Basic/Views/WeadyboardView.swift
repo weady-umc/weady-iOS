@@ -6,32 +6,21 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct WeadyboardView: View {
     @Environment(NavigationRouter.self) private var router
     @State private var isFilterPresented = false
-    @State private var selectedItem: WeadyBoardItem? = nil
-
-    // 임의로 정해둔 게시물 별 날씨 아이콘
-    private let boardItems: [WeadyBoardItem] = [
-        .init(imageName: "boardex1", weather: "sunny"),
-        .init(imageName: "boardex2", weather: "cloudy"),
-        .init(imageName: "boardex3", weather: "rainy"),
-        .init(imageName: "boardex4", weather: "partlycloudy"),
-        .init(imageName: "boardex1", weather: "sunny"),
-        .init(imageName: "boardex2", weather: "snowy"),
-        .init(imageName: "boardex3", weather: "windy"),
-        .init(imageName: "boardex4", weather: "cloudy")
-    ]
-
-    private var leftColumn: [WeadyBoardItem] {
-        boardItems.enumerated().compactMap { $0.offset % 2 == 0 ? $0.element : nil }
+    @StateObject private var viewModel = WeadyboardViewModel()
+    
+    private var leftColumn: [BoardPreviewDTO] {
+        viewModel.posts.enumerated().compactMap { $0.offset % 2 == 0 ? $0.element : nil }
     }
-
-    private var rightColumn: [WeadyBoardItem] {
-        boardItems.enumerated().compactMap { $0.offset % 2 == 1 ? $0.element : nil }
+    
+    private var rightColumn: [BoardPreviewDTO] {
+        viewModel.posts.enumerated().compactMap { $0.offset % 2 == 1 ? $0.element : nil }
     }
-
+    
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
@@ -41,7 +30,7 @@ struct WeadyboardView: View {
                     showAlarmButton: true,
                     showBottomDivider: false
                 )
-
+                
                 HStack {
                     Spacer()
                     Button {
@@ -60,17 +49,17 @@ struct WeadyboardView: View {
                     .padding(.trailing, 20)
                     .padding(.bottom, 6)
                 }
-
+                
                 ScrollView {
                     HStack(alignment: .top, spacing: 8) {
                         VStack(spacing: 8) {
-                            ForEach(leftColumn) { item in
+                            ForEach(leftColumn, id: \.boardId) { item in
                                 boardImageCard(item: item)
                             }
                         }
-
+                        
                         VStack(spacing: 8) {
-                            ForEach(rightColumn) { item in
+                            ForEach(rightColumn, id: \.boardId) { item in
                                 boardImageCard(item: item)
                             }
                         }
@@ -79,7 +68,7 @@ struct WeadyboardView: View {
                     .padding(.top, 8)
                 }
             }
-
+            
             VStack {
                 Spacer()
                 HStack {
@@ -107,22 +96,29 @@ struct WeadyboardView: View {
         .sheet(isPresented: $isFilterPresented) {
             WeadyboardFilterSheet()
         }
+                .task {
+                    viewModel.fetchBoards()
+                }
     }
-
+    
     @ViewBuilder
-    private func boardImageCard(item: WeadyBoardItem) -> some View {
+    private func boardImageCard(item: BoardPreviewDTO) -> some View {
         Button {
             router.push(.weadyboardPostWithItem(item))
         } label: {
             ZStack(alignment: .topTrailing) {
-                Image(item.imageName)
+
+                KFImage(URL(string: item.imgUrl ?? ""))
+                    .placeholder {
+                        Color.gray100
+                    }
                     .resizable()
                     .scaledToFill()
-                    .frame(width: 177)
+                    .frame(width: 177, height: 240)
                     .clipped()
                     .cornerRadius(8)
-
-                Image(item.weather)
+                
+                Image(WeatherTag.imageName(for: item.weatherTagId))
                     .resizable()
                     .scaledToFit()
                     .frame(width: 20, height: 20)

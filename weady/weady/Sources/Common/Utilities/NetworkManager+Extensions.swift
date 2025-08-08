@@ -2,14 +2,6 @@
 //  NetworkManager+Extensions.swift
 //  weady
 //
-//  Created by 고석현 on 7/31/25.
-//
-
-import Foundation
-//
-//  NetworkManager+Extensions.swift
-//  weady
-//
 //  Created by 엄민서 on 7/29/25.
 //
 
@@ -189,21 +181,20 @@ extension NetworkManager {
                 let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
                 let finalMessage = errorResponse?.message ?? errorMessage
                 
-//                if errorResponse?.code == "TOKEN4011" || errorResponse?.code == "TOKEN4012" {
-//                    print("[토큰 만료] 토큰 재발급 시도 중...")
-//                    
-//                    AuthService().reissue() { success in
-//                        if success {
-//                            print("[토큰 재발급 완료] API 재요청 실행...")
-//                            handleResponse(response, decodingType: decodingType)
-//                        } else {
-//                            print("[토큰 재발급 실패] 로그아웃 처리 필요")
-//                        }
-//                    }
-//                    return .failure(.tokenExpiredError)
-//                    
-//                }
-                
+                if errorResponse?.code == "TOKEN4011" || errorResponse?.code == "TOKEN4012" {
+                    print("[토큰 만료] 토큰 재발급 시도 중...")
+                    
+                    AuthService().reissue() { success in
+                        if success {
+                            print("[토큰 재발급 완료] API 재요청 실행...")
+                            handleResponse(response, decodingType: decodingType)
+                        } else {
+                            print("[토큰 재발급 실패] 로그아웃 처리 필요")
+                        }
+                    }
+                    return .failure(.tokenExpiredError)
+                    
+                }
                 return .failure(.serverError(statusCode: response.statusCode, message: finalMessage))
             }
             
