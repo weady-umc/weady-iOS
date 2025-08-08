@@ -342,4 +342,7 @@ struct NoWeadyboardView: View {
 }
 
 
+#Preview {
+    WeadychiveView()
+}
 

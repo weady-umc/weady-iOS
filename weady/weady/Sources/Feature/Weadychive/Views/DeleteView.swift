@@ -77,8 +77,8 @@ struct DeleteView: View {
             }) {
                 Text("완료")
                     .fontName(.captionMedium14)
-                    .foregroundColor(selectedItems.isEmpty ? .gray100 : .black100)
-            }
+                    .foregroundColor(selectedItems.isEmpty ? .gray : .black100)
+            }	
             .disabled(selectedItems.isEmpty)
         }
         .padding()
