@@ -30,15 +30,23 @@ extension View {
 }
 
 extension UIApplication {
-    func topViewController() -> UIViewController? {
-        let keyWindow = UIApplication.shared.connectedScenes
-            .compactMap { ($0 as? UIWindowScene)?.keyWindow }
-            .first
+    func topViewController(controller: UIViewController? = UIApplication.shared.connectedScenes
+        .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+        .first?.rootViewController) -> UIViewController? {
 
-        var topVC = keyWindow?.rootViewController
-        while let presentedVC = topVC?.presentedViewController {
-            topVC = presentedVC
+        if let nav = controller as? UINavigationController {
+            return topViewController(controller: nav.visibleViewController)
         }
-        return topVC
+
+        if let tab = controller as? UITabBarController,
+           let selected = tab.selectedViewController {
+            return topViewController(controller: selected)
+        }
+
+        if let presented = controller?.presentedViewController {
+            return topViewController(controller: presented)
+        }
+
+        return controller
     }
 }

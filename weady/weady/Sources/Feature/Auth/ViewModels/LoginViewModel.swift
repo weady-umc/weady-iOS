@@ -37,21 +37,47 @@ final class LoginViewModel: ObservableObject {
                 return
             }
             
-            self.requestLogin(accessToken: accessToken, provider: "kakao") {
-                completion(true)
+            UserApi.shared.me { user, error in
+                if let error = error {
+                    DispatchQueue.main.async {
+                        self.errorMessage = "사용자 정보 확인 실패: \(error.localizedDescription)"
+                        completion(false)
+                    }
+                    return
+                }
+                
+                guard let id = user?.id else {
+                    DispatchQueue.main.async {
+                        self.errorMessage = "카카오 사용자 ID 없음"
+                        completion(false)
+                    }
+                    return
+                }
+                
+                if let email = user?.kakaoAccount?.email {
+                    print("✅ Kakao ID: \(id), 이메일: \(email)")
+                } else {
+                    print("⚠️ Kakao ID: \(id), 이메일 없음 (email 동의 안 됐을 수 있음)")
+                }
+                
+                self.requestLogin(accessToken: accessToken, provider: "kakao") {
+                    completion(true)
+                }
             }
         }
     }
     
     // MARK: - 구글 로그인
-    func loginWithGoogle(completion: @escaping () -> Void) {
+    func loginWithGoogle(completion: @escaping (Bool) -> Void) {
         guard let rootViewController = UIApplication.shared.topViewController() else {
             self.errorMessage = "RootViewController를 찾을 수 없습니다."
+            completion(false)
             return
         }
         
         guard let clientID = Bundle.main.infoDictionary?["GIDClientID"] as? String else {
             self.errorMessage = "Google Client ID가 설정되지 않았습니다."
+            completion(false)
             return
         }
         
@@ -61,15 +87,19 @@ final class LoginViewModel: ObservableObject {
         GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { result, error in
             if let error = error {
                 self.errorMessage = error.localizedDescription
+                completion(false)
                 return
             }
             
-            guard let token = result?.user.accessToken.tokenString else {
+            guard let accessToken = result?.user.accessToken.tokenString else {
                 self.errorMessage = "AccessToken을 가져올 수 없습니다."
+                completion(false)
                 return
             }
             
-            self.requestLogin(accessToken: token, provider: "google", completion: completion)
+            self.requestLogin(accessToken: accessToken, provider: "google") {
+                completion(true)
+            }
         }
     }
     

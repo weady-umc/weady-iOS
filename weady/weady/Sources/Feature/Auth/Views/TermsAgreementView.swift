@@ -13,7 +13,6 @@ struct TermsAgreementView: View {
     @State private var showNicknameInput = false
     
     var body: some View {
-        NavigationStack {
             VStack(alignment: .leading) {
                 
                 Text("서비스 이용약관")
@@ -95,7 +94,7 @@ struct TermsAgreementView: View {
                     }
                 }
             }
-        }
+        
         .fullScreenCover(isPresented: $showNicknameInput) {
             NicknameInputView()
         }

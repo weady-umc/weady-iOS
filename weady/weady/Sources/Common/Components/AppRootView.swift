@@ -25,11 +25,10 @@ struct AppRootView: View {
                             .environment(router)
                             .navigationBarHidden(true)
                     case .onboarding:
-                        OnboardingView()
+                        TermsAgreementView()
                     case .basetab:
                         ZStack(alignment: .bottom) {
                             BaseTabScreen(selectedTab: $selectedTab)
-                            
                             if !isTabBarHidden {
                                 BaseTabView(selectedTab: $selectedTab, isTabBarHidden: $isTabBarHidden)
                                     .transition(.move(edge: .bottom))
@@ -42,10 +41,8 @@ struct AppRootView: View {
                         HomeView()
                     case .weadyboard:
                         WeadyboardView()
-                    case .weadyboardPost:
-                        WeadyboardPostView(isTabBarHidden: $isTabBarHidden, boardId: 1)
-                    case .weadyboardPostWithItem(let item):
-                        WeadyboardPostView(isTabBarHidden: $isTabBarHidden, boardId: item.boardId)
+                    case .weadyboardPost(let boardId):
+                        WeadyboardPostView(isTabBarHidden: $isTabBarHidden, boardId: boardId)
                     case .weadyboardPostReportDetail(let reason, let boardId):
                         WeadyboardPostReportDetailView(
                             reason: reason,
