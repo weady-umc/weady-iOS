@@ -37,10 +37,9 @@ extension WeatherEndpoints: TargetType {
     
     var method: Moya.Method {
         switch self {
-        case .getShortWeather, .getMidTermWeather:
+        case .getShortWeather, .getMidTermWeather, .getPreview:
             return .get
-        case .getPreview:
-            return .post
+
         }
     }
     
@@ -49,18 +48,26 @@ extension WeatherEndpoints: TargetType {
         case .getShortWeather, .getMidTermWeather:
             return .requestPlain
         case let .getPreview(bCode, x, y):
-            let body: [String: Any] = [
+            let query: [String: Any] = [
                 "b_code": bCode,
-                "longitude": x,
-                "latitude": y
+                "x": x,
+                "y": y
             ]
-            return .requestParameters(parameters: body, encoding: JSONEncoding.default)
+            return .requestParameters(parameters: query, encoding: URLEncoding.default)
                 
         }
         
     }
     
     var headers: [String: String]? {
-        return ["Content-Type": "application/json"]
+        var header: [String: String] = ["Content-Type": "application/json"]
+
+        
+        if let accessToken = UserDefaults.standard.string(forKey: "accessToken") {
+            header["Authorization"] = "Bearer \(accessToken)"
         }
+
+        return header
+    }
+
 }

@@ -9,13 +9,14 @@ import SwiftUI
 
 enum AppTextStyle {
     case titleBold24, titleSemibold24, titleMedium24
-    case headingBold20, headingSemibold20, headingMedium20, headingRegular20
+    case headingBold20, headingSemibold20, headingMedium20, headingRegular20, headingMedium80
     case bodyBold16, bodySemibold16, bodyMedium16, bodyRegular16, bodyLight16
     case captionSemibold14, captionMedium14, captionRegular14, captionLight14
     case metaSemibold12, metaMedium12, metaRegular12
     case metaMedium10, metaRegular10, metaMedium8, metaRegular8
 
     case homeRegular30, homeSemibold12, homeMedium11, homeRegular11
+
 
     var font: Font {
         switch self {
@@ -52,13 +53,15 @@ enum AppTextStyle {
         case .homeMedium11: return .custom("Pretendard-Medium", size: 11)
         case .homeRegular11: return .custom("Pretendard-Regular", size: 11)
         case .homeSemibold12: return .custom("Pretendard-Semibold", size: 12)
+            
+        case .headingMedium80: return .custom("Pretendard-Medium", size: 80)
         }
     }
 
     var fontSize: CGFloat {
         switch self {
         case .titleBold24, .titleSemibold24, .titleMedium24: return 24
-        case .headingBold20, .headingSemibold20, .headingMedium20, .headingRegular20: return 20
+        case .headingBold20, .headingSemibold20, .headingMedium20, .headingRegular20, .headingMedium80: return 20
         case .bodyBold16, .bodySemibold16, .bodyMedium16, .bodyRegular16, .bodyLight16: return 16
         case .captionSemibold14, .captionMedium14, .captionRegular14, .captionLight14: return 14
         case .metaSemibold12, .metaMedium12, .metaRegular12, .homeSemibold12: return 12
@@ -73,7 +76,7 @@ enum AppTextStyle {
     var lineHeight: CGFloat {
         switch self {
         case .titleBold24, .titleSemibold24, .titleMedium24: return 35
-        case .headingBold20, .headingSemibold20, .headingMedium20, .headingRegular20: return 28
+        case .headingBold20, .headingSemibold20, .headingMedium20, .headingRegular20, .headingMedium80: return 28
         case .bodySemibold16, .bodyMedium16, .bodyRegular16, .bodyLight16: return 24
         case .bodyBold16: return 24.5
         case .captionSemibold14, .captionMedium14, .captionRegular14, .captionLight14: return 20

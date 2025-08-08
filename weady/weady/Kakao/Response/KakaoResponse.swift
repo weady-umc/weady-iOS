@@ -7,45 +7,29 @@
 
 import Foundation
 
-struct KakaoSearchResponse: Decodable {
-    let documents: [KakaoPlace]
+struct AddressSearchResponse: Decodable {
+    let documents: [AddressDocument]
 }
 
-struct KakaoPlace: Decodable, Identifiable {
-    var id: String { placeName + x + y }
+struct AddressDocument: Decodable, Identifiable {
+    let address_name: String
+    var id: String { address.bCode + x + y }
 
-    let placeName: String
-    let addressName: String // 서울 서초구 양재1동 이런식으로 나오는 주소
-    let x: String   // 경도
-    let y: String   // 위도
-    
+    let address: AddressInfo  
+    let x: String
+    let y: String
+}
+
+struct AddressInfo: Decodable {
+    let region1depthName: String
+    let region2depthName: String
+    let region3depthName: String
+    let bCode: String
 
     enum CodingKeys: String, CodingKey {
-        case placeName = "place_name"
-        case addressName = "address_name"
-        case x, y
-
-    }
-}
-
-struct CoordToRegionResponse: Decodable {
-    let documents: [RegionDocument]
-}
-
-struct RegionDocument: Decodable {
-    let regionType: String      // ex: "B"
-    let code: String            // b_code (행정동 코드)
-    let addressName: String
-    let region1DepthName: String
-    let region2DepthName: String
-    let region3DepthName: String
-
-    enum CodingKeys: String, CodingKey {
-        case regionType = "region_type"
-        case code
-        case addressName = "address_name"
-        case region1DepthName = "region_1depth_name"
-        case region2DepthName = "region_2depth_name"
-        case region3DepthName = "region_3depth_name"
+        case region1depthName = "region_1depth_name"
+        case region2depthName = "region_2depth_name"
+        case region3depthName = "region_3depth_name"
+        case bCode = "b_code"
     }
 }

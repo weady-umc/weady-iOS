@@ -11,8 +11,7 @@ import SwiftUI
 struct weadyApp: App {
     var body: some Scene {
         WindowGroup {
-            WeatherLocationView()
-                .environment(NavigationRouter())
+            AppRootView()
         }
     }
 }

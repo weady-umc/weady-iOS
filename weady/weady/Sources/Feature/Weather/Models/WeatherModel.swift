@@ -49,9 +49,24 @@ struct WeatherAddData {
     var lowTemperature: Int
     var highTemperature: Int
     var rainProbability: Int
+    let windSpeed: Int
+
     
     var hourlyWeather: [HourlyWeather]
 }
+
+let example = WeatherAddData(
+        weatherBackground: "weather_sunny",
+        place: "서울특별시 강남구",
+        temperature: 25,
+        weatherIcon: "sun.max",
+        description: "맑음",
+        lowTemperature: 19,
+        highTemperature: 28,
+        rainProbability: 10,
+        windSpeed: 3,
+        hourlyWeather: []
+    )
 
 struct HourlyWeather: Identifiable {
     var id = UUID()
@@ -59,4 +74,5 @@ struct HourlyWeather: Identifiable {
     var iconName: String
     var temp: String
 }
+
 

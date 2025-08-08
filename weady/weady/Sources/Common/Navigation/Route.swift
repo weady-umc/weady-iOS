@@ -19,4 +19,5 @@ enum Route: Hashable {
     
     case weatheraddlocation
     case weathersearch
+    case weatherlocation
 }

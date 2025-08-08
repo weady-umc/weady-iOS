@@ -15,7 +15,8 @@ struct ShortWeatherResponse: Decodable {
 }
 
 //단기예보 모델
-struct ShortWeatherData: Decodable {
+struct ShortWeatherData: Decodable, Identifiable {
+    var id: UUID { UUID() }
     let address1: String
     let address2: String
     let address3: String
@@ -69,5 +70,5 @@ struct MidTermForecast: Decodable {
 struct WeatherPreviewResponse: Decodable {
     let code: Int
     let message: String
-    let data: ShortWeatherData
+    let data: ShortWeatherData?
 }

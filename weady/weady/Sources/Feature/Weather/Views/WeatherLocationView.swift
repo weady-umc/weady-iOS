@@ -12,6 +12,8 @@ struct WeatherLocationView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.editMode) private var editMode
     @Environment(NavigationRouter.self) var router
+    @State private var selectedPlace: AddressDocument? = nil
+
 
     
     var body: some View {
@@ -56,7 +58,7 @@ struct WeatherLocationView: View {
                 .navigationDestination(for: Route.self) { route in
                         switch route {
                         case .weathersearch:
-                            WeatherSearchView(selectedPlace: .constant(nil))
+                            WeatherSearchView(selectedPlace: $selectedPlace)
                         default:
                             HomeView()
                         }
