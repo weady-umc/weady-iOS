@@ -87,7 +87,7 @@ struct WeadyboardView: View {
                         .background(Color.black70)
                         .clipShape(RoundedRectangle(cornerRadius: 30))
                     }
-                    .padding(.bottom, 106)
+                    .padding(.bottom, 86)
                     .padding(.trailing, 24)
                 }
             }
@@ -104,7 +104,7 @@ struct WeadyboardView: View {
     @ViewBuilder
     private func boardImageCard(item: BoardPreviewDTO) -> some View {
         Button {
-            router.push(.weadyboardPostWithItem(item))
+            router.push(.weadyboardPost(boardId: item.boardId))
         } label: {
             ZStack(alignment: .topTrailing) {
 
@@ -127,8 +127,4 @@ struct WeadyboardView: View {
             }
         }
     }
-}
-
-#Preview {
-    WeadyboardView()
 }

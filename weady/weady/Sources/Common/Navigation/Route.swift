@@ -14,7 +14,6 @@ enum Route: Hashable {
     case home
     case weadyboard
     case weadyboardPost(boardId: Int)
-    case weadyboardPostWithItem(BoardPreviewDTO)
     case weadyboardPostReportDetail(ReportReason, boardId: Int)
     case weadychive
     case mypage
