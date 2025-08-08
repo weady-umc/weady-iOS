@@ -9,14 +9,13 @@ import SwiftUI
 
 enum AppTextStyle {
     case titleBold24, titleSemibold24, titleMedium24
-    case metaSemibold21
-    case headingBold20, headingSemibold20, headingMedium20, headingRegular20
+    case headingBold20, headingSemibold20, headingMedium20, headingRegular20, headingMedium80
     case bodyBold16, bodySemibold16, bodyMedium16, bodyRegular16, bodyLight16
     case captionSemibold14, captionMedium14, captionRegular14, captionLight14
     case metaSemibold12, metaMedium12, metaRegular12
-    case metaMedium10, metaRegular10, metaMedium8, metaRegular8
-
+    case metaMedium10, metaRegular10, metaMedium8, metaRegular8, metaSemibold21
     case homeRegular30, homeSemibold12, homeMedium11, homeRegular11
+
 
     var font: Font {
         switch self {
@@ -28,6 +27,7 @@ enum AppTextStyle {
         case .headingSemibold20: return .custom("Pretendard-SemiBold", size: 20)
         case .headingMedium20: return .custom("Pretendard-Medium", size: 20)
         case .headingRegular20: return .custom("Pretendard-Regular", size: 20)
+        case .headingMedium80: return .custom("Pretendard-Medium", size: 80)
 
         case .bodyBold16: return .custom("Pretendard-Bold", size: 16)
         case .bodySemibold16: return .custom("Pretendard-SemiBold", size: 16)
@@ -39,7 +39,7 @@ enum AppTextStyle {
         case .captionMedium14: return .custom("Pretendard-Medium", size: 14)
         case .captionRegular14: return .custom("Pretendard-Regular", size: 14)
         case .captionLight14: return .custom("Pretendard-Light", size: 14)
-        case .metaSemibold21: return .custom("Pretendard-SemiBold", size: 21)
+            
         case .metaSemibold12: return .custom("Pretendard-SemiBold", size: 12)
         case .metaMedium12: return .custom("Pretendard-Medium", size: 12)
         case .metaRegular12: return .custom("Pretendard-Regular", size: 12)
@@ -47,20 +47,20 @@ enum AppTextStyle {
         case .metaRegular10: return .custom("Pretendard-Regular", size: 10)
         case .metaMedium8: return .custom("Pretendard-Medium", size: 8)
         case .metaRegular8: return .custom("Pretendard-Regular", size: 8)
+        case .metaSemibold21: return .custom("Pretendard-SemiBold", size: 21)
 
         case .homeRegular30: return .custom("Pretendard-Regular", size: 30)
         case .homeSemibold12: return .custom("Pretendard-SemiBold", size: 12)
         case .homeMedium11: return .custom("Pretendard-Medium", size: 11)
         case .homeRegular11: return .custom("Pretendard-Regular", size: 11)
-        case .homeSemibold12: return .custom("Pretendard-Semibold", size: 12)
         }
     }
 
     var fontSize: CGFloat {
         switch self {
         case .titleBold24, .titleSemibold24, .titleMedium24: return 24
+        case .headingBold20, .headingSemibold20, .headingMedium20, .headingRegular20, .headingMedium80: return 20
         case .metaSemibold21: return 21
-        case .headingBold20, .headingSemibold20, .headingMedium20, .headingRegular20: return 20
         case .bodyBold16, .bodySemibold16, .bodyMedium16, .bodyRegular16, .bodyLight16: return 16
         case .captionSemibold14, .captionMedium14, .captionRegular14, .captionLight14: return 14
         case .metaSemibold12, .metaMedium12, .metaRegular12, .homeSemibold12: return 12
@@ -68,14 +68,13 @@ enum AppTextStyle {
         case .metaMedium8, .metaRegular8: return 8
         case .homeRegular30: return 30
         case .homeMedium11, .homeRegular11: return 11
-        case .homeSemibold12:return 12
         }
     }
 
     var lineHeight: CGFloat {
         switch self {
         case .titleBold24, .titleSemibold24, .titleMedium24: return 35
-        case .headingBold20, .headingSemibold20, .headingMedium20, .headingRegular20, .metaSemibold21: return 28
+        case .headingBold20, .headingSemibold20, .headingMedium20, .headingRegular20, .headingMedium80, .metaSemibold21: return 28
         case .bodySemibold16, .bodyMedium16, .bodyRegular16, .bodyLight16: return 24
         case .bodyBold16: return 24.5
         case .captionSemibold14, .captionMedium14, .captionRegular14, .captionLight14: return 20
@@ -84,7 +83,6 @@ enum AppTextStyle {
              .metaMedium8, .metaRegular8: return 16
         case .homeRegular30: return 30
         case .homeMedium11, .homeRegular11: return 11
-
         case .homeSemibold12: return 14
 
         }

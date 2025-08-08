@@ -4,7 +4,6 @@
 //
 //  Created by 엄민서 on 7/10/25.
 //
-
 import SwiftUI
 
 struct AppRootView: View {
@@ -12,7 +11,8 @@ struct AppRootView: View {
     @State private var isTabBarHidden = false
     @State private var selectedTab: TabType = .home
     @EnvironmentObject var reportViewModel: WeadyboardReportViewModel
-    
+    private let isTestingWeatherHomeView = true
+
     var body: some View {
         NavigationStack(path: $router.path) {
             SplashView()
@@ -54,7 +54,17 @@ struct AppRootView: View {
                         WeadychiveView()
                     case .mypage:
                         MyPageView()
-                        
+                    case .weatheraddlocation:
+                        WeatherLocationAddView(
+                            viewModel: WeatherLocationAddViewModel(),
+                            locationViewModel: WeatherLocationViewModel(),
+                            selectedPlace: .constant(nil),
+                            weather: ShortWeatherData.example
+                        )
+                    case .weathersearch:
+                        WeatherSearchView(selectedPlace: .constant(nil))
+                    case .weatherlocation:
+                        WeatherLocationView()
                     }
                 }
         }
