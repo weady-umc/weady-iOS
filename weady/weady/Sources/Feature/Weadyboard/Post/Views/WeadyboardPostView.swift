@@ -7,16 +7,16 @@
 
 import SwiftUI
 
-// TODO: 게시물 화면 아직 수정중
 struct WeadyboardPostView: View {
-    @Environment(NavigationRouter.self) private var router
+    @Environment(\.dismiss) private var dismiss
     @Binding var isTabBarHidden: Bool
     @State private var showCommentSheet = false
-    @State private var selectedPage = 0
     @State private var showMoreSheet = false
     @State private var showReportSheet = false
-    @State private var selectedReason: ReportReason? = nil
-    let item: WeadyBoardItem
+    
+    let boardId: Int
+    @StateObject private var viewModel = WeadyboardPostViewModel()
+    @StateObject private var reportViewModel = WeadyboardReportViewModel()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -25,65 +25,90 @@ struct WeadyboardPostView: View {
                 showBackButton: true,
                 backAction: {
                     isTabBarHidden = false
-                    router.pop()
+                    dismiss()
                 }
             )
             
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 16) {
-                    TabView {
-                        Image(item.imageName)
-                            .resizable()
-                            .frame(width: 375, height: 470)
-                            .clipped()
+            if let post = viewModel.post {
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 16) {
+                        Spacer()
+                        WeadyboardUserHeaderView(
+                            userName: post.userName,
+                            userProfileImageUrl: post.userProfileImageUrl ?? "profile",
+                            onMoreTap: { showMoreSheet = true }
+                        )
+                        
+                        WeadyboardPostImageView(images: post.imageDtoList.map { $0.imgUrl })
+                        
+                        WeadyboardActionButtonsView(
+                            goodStatus: viewModel.post?.goodStatus ?? false,
+                            goodCount: viewModel.post?.goodCount ?? 0,
+                            commentCount: 0,
+                            onLikeTap: {
+                                guard let boardId = viewModel.post?.boardId else { return }
+                                if viewModel.post?.goodStatus == true {
+                                    viewModel.unlikeBoard(boardId: boardId)
+                                } else {
+                                    viewModel.likeBoard(boardId: boardId)
+                                }
+                            },
+                            onCommentTap: {
+                                showCommentSheet = true
+                            },
+                            onBookmarkTap: {
+                            }
+                        )
+                        
+                        WeadyboardContentView(
+                            createdAt: post.createdAt,
+                            content: post.content
+                        )
+                        
+                        WeadyboardPostCardView(
+                            userName: post.userName,
+                            weatherText: viewModel.weatherLabel(for: post.weatherTagId),
+                            temperatureText: viewModel.temperatureText(for: post.temperatureTagId),
+                            placeDtoList: post.placeDtoList,
+                            styleNames: post.styleIdList.compactMap { StyleTag(rawValue: $0)?.name }
+                        )
+                        .padding(.horizontal, 20)
                     }
-                    .frame(width: 375, height: 470)
-                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-                    .cornerRadius(12)
-                    
-                    HStack(spacing: 24) {
-                        Image("likes")
-                        Text("138").fontName(.metaRegular12)
-                        Button { showCommentSheet = true } label: {
-                            Image("comment")
-                        }
-                        Text("7").fontName(.metaRegular12)
-                        Image("bookmark")
-                        Button { showMoreSheet = true } label: {
-                            Image("more")
-                        }
-                    }
-                    .font(.system(size: 20))
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 16)
-                    
-                    Text("어쩌구 저쩌구 내용 텍스트")
-                        .fontName(.captionRegular14)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 16)
                 }
+            } else if viewModel.isLoading {
+                ProgressView().padding(.top, 100)
+            } else if let error = viewModel.errorMessage {
+                Text(error).foregroundColor(.red)
             }
         }
         .onAppear {
             isTabBarHidden = true
+            viewModel.fetchPostDetail(boardId: boardId)
         }
         .onDisappear {
             isTabBarHidden = false
         }
         .sheet(isPresented: $showCommentSheet) {
-            WeadyboardPostCommentSheet()
+            WeadyboardPostCommentSheet(boardId: boardId)
                 .presentationDetents([.height(624)])
         }
         .sheet(isPresented: $showMoreSheet) {
-            WeadyboardPostMoreActionSheet(showReportSheet: $showReportSheet)
-                .presentationDetents([.height(255)])
+            WeadyboardPostMoreActionSheet(
+                showReportSheet: $showReportSheet,
+                boardId: boardId,
+                reportViewModel: reportViewModel
+            )
+            .presentationDetents([.height(255)])
         }
         .sheet(isPresented: $showReportSheet) {
-            WeadyboardPostReportNavigationSheet()
-                .presentationDetents([.height(759)])
+            WeadyboardPostReportNavigationSheet(
+                boardId: boardId,
+                reportViewModel: reportViewModel
+            )
+            .presentationDetents([.height(759)])
         }
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
     }
 }
+
