@@ -17,12 +17,12 @@ struct WeadyboardFilterSheet: View {
     
     let seasonTags = ["봄", "여름", "가을", "겨울"]
     let weatherTags: [(label: String, iconName: String)] = [
-        ("맑은 날", "sunny"),
-        ("구름 많은 날", "cloudy"),
-        ("비 오는 날", "rainy"),
-        ("눈 오는 날", "snowy"),
+        ("맑은 날", "sunnyIcon"),
+        ("구름 많은 날", "cloudyIcon"),
+        ("비 오는 날", "rainIcony"),
+        ("눈 오는 날", "snowyIcon"),
         ("흐린 날", "partlycloudy"),
-        ("바람 많은 날", "windy")
+        ("바람 많은 날", "windyIcon")
     ]
     
     var temperatureRangeText: String {

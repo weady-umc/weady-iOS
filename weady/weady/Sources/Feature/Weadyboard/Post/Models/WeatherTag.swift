@@ -11,12 +11,12 @@ enum WeatherTag: Int {
 
     static func iconName(for id: Int) -> String {
         switch id {
-        case 0: return "sunny"
-        case 1: return "cloudy"
-        case 2: return "rainy"
-        case 3: return "snowy"
+        case 0: return "sunnyIcon"
+        case 1: return "cloudyIcon"
+        case 2: return "rainyIcon"
+        case 3: return "snowyIcon"
         case 4: return "partlycloudy"
-        case 5: return "windy"
+        case 5: return "windyIcon"
         default: return ""
         }
     }
@@ -35,12 +35,12 @@ enum WeatherTag: Int {
     
     static func imageName(for id: Int) -> String {
             switch id {
-            case 0: return "sunny"
-            case 1: return "cloudy"
-            case 2: return "rainy"
-            case 3: return "snowy"
+            case 0: return "sunnyIcon"
+            case 1: return "cloudyIcon"
+            case 2: return "rainyIcon"
+            case 3: return "snowyIcon"
             case 4: return "partlycloudy"
-            case 5: return "windy"
+            case 5: return "windyIcon"
             default: return "defaultWeather"
             }
         }
