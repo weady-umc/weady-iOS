@@ -78,7 +78,8 @@ struct StartView: View {
         }
         //Next
         .fullScreenCover(isPresented: $vm.didTapNext) {
-            EmptyView()
+            // 일단 웨디시작하기 버튼 눌렀을 때 홈 화면 넘어가도록 임의로 설정 
+            BaseTabContainerView()
         }
     }
 }

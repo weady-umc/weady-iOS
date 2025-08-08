@@ -15,7 +15,6 @@ import GoogleSignInSwift
 @main
 struct weadyApp: App {
     @State private var router = NavigationRouter()
-    @StateObject private var reportViewModel = WeadyboardReportViewModel()
 
     init() {
         let kakaoNativeAppKey = (Bundle.main.infoDictionary?["KAKAO_NATIVE_APP_KEY"] as? String) ?? ""
@@ -26,7 +25,6 @@ struct weadyApp: App {
         WindowGroup {
             AppRootView()
                 .environment(router)
-                .environmentObject(reportViewModel)
                 .onOpenURL { url in
                     if AuthApi.isKakaoTalkLoginUrl(url) {
                         _ = AuthController.handleOpenUrl(url: url)
