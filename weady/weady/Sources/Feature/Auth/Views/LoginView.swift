@@ -61,17 +61,18 @@ struct LoginView: View {
                     }
                 }
             } label: {
-                HStack {
-                    Image("kakao_icon")
-                        .resizable()
-                        .frame(width: 21, height: 19.3)
-                        .padding(.leading, 23)
+                ZStack {
+                    HStack {
+                        Image("kakao_icon")
+                            .resizable()
+                            .frame(width: 21, height: 19.3)
+                            .padding(.leading, 20)
+                        Spacer()
+                    }
                     Text("카카오로 시작")
                         .fontName(.metaMedium12)
                         .foregroundColor(.black)
-                        .frame(maxWidth: .infinity, alignment: .center)
                 }
-                .padding()
                 .frame(width: 315, height: 44)
                 .background(Color.login100)
                 .cornerRadius(6)
@@ -89,17 +90,18 @@ struct LoginView: View {
                     }
                 }
             } label: {
-                HStack {
-                    Image("google_icon")
-                        .resizable()
-                        .frame(width: 16, height: 16)
-                        .padding(.leading, 23)
+                ZStack {
+                    HStack {
+                        Image("google_icon")
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                            .padding(.leading, 20)
+                        Spacer()
+                    }
                     Text("구글로 시작")
                         .fontName(.metaMedium12)
                         .foregroundColor(.black)
-                        .frame(maxWidth: .infinity, alignment: .center)
                 }
-                .padding()
                 .frame(width: 315, height: 44)
                 .background(Color.white)
                 .overlay(
@@ -112,17 +114,18 @@ struct LoginView: View {
             Button {
                 
             } label: {
-                HStack {
-                    Image("apple_icon")
-                        .resizable()
-                        .frame(width: 15.17, height: 18)
-                        .padding(.leading, 23)
+                ZStack {
+                    HStack {
+                        Image("apple_icon")
+                            .resizable()
+                            .frame(width: 15.17, height: 18)
+                            .padding(.leading, 20)
+                        Spacer()
+                    }
                     Text("애플로 시작")
                         .fontName(.metaMedium12)
                         .foregroundColor(.black)
-                        .frame(maxWidth: .infinity, alignment: .center)
                 }
-                .padding()
                 .frame(width: 315, height: 44)
                 .background(Color.white)
                 .overlay(
