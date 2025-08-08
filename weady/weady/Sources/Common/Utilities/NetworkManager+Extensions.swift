@@ -19,8 +19,12 @@ extension NetworkManager {
         provider.request(target) { result in
             switch result {
             case .success(let response):
-                let result: Result<T, NetworkError> = self.handleResponse(response, decodingType: decodingType)
-                completion(result)
+                self.handleResponse(
+                    response,
+                    target: target,
+                    decodingType: decodingType,
+                    completion: completion
+                )
             case .failure(let error):
                 let networkError = self.handleNetworkError(error)
                 completion(.failure(networkError))
@@ -160,56 +164,54 @@ extension NetworkManager {
     // MARK: - 상태 코드 처리 처리 함수
     private func handleResponse<T: Decodable>(
         _ response: Response,
-        decodingType: T.Type
-    ) -> Result<T, NetworkError> { // 옵셔널 미지원
+        target: Endpoint,
+        decodingType: T.Type,
+        completion: @escaping (Result<T, NetworkError>) -> Void
+    ) {
         do {
-            // 1. 상태 코드 확인
             guard (200...299).contains(response.statusCode) else {
                 let errorMessage: String
                 switch response.statusCode {
-                case 300..<400:
-                    errorMessage = "리다이렉션 오류 발생: \(response.statusCode)"
-                case 400..<500:
-                    errorMessage = "클라이언트 오류 발생: \(response.statusCode)"
-                case 500..<600:
-                    errorMessage = "서버 오류 발생: \(response.statusCode)"
-                default:
-                    errorMessage = "알 수 없는 오류 발생: \(response.statusCode)"
+                case 300..<400: errorMessage = "리다이렉션 오류 발생: \(response.statusCode)"
+                case 400..<500: errorMessage = "클라이언트 오류 발생: \(response.statusCode)"
+                case 500..<600: errorMessage = "서버 오류 발생: \(response.statusCode)"
+                default: errorMessage = "알 수 없는 오류 발생: \(response.statusCode)"
                 }
                 
-                // 2. 서버 응답 메시지 처리
                 let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
                 let finalMessage = errorResponse?.message ?? errorMessage
                 
                 if errorResponse?.code == "TOKEN4011" || errorResponse?.code == "TOKEN4012" {
                     print("[토큰 만료] 토큰 재발급 시도 중...")
                     
-                    AuthService().reissue() { success in
+                    AuthService().reissue { success in
                         if success {
                             print("[토큰 재발급 완료] API 재요청 실행...")
-                            handleResponse(response, decodingType: decodingType)
+                            self.request(target: target, decodingType: decodingType, completion: completion)
                         } else {
                             print("[토큰 재발급 실패] 로그아웃 처리 필요")
+                            completion(.failure(.tokenExpiredError))
                         }
                     }
-                    return .failure(.tokenExpiredError)
-                    
+                    return
                 }
-                return .failure(.serverError(statusCode: response.statusCode, message: finalMessage))
+                
+                completion(.failure(.serverError(statusCode: response.statusCode, message: finalMessage)))
+                return
             }
             
-            // 3. 응답 디코딩
+            // 응답 디코딩
             let apiResponse = try JSONDecoder().decode(ApiResponse<T>.self, from: response.data)
             
-            // 4. result 처리 (빈 데이터 불허)
             guard let result = apiResponse.data else {
-                return .failure(.serverError(statusCode: response.statusCode, message: "결과 데이터가 없습니다."))
+                completion(.failure(.serverError(statusCode: response.statusCode, message: "결과 데이터가 없습니다.")))
+                return
             }
             
-            return .success(result) // 반드시 데이터가 필요함
+            completion(.success(result))
             
         } catch {
-            return .failure(.decodingError) // 디코딩 실패
+            completion(.failure(.decodingError))
         }
     }
     
