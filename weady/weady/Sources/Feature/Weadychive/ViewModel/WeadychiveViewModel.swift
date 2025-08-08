@@ -34,9 +34,11 @@ final class WeadychiveViewModel: ObservableObject {
     
     // MARK: - Init
     init() {
+        //TODO: 실제 API 호출로 변경할 것
         // fetchScrappedCurations()
         // fetchScrappedBoards()
         
+        // Mock 데이터로 초기화 (테스트용) . 서버 통신 실패 시 대체용 mock 데이터. 
         scrappedCurationItems = (0..<10).map {
             CurationItem(
                 id: $0,

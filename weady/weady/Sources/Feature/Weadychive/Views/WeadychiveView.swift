@@ -57,14 +57,12 @@ struct WeadychiveView: View {
         .navigationDestination(isPresented: $navigateToDeleteView) {
             if selectedTopTab == .curation {
                 DeleteView(type: .curation,
-                           items: .constant(viewModel.scrappedCurationItems.map { DeleteItem(id: $0.id, imageUrl: $0.firstImgUrl) })) { deleted in
-                    viewModel.deleteCurationItems(with: deleted)
-                }
+                           items: .constant(viewModel.scrappedCurationItems.map { DeleteItem(id: $0.id, imageUrl: $0.firstImgUrl) }),
+                           viewModel: viewModel)
             } else {
                 DeleteView(type: .weadyboard,
-                           items: .constant(viewModel.scrappedWeadyboardItems.map { DeleteItem(id: $0.id, imageUrl: $0.imgUrl) })) { deleted in
-                    viewModel.deleteWeadyboardItems(with: deleted)
-                }
+                           items: .constant(viewModel.scrappedWeadyboardItems.map { DeleteItem(id: $0.id, imageUrl: $0.imgUrl) }),
+                           viewModel: viewModel)
             }
         }
         
@@ -196,7 +194,9 @@ struct CurationListView: View {
                     }
                 }
                 .padding(.horizontal, 2)
+                .padding(.bottom,0)
             }
+            .ignoresSafeArea(.all,edges: .bottom)
         }
     }
 }
@@ -242,7 +242,9 @@ struct WeadyboardListView: View {
                     }
                 }
                 .padding(.horizontal, 2)
+                .padding(.bottom,0)
             }
+            .ignoresSafeArea(.all,edges: .bottom)
         }
     }
 }
