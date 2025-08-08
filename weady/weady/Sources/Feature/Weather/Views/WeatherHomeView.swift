@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WeatherHomeView: View {
     @Bindable var viewModel: WeatherHomeViewModel = .init()
-    private let shortData = ShortWeatherData.example
+   // private let shortData = ShortWeatherData.example
     @Environment(NavigationRouter.self) var router
     @State private var path = NavigationPath()
 
@@ -24,9 +24,16 @@ struct WeatherHomeView: View {
                 SegmentView
                 
                 
-                let addData = WeatherLocationAddViewModel().convertToWeatherAddData(from: shortData)
-                
-                weatherView(weather: addData)
+                if let data = viewModel.shortData {
+                                    let addData = viewModel.convertToWeatherAddData(from: data)
+                                    weatherView(weather: addData)
+                                } else {
+                                    ProgressView("날씨를 불러오는 중...")
+                                        .onAppear {
+                                            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU0NjY4OTg4fQ.RaIwox3gZHhagN88NQ4lnN1Iag7r7n_ADHZ1d14gHWMyNd3vgs8N0ZbTX0RXodsmzS2GzdOTF7WWrPfozj7fUg", forKey: "accessToken")
+                                            viewModel.fetchShortWeather()
+                                        }
+                                }
                 
 
             }

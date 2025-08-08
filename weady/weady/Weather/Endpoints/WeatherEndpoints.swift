@@ -61,13 +61,14 @@ extension WeatherEndpoints: TargetType {
     
     var headers: [String: String]? {
         var header: [String: String] = ["Content-Type": "application/json"]
-
-        
         if let accessToken = UserDefaults.standard.string(forKey: "accessToken") {
+            print("✅ accessToken 있음 → Authorization 헤더 삽입됨")
             header["Authorization"] = "Bearer \(accessToken)"
+        } else {
+            print("⚠️ accessToken 없음 → 헤더 누락됨")
         }
-
         return header
     }
+
 
 }

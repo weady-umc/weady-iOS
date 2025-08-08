@@ -15,7 +15,7 @@ class WeatherLocationAddViewModel: ObservableObject {
     private let service = WeatherServices()
     
     func fetchWeather(locationId: Int) {
-        service.fetchShortWeather(locationId: locationId) { [weak self] result in
+        service.fetchShortWeather{ [weak self] result in
             DispatchQueue.main.async {
                 guard let self else { return }
                 switch result {

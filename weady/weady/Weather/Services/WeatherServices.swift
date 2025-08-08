@@ -16,23 +16,34 @@ final class WeatherServices {
     
     init() {}
 
-    func fetchShortWeather(locationId: Int, completion: @escaping (Result<ShortWeatherData, Error>) -> Void) {
+    func fetchShortWeather(completion: @escaping (Result<ShortWeatherData, Error>) -> Void) {
         provider.request(.getShortWeather) { result in
             switch result {
             case .success(let response):
+
+                if let json = try? JSONSerialization.jsonObject(with: response.data, options: []),
+                   let pretty = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted),
+                   let jsonStr = String(data: pretty, encoding: .utf8) {
+                    print("📦 날씨 API 응답:\n\(jsonStr)")
+                }
+
                 do {
+
                     let decoded = try JSONDecoder().decode(ShortWeatherResponse.self, from: response.data)
                     completion(.success(decoded.data))
                 } catch {
+                    print("❌ 디코딩 에러:", error)
                     completion(.failure(error))
                 }
 
             case .failure(let error):
+                print("❌ API 요청 실패:", error)
                 completion(.failure(error))
             }
         }
     }
-    
+
+
     func fetchMidTermWeather(locationId: Int, completion: @escaping (Result<[MidTermForecast], Error>) -> Void) {
         provider.request(.getMidTermWeather) { result in
             switch result {
