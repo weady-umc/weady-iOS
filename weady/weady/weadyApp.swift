@@ -30,6 +30,7 @@ struct weadyApp: App {
                 .onOpenURL { url in
                     if AuthApi.isKakaoTalkLoginUrl(url) {
                         _ = AuthController.handleOpenUrl(url: url)
+                    } else if GIDSignIn.sharedInstance.handle(url) {
                     }
                 }
         }
