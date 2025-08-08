@@ -9,6 +9,7 @@ import SwiftUI
 
 enum AppTextStyle {
     case titleBold24, titleSemibold24, titleMedium24
+    case metaSemibold21
     case headingBold20, headingSemibold20, headingMedium20, headingRegular20
     case bodyBold16, bodySemibold16, bodyMedium16, bodyRegular16, bodyLight16
     case captionSemibold14, captionMedium14, captionRegular14, captionLight14
@@ -38,7 +39,7 @@ enum AppTextStyle {
         case .captionMedium14: return .custom("Pretendard-Medium", size: 14)
         case .captionRegular14: return .custom("Pretendard-Regular", size: 14)
         case .captionLight14: return .custom("Pretendard-Light", size: 14)
-
+        case .metaSemibold21: return .custom("Pretendard-SemiBold", size: 21)
         case .metaSemibold12: return .custom("Pretendard-SemiBold", size: 12)
         case .metaMedium12: return .custom("Pretendard-Medium", size: 12)
         case .metaRegular12: return .custom("Pretendard-Regular", size: 12)
@@ -58,6 +59,7 @@ enum AppTextStyle {
     var fontSize: CGFloat {
         switch self {
         case .titleBold24, .titleSemibold24, .titleMedium24: return 24
+        case .metaSemibold21: return 21
         case .headingBold20, .headingSemibold20, .headingMedium20, .headingRegular20: return 20
         case .bodyBold16, .bodySemibold16, .bodyMedium16, .bodyRegular16, .bodyLight16: return 16
         case .captionSemibold14, .captionMedium14, .captionRegular14, .captionLight14: return 14
@@ -73,7 +75,7 @@ enum AppTextStyle {
     var lineHeight: CGFloat {
         switch self {
         case .titleBold24, .titleSemibold24, .titleMedium24: return 35
-        case .headingBold20, .headingSemibold20, .headingMedium20, .headingRegular20: return 28
+        case .headingBold20, .headingSemibold20, .headingMedium20, .headingRegular20, .metaSemibold21: return 28
         case .bodySemibold16, .bodyMedium16, .bodyRegular16, .bodyLight16: return 24
         case .bodyBold16: return 24.5
         case .captionSemibold14, .captionMedium14, .captionRegular14, .captionLight14: return 20
