@@ -17,7 +17,7 @@ struct WeadychiveView: View {
     @State private var selectedTopTab: TopTab = .curation // 기본 선택 탭
     @State private var showSheet = false // 시트 표시 여부
     @State private var navigateToDeleteView: Bool = false   // 삭제 뷰로 네비게이션 여부
-
+   
 
     // MARK: - Body
     var body: some View {
@@ -343,7 +343,3 @@ struct NoWeadyboardView: View {
 
 
 
-
-#Preview {
-  WeadychiveView()
-}

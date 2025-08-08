@@ -155,21 +155,9 @@ final class WeadychiveViewModel: ObservableObject {
         }
     }
     
-    /// 게시물 스크랩 삭제
-    func removeBoardScrap(boardId: Int) {
-        let dto = ScrapBoardRequestDto(boardId: boardId)
-        service.deleteScrapBoard(dto: dto) { result in
-            switch result {
-            case .success(let response):
-                print("✅ 웨디보드 스크랩 삭제 성공: \(response.isScraped)")
-                self.fetchScrappedBoards()
-            case .failure(let error):
-                print("❌ 웨디보드 스크랩 삭제 실패: \(error)")
-            }
-        }
-    }
+ 
     
-    // MARK: - 데이터 삭제
+    // MARK: - 큐레이션 스크랩 삭제
     func deleteCurationItems(with ids: [Int64]) {
         for id in ids {
             let dto = ScrapCurationRequestDto(curationId: Int(id))
@@ -184,7 +172,7 @@ final class WeadychiveViewModel: ObservableObject {
         }
         scrappedCurationItems.removeAll { ids.contains(Int64($0.id)) }
     }
-
+//MARK: -웨디보드 스크랩 삭제
     func deleteWeadyboardItems(with ids: [Int64]) {
         for id in ids {
             let dto = ScrapBoardRequestDto(boardId: Int(id))
