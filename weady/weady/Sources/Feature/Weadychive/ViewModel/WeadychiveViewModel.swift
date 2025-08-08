@@ -35,10 +35,10 @@ final class WeadychiveViewModel: ObservableObject {
     // MARK: - Init
     init() {
         //TODO: 실제 API 호출로 변경할 것
-        // fetchScrappedCurations()
-        // fetchScrappedBoards()
+//         fetchScrappedCurations()
+//         fetchScrappedBoards()
         
-        // Mock 데이터로 초기화 (테스트용) . 서버 통신 실패 시 대체용 mock 데이터. 
+        //MARK: -  Mock 데이터로 초기화 (테스트용) . 서버 통신 실패 시 대체용 mock 데이터.
         scrappedCurationItems = (0..<10).map {
             CurationItem(
                 id: $0,
@@ -49,7 +49,7 @@ final class WeadychiveViewModel: ObservableObject {
 
         scrappedWeadyboardItems = (0..<18).map {
             WeadyboardItem(
-                id: $0 + 100,
+                id: $0,
                 username: "User \($0)",
                 imgUrl: "weadyboard\(($0 % 7) + 1)",
                 weatherTagId: $0 % 5
@@ -57,7 +57,7 @@ final class WeadychiveViewModel: ObservableObject {
         }
         
         // Moya 로그 테스트
-        testMoyaLogOutput()
+        CurationLogOutput()
     }
     
     // MARK: - API Calls
@@ -113,19 +113,7 @@ final class WeadychiveViewModel: ObservableObject {
         }
     }
     
-    /// 큐레이션 스크랩 추가
-    func addCurationScrap(curationId: Int) {
-        let dto = ScrapCurationRequestDto(curationId: curationId)
-        service.postScrapCuration(dto: dto) { result in
-            switch result {
-            case .success(let response):
-                print("✅ 큐레이션 스크랩 성공: \(response.isScraped)")
-                self.fetchScrappedCurations()
-            case .failure(let error):
-                print("❌ 큐레이션 스크랩 실패: \(error)")
-            }
-        }
-    }
+  
     
     /// 큐레이션 스크랩 삭제
     func removeCurationScrap(curationId: Int) {
@@ -189,8 +177,8 @@ final class WeadychiveViewModel: ObservableObject {
     }
     
     // MARK: - Moya Log Test
-    func testMoyaLogOutput() {
-        print("🛠 testMoyaLogOutput 실행됨")
+    func CurationLogOutput() {
+        print("🛠 CurationLogOutput 실행됨")
         let token = KeychainSwift().get("serverAccessToken") ?? "없음"
         print("🔑 accessToken: \(token)")
         print("📡 서버에 getScrappedCurationsByUser 요청 전송 시작")

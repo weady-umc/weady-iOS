@@ -16,53 +16,57 @@ struct WeadychiveView: View {
     // MARK: - 프로퍼티
     @State private var selectedTopTab: TopTab = .curation // 기본 선택 탭
     @State private var showSheet = false // 시트 표시 여부
-    @State private var navigateToDeleteView: Bool = false   // 삭제 뷰로 네비게이션 여부
+    @State private var navigateToDelete = false // Add navigation state here
+    // 추가
+    @State private var deletedCurationIDs: Set<Int> = []
+    @State private var deletedWeadyboardIDs: Set<Int> = []
    
 
     // MARK: - Body
     var body: some View {
-        VStack(spacing: 0) {
-            TopBar(showSheet: $showSheet)
-                .padding(.bottom, 12)
-            // Top Tab Indicator
-            TopTabIndicatorView(selectedTab: $selectedTopTab)
-                .padding(.top, 12)
-            
-            // TODO: - 인디케이터 바에 따라서 아래 콘텐츠 분기
-            Group {
-                switch selectedTopTab {
-                case .curation:
-                    if viewModel.hasScrappedCurations {
-                        CurationListView(items: viewModel.scrappedCurationItems) // ViewModel 연동
-                    } else {
-                        NoCurationView()
-                    }
-                case .weadyboard:
-                    if viewModel.hasScrappedWeadyboards {
-                        WeadyboardListView(items: viewModel.scrappedWeadyboardItems) // ViewModel 연동
-                    } else {
-                        NoWeadyboardView()
+        NavigationStack {
+            VStack(spacing: 0) {
+                TopBar(showSheet: $showSheet)
+                    .padding(.bottom, 12)
+                // Top Tab Indicator
+                TopTabIndicatorView(selectedTab: $selectedTopTab)
+                    .padding(.top, 12)
+                
+                // TODO: - 인디케이터 바에 따라서 아래 콘텐츠 분기
+                Group {
+                    switch selectedTopTab {
+                    case .curation:
+                        if viewModel.hasScrappedCurations {
+                            CurationListView(items: viewModel.scrappedCurationItems) // ViewModel 연동
+                        } else {
+                            NoCurationView()
+                        }
+                    case .weadyboard:
+                        if viewModel.hasScrappedWeadyboards {
+                            WeadyboardListView(items: viewModel.scrappedWeadyboardItems) // ViewModel 연동
+                        } else {
+                            NoWeadyboardView()
+                        }
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-        // Sheet 표시: 더보기 탭에서 "스크랩 취소하기"를 눌렀을 때 표시
-        .sheet(isPresented: $showSheet) {
-            SheetView(showSheet: $showSheet, navigateToDeleteView: $navigateToDeleteView, selectedTopTab: selectedTopTab)
+            // Sheet 표시: 더보기 탭에서 "스크랩 취소하기"를 눌렀을 때 표시
+            .sheet(isPresented: $showSheet) {
+                SheetView(showSheet: $showSheet) {
+                    navigateToDelete = true
+                }
                 .presentationDetents([.height(145)])
                 .presentationDragIndicator(.visible)
-        }
-        // 삭제 뷰로 네비게이션: 탭에 따라 해당 삭제 뷰로 이동
-        .navigationDestination(isPresented: $navigateToDeleteView) {
-            if selectedTopTab == .curation {
-                DeleteView(type: .curation,
-                           items: .constant(viewModel.scrappedCurationItems.map { DeleteItem(id: $0.id, imageUrl: $0.firstImgUrl) }),
-                           viewModel: viewModel)
-            } else {
-                DeleteView(type: .weadyboard,
-                           items: .constant(viewModel.scrappedWeadyboardItems.map { DeleteItem(id: $0.id, imageUrl: $0.imgUrl) }),
-                           viewModel: viewModel)
+            }
+            .navigationDestination(isPresented: $navigateToDelete) {
+                if selectedTopTab == .curation {
+                    DeleteView(type: .curation, viewModel: WeadychiveViewModel())
+                        .navigationBarBackButtonHidden(true)
+                } else {
+                    DeleteView(type: .weadyboard, viewModel: WeadychiveViewModel())
+                        .navigationBarBackButtonHidden(true)
+                }
             }
         }
         
@@ -253,21 +257,18 @@ struct WeadyboardListView: View {
 
 struct SheetView: View {
     @Binding var showSheet: Bool
-    @Binding var navigateToDeleteView: Bool
-    var selectedTopTab: TopTab
+    var onDeleteTap: () -> Void
 
- 
     var body: some View {
         VStack(alignment: .leading) {
             Button {
                 showSheet = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    navigateToDeleteView = true
+                    onDeleteTap()
                 }
             } label: {
                 Text("스크랩 취소하기")
-                    .foregroundStyle(Color(red: 1, green: 0.23, blue: 0.19)) //피그마에 맞는 시스템 레드로 바꿈
-                //그냥 피그마에 있는 속성 그대로 가져옴. (extension에서 못찾음)
+                    .foregroundStyle(Color(red: 1, green: 0.23, blue: 0.19))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 50)
@@ -275,7 +276,6 @@ struct SheetView: View {
             Spacer()
         }
     }
-    
 }
 // MARK: - NoCurationView (스크랩된 큐레이션 없는 경우)
 struct NoCurationView: View {
@@ -342,7 +342,8 @@ struct NoWeadyboardView: View {
 }
 
 
+
+
 #Preview {
     WeadychiveView()
 }
-

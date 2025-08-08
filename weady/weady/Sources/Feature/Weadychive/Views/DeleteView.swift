@@ -19,7 +19,7 @@ struct DeleteView: View {
     }
 
     let type: DeleteType
-    @Binding var items: [DeleteItem]
+    // Removed @Binding var items: [DeleteItem]
     @ObservedObject var viewModel: WeadychiveViewModel
 
     @Environment(\.dismiss) private var dismiss
@@ -78,7 +78,7 @@ struct DeleteView: View {
                 Text("완료")
                     .fontName(.captionMedium14)
                     .foregroundColor(selectedItems.isEmpty ? .gray : .black100)
-            }	
+            }
             .disabled(selectedItems.isEmpty)
         }
         .padding()
@@ -87,7 +87,16 @@ struct DeleteView: View {
     private var gridView: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 2) {
-                ForEach(items) { item in
+                let currentItems: [DeleteItem] = {
+                    switch type {
+                    case .curation:
+                        return viewModel.scrappedCurationItems.map { DeleteItem(id: $0.id, imageUrl: $0.firstImgUrl) }
+                    case .weadyboard:
+                        return viewModel.scrappedWeadyboardItems.map { DeleteItem(id: $0.id, imageUrl: $0.imgUrl) }
+                    }
+                }()
+
+                ForEach(currentItems) { item in
                     gridItemView(for: item)
                 }
             }
@@ -139,25 +148,9 @@ struct DeleteView: View {
         }
     }
 }
-
-#Preview("DeleteView - Curation") {
-    let mockItems = (0..<10).map {
-        DeleteItem(id: Int64($0), imageUrl: $0 % 2 == 0 ? "curation1" : "curation2")
-    }
-    return NavigationStack {
-        DeleteView(type: .curation,
-                   items: .constant(mockItems),
-                   viewModel: WeadychiveViewModel())
-    }
-}
-
-#Preview("DeleteView - Weadyboard") {
-    let mockItems = (0..<20).map {
-        DeleteItem(id: Int64($0), imageUrl: "weadyboard\(($0 % 7) + 1)")
-    }
-    return NavigationStack {
-        DeleteView(type: .weadyboard,
-                   items: .constant(mockItems),
-                   viewModel: WeadychiveViewModel())
-    }
-}
+//
+//#Preview("DeleteView - Curation") {
+//    NavigationStack {
+//        DeleteView(type: .curation, viewModel: WeadychiveViewModel())
+//    }
+//}
