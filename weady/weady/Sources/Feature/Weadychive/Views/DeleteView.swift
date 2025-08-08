@@ -1,125 +1,131 @@
-////
-////  DeleteView.swift
-////  weady
-////
-////  Created by 고석현 on 7/28/25.
-////
+//////
+//  DeleteView.swift
+//  weady
 //
-//import SwiftUI
-//
-//enum DeleteContentType {
-//    case curation, weadyboard
-//
-//    var title: String {
-//        switch self {
-//        case .curation: return "스크랩한 큐레이션"
-//        case .weadyboard: return "스크랩한 웨디보드"
-//        }
-//    }
-//
-//    var gridColumns: [GridItem] {
-//        switch self {
-//        case .curation: return Array(repeating: GridItem(.flexible(), spacing: 2), count: 2)
-//        case .weadyboard: return Array(repeating: GridItem(.flexible(), spacing: 2), count: 3)
-//        }
-//    }
-//
-//    func imageName(for index: Int) -> String {
-//        switch self {
-//        case .curation: return index % 2 == 0 ? "curation1" : "curation2"
-//        case .weadyboard: return "weadyboard\((index % 7) + 1)"
-//        }
-//    }
-//
-//    var imageHeight: CGFloat {
-//        switch self {
-//        case .curation: return 240
-//        case .weadyboard: return 164
-//        }
-//    }
-//}
-//
-////MARK: -스크랩 취소하기 화면
-//struct DeleteView: View {
-//    @Environment(\.dismiss) var dismiss
-//    let type: DeleteContentType
-//    @Binding var items: [Int]
-//    var onDelete: ([Int]) -> Void
-//    @State private var selectedItems: Set<Int> = []
-//
-//   
-//    var body: some View {
-//        VStack(spacing: 0) {
+//  Created by 고석현 on 7/28/25.
 //
 //
-//            ScrollView {
-//                LazyVGrid(columns: type.gridColumns, spacing: 2) {
-//                    // 삭제 가능한 항목 리스트 표시
-//                    ForEach(items, id: \.self) { index in
-//                        Button {
-//                            if selectedItems.contains(index) {
-//                                selectedItems.remove(index)
-//                            } else {
-//                                selectedItems.insert(index)
-//                            }
-//                        } label: {
-//                            ZStack(alignment: .topTrailing) {
-//                                Image(type.imageName(for: index))
-//                                    .resizable()
-//                                    .aspectRatio(contentMode: .fill)
-//                                    .frame(height: type.imageHeight)
-//                                    .clipped()
-//                                    .overlay(
-//                                        selectedItems.contains(index) ? Color.black.opacity(0.3) : Color.clear
-//                                    )
-//
-//                                Image(systemName: selectedItems.contains(index) ? "checkmark.circle.fill" : "circle")
-//                                    .resizable()
-//                                    .frame(width: 24, height: 24)
-//                                    .foregroundStyle(.white)
-//                                    .background(Color.black.opacity(0.6))
-//                                    .clipShape(Circle())
-//                                    .padding(6)
-//                            }
-//                        }
-//                    }
-//                }
-//                .padding(.horizontal, 2)
-//            }
-//        }
-//        .navigationBarBackButtonHidden(true)
-//        .navigationBarTitleDisplayMode(.inline)
-//        .toolbar {
-//            ToolbarItem(placement: .navigationBarLeading) {
-//                Button(action: {
-//                    dismiss()
-//                }) {
-//                    Image(systemName: "chevron.left")
-//                        .foregroundStyle(.black)
-//                }
-//            }
-//
-//            ToolbarItem(placement: .principal) {
-//                Text("취소할 항목")
-//                    .font(.headline)
-//            }
-//
-//            ToolbarItem(placement: .navigationBarTrailing) {
-//                Button(action: {
-//                    dismiss()
-//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-//                        onDelete(Array(selectedItems))
-//                    }
-//                }) {
-//                    Text("완료")
-//                        .fontName(.captionMedium14)
-//                        .foregroundStyle(.black)
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//
-//
-//
+import SwiftUI
+
+struct DeleteItem: Identifiable, Hashable {
+    let id: Int64
+    let imageUrl: String
+}
+
+struct DeleteView: View {
+    enum DeleteType {
+        case curation
+        case weadyboard
+    }
+
+    let type: DeleteType
+    @Binding var items: [DeleteItem]
+    var onDelete: ([Int64]) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedItems: Set<Int64> = []
+
+    var title: String {
+        switch type {
+        case .curation: return "취소할 항목"
+        case .weadyboard: return "취소할 항목"
+        }
+    }
+
+    var columns: [GridItem] {
+        switch type {
+        case .curation:
+            return [GridItem(.flexible(), spacing: 2), GridItem(.flexible(), spacing: 2)]
+        case .weadyboard:
+            return [GridItem(.flexible(), spacing: 2), GridItem(.flexible(), spacing: 2), GridItem(.flexible(), spacing: 2)]
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                        .padding(.trailing, 8)
+                }
+                Spacer()
+                Text(title)
+                    .fontName(.bodySemibold16)
+                Spacer()
+                Button(action: {
+                    let deletedIDs = Array(selectedItems)
+                    onDelete(deletedIDs) // 서버 통신은 이 클로저에서 수행됨
+                    selectedItems.removeAll()
+                    dismiss() // 이전 화면으로 돌아가기
+                }) {
+                    Text("완료")
+                        .fontName(.captionMedium14)
+                        .foregroundColor(selectedItems.isEmpty ? .gray100 : .black100)
+                }
+                .disabled(selectedItems.isEmpty)
+            }
+            .padding()
+
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 2) {
+                    ForEach(items) { item in
+                        ZStack(alignment: .topTrailing) {
+                            Button(action: {
+                                if selectedItems.contains(item.id) {
+                                    selectedItems.remove(item.id)
+                                } else {
+                                    selectedItems.insert(item.id)
+                                }
+                            }) {
+                                AsyncImage(url: URL(string: item.imageUrl)) { image in
+                                    image.resizable()
+                                         .aspectRatio(contentMode: .fill)
+                                } placeholder: {
+                                    Color.gray.opacity(0.3)
+                                }
+                                .frame(height: type == .curation ? 240 : 164)
+                                .clipped()
+                                .overlay(
+                                    Group {
+                                        if selectedItems.contains(item.id) {
+                                            Color.black.opacity(0.4)
+                                        }
+                                    }
+                                )
+                            }
+                            .buttonStyle(.plain)
+
+                            if selectedItems.contains(item.id) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .resizable()
+                                    .frame(width: 24, height: 24)
+                                    .foregroundColor(.white)
+                                    .background(Color.black.opacity(0.6))
+                                    .clipShape(Circle())
+                                    .padding(6)
+                            }
+                        }
+                    }
+                }
+                .padding(2)
+            }
+        }
+        .background(Color.white)
+    }
+}
+
+// MARK: - Preview
+#Preview {
+    struct DeleteViewPreviewWrapper: View {
+        @State private var mockItems: [DeleteItem] = (1...12).map { DeleteItem(id: Int64($0), imageUrl: "https://via.placeholder.com/150") }
+        
+        var body: some View {
+            DeleteView(type: .curation, items: $mockItems) { deleted in
+                print("Deleted items: \(deleted)")
+            }
+        }
+    }
+
+    return DeleteViewPreviewWrapper()
+}

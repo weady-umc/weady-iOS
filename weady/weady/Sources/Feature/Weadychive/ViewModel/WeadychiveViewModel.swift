@@ -16,6 +16,10 @@ final class WeadychiveViewModel: ObservableObject {
     // MARK: - Published Properties
     @Published var scrappedCurationItems: [CurationItem] = []
     @Published var scrappedWeadyboardItems: [WeadyboardItem] = []
+    @Published var isCurationFetchFailed: Bool = false
+    @Published var isWeadyboardFetchFailed: Bool = false
+    @Published var isCurationLoaded: Bool = false
+    @Published var isWeadyboardLoaded: Bool = false
     
     var hasScrappedCurations: Bool {
         scrappedCurationItems.contains { !$0.firstImgUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
@@ -30,9 +34,25 @@ final class WeadychiveViewModel: ObservableObject {
     
     // MARK: - Init
     init() {
-        // 앱 시작 시 더미 데이터 대신 서버 데이터 불러오기
-        fetchScrappedCurations()
-        fetchScrappedBoards()
+        // fetchScrappedCurations()
+        // fetchScrappedBoards()
+        
+        scrappedCurationItems = (0..<10).map {
+            CurationItem(
+                id: $0,
+                title: "Mock Curation \($0)",
+                firstImgUrl: $0 % 2 == 0 ? "curation1" : "curation2"
+            )
+        }
+
+        scrappedWeadyboardItems = (0..<18).map {
+            WeadyboardItem(
+                id: $0 + 100,
+                username: "User \($0)",
+                imgUrl: "weadyboard\(($0 % 7) + 1)",
+                weatherTagId: $0 % 5
+            )
+        }
         
         // Moya 로그 테스트
         testMoyaLogOutput()
@@ -44,6 +64,7 @@ final class WeadychiveViewModel: ObservableObject {
     func fetchScrappedCurations() {
         service.getScrappedCurationsByUser { [weak self] result in
             DispatchQueue.main.async {
+                self?.isCurationLoaded = true
                 switch result {
                 case .success(let response):
                     print("✅ Scrapped Curations API 성공")
@@ -54,8 +75,11 @@ final class WeadychiveViewModel: ObservableObject {
                             firstImgUrl: $0.firstImgUrl
                         )
                     }
+                    self?.isCurationFetchFailed = false
                 case .failure(let error):
                     print("❌ Scrapped Curations API 실패: \(error)")
+                    self?.isCurationFetchFailed = true
+                    self?.scrappedCurationItems = []
                 }
             }
         }
@@ -65,6 +89,7 @@ final class WeadychiveViewModel: ObservableObject {
     func fetchScrappedBoards(size: Int = 18, page: Int = 0) {
         service.getScrappedBoardsByUser(size: size, page: page) { [weak self] result in
             DispatchQueue.main.async {
+                self?.isWeadyboardLoaded = true
                 switch result {
                 case .success(let response):
                     print("✅ Scrapped Boards API 성공")
@@ -76,8 +101,11 @@ final class WeadychiveViewModel: ObservableObject {
                             weatherTagId: $0.weatherTagId
                         )
                     }
+                    self?.isWeadyboardFetchFailed = false
                 case .failure(let error):
                     print("❌ Scrapped Boards API 실패: \(error)")
+                    self?.isWeadyboardFetchFailed = true
+                    self?.scrappedWeadyboardItems = []
                 }
             }
         }
@@ -139,12 +167,34 @@ final class WeadychiveViewModel: ObservableObject {
         }
     }
     
-    // MARK: - 로컬 데이터 삭제 (뷰에서 사용)
+    // MARK: - 데이터 삭제
     func deleteCurationItems(with ids: [Int64]) {
+        for id in ids {
+            let dto = ScrapCurationRequestDto(curationId: Int(id))
+            service.deleteScrapCuration(dto: dto) { result in
+                switch result {
+                case .success(let response):
+                    print("✅ 서버 큐레이션 스크랩 삭제 성공: \(response.isScraped)")
+                case .failure(let error):
+                    print("❌ 서버 큐레이션 스크랩 삭제 실패: \(error.localizedDescription)")
+                }
+            }
+        }
         scrappedCurationItems.removeAll { ids.contains(Int64($0.id)) }
     }
-    
+
     func deleteWeadyboardItems(with ids: [Int64]) {
+        for id in ids {
+            let dto = ScrapBoardRequestDto(boardId: Int(id))
+            service.deleteScrapBoard(dto: dto) { result in
+                switch result {
+                case .success(let response):
+                    print("✅ 서버 웨디보드 스크랩 삭제 성공: \(response.isScraped)")
+                case .failure(let error):
+                    print("❌ 서버 웨디보드 스크랩 삭제 실패: \(error.localizedDescription)")
+                }
+            }
+        }
         scrappedWeadyboardItems.removeAll { ids.contains(Int64($0.id)) }
     }
     
@@ -153,7 +203,7 @@ final class WeadychiveViewModel: ObservableObject {
         print("🛠 testMoyaLogOutput 실행됨")
         let token = KeychainSwift().get("serverAccessToken") ?? "없음"
         print("🔑 accessToken: \(token)")
-        
+        print("📡 서버에 getScrappedCurationsByUser 요청 전송 시작")
         service.getScrappedCurationsByUser { result in
             switch result {
             case .success(let response):
@@ -164,7 +214,7 @@ final class WeadychiveViewModel: ObservableObject {
                     print("   - [\(curation.curationId)] \(curation.curationTitle), URL: \(curation.firstImgUrl)")
                 }
             case .failure(let error):
-                print("🚨 요청 실패: \(error)")
+                print("🚨 요청 실패: \(error.localizedDescription)")
             }
         }
     }
