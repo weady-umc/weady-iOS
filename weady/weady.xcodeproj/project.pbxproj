@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+
+		CD766F6E2E411AB800E3CC88 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = CD766F6D2E411AB800E3CC88 /* CombineMoya */; };
+		CD766F702E411AB800E3CC88 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = CD766F6F2E411AB800E3CC88 /* Moya */; };
+		CD766F732E411B1B00E3CC88 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = CD766F722E411B1B00E3CC88 /* Alamofire */; settings = {ATTRIBUTES = (Required, ); }; };
+
 		5620BA552E3D90E700056C83 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA542E3D90E700056C83 /* KeychainSwift */; };
 		5620BA5C2E3DAC7700056C83 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA5B2E3DAC7700056C83 /* CombineMoya */; };
 		5620BA5E2E3DAC7700056C83 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA5D2E3DAC7700056C83 /* Moya */; };
@@ -19,15 +24,27 @@
 		566866ED2E41D4EC00187030 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 566866EC2E41D4EC00187030 /* GoogleSignInSwift */; };
 		569ACB3C2E419ABC00C4D1A1 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 569ACB3B2E419ABC00C4D1A1 /* GoogleSignIn */; };
 		CDF990FC2E3B849100446374 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = CDF990FB2E3B849100446374 /* Moya */; };
+
 		CDF990FF2E3B865100446374 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = CDF990FE2E3B865100446374 /* KeychainSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		808ED0FB2E1D9EFF00442DA8 /* weady.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = weady.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD0BCACC2E41204600CE9FF9 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CD1B01852E4114AD00EA74CE /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CD53DF432E41E76B0060DA84 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CD766E062E41176400E3CC88 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CD766F0A2E41195600E3CC88 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CD9662FB2E410DC400ED7340 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CD9663582E4110AA00ED7340 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		CDA22E922E411DBC00CB0A18 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CDD46A0B2E411F4C00988115 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CDDDE2C12E4116DA00F22F0B /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDF98D1B2E29549500446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDF98E0D2E3A58E400446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDF98FE22E3B7B8800446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDF990B32E3B827200446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CDF992A12E3B98F400446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -56,6 +73,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+
+				CD766F6E2E411AB800E3CC88 /* CombineMoya in Frameworks */,
+				CD766F732E411B1B00E3CC88 /* Alamofire in Frameworks */,
+				CD766F702E411AB800E3CC88 /* Moya in Frameworks */,
+
 				5620BA622E3DAC7700056C83 /* RxMoya in Frameworks */,
 				569ACB3C2E419ABC00C4D1A1 /* GoogleSignIn in Frameworks */,
 				5620BA5C2E3DAC7700056C83 /* CombineMoya in Frameworks */,
@@ -67,8 +89,8 @@
 				5620BA552E3D90E700056C83 /* KeychainSwift in Frameworks */,
 				566866EB2E41D4C300187030 /* KakaoSDKUser in Frameworks */,
 				5620BA5E2E3DAC7700056C83 /* Moya in Frameworks */,
+
 				CDF990FF2E3B865100446374 /* KeychainSwift in Frameworks */,
-				CDF990FC2E3B849100446374 /* Moya in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,6 +102,7 @@
 			children = (
 				808ED0FD2E1D9EFF00442DA8 /* weady */,
 				808ED0FC2E1D9EFF00442DA8 /* Products */,
+				CD9663592E4110AA00ED7340 /* Config */,
 			);
 			sourceTree = "<group>";
 		};
@@ -88,6 +111,59 @@
 			children = (
 				808ED0FB2E1D9EFF00442DA8 /* weady.app */,
 			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD0BCACE2E41204600CE9FF9 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD1B01872E4114AD00EA74CE /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD53DF452E41E76B0060DA84 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD766E082E41176400E3CC88 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD766F0C2E41195600E3CC88 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD9662FD2E410DC400ED7340 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD9663592E4110AA00ED7340 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				CD9663582E4110AA00ED7340 /* Config.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		CDA22E942E411DBC00CB0A18 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CDD46A0D2E411F4C00988115 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CDDDE2C32E4116DA00F22F0B /* Products */ = {
+			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -107,6 +183,11 @@
 			sourceTree = "<group>";
 		};
 		CDF990B52E3B827200446374 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CDF992A32E3B98F400446374 /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -131,6 +212,12 @@
 			);
 			name = weady;
 			packageProductDependencies = (
+
+				CDF990FE2E3B865100446374 /* KeychainSwift */,
+				CD766F6D2E411AB800E3CC88 /* CombineMoya */,
+				CD766F6F2E411AB800E3CC88 /* Moya */,
+				CD766F722E411B1B00E3CC88 /* Alamofire */,
+
 				5620BA542E3D90E700056C83 /* KeychainSwift */,
 				5620BA5B2E3DAC7700056C83 /* CombineMoya */,
 				5620BA5D2E3DAC7700056C83 /* Moya */,
@@ -144,6 +231,7 @@
 				566866E82E41D4C300187030 /* KakaoSDKAuth */,
 				566866EA2E41D4C300187030 /* KakaoSDKUser */,
 				566866EC2E41D4EC00187030 /* GoogleSignInSwift */,
+
 			);
 			productName = weady;
 			productReference = 808ED0FB2E1D9EFF00442DA8 /* weady.app */;
@@ -174,6 +262,11 @@
 			mainGroup = 808ED0F22E1D9EFF00442DA8;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+
+				CDF990FD2E3B865100446374 /* XCRemoteSwiftPackageReference "keychain-swift" */,
+				CD766F6C2E411AB800E3CC88 /* XCRemoteSwiftPackageReference "Moya" */,
+				CD766F712E411B1B00E3CC88 /* XCRemoteSwiftPackageReference "Alamofire" */,
+
 				5620BA532E3D90E700056C83 /* XCRemoteSwiftPackageReference "keychain-swift" */,
 				5620BA5A2E3DAC7700056C83 /* XCRemoteSwiftPackageReference "Moya" */,
 				CDF990FA2E3B849100446374 /* XCRemoteSwiftPackageReference "Moya" */,
@@ -181,26 +274,67 @@
 				569ACB3A2E419ABC00C4D1A1 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				5660B2722E419DE100A9C7F5 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
 				5660B2752E41CD5300A9C7F5 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 808ED0FC2E1D9EFF00442DA8 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = CDF98FE42E3B7B8800446374 /* Products */;
-					ProjectRef = CDF98FE22E3B7B8800446374 /* weady.xcodeproj */;
+					ProductGroup = CD0BCACE2E41204600CE9FF9 /* Products */;
+					ProjectRef = CD0BCACC2E41204600CE9FF9 /* weady.xcodeproj */;
 				},
 				{
-					ProductGroup = CDF98D1D2E29549500446374 /* Products */;
-					ProjectRef = CDF98D1B2E29549500446374 /* weady.xcodeproj */;
+					ProductGroup = CD766F0C2E41195600E3CC88 /* Products */;
+					ProjectRef = CD766F0A2E41195600E3CC88 /* weady.xcodeproj */;
 				},
 				{
 					ProductGroup = CDF990B52E3B827200446374 /* Products */;
 					ProjectRef = CDF990B32E3B827200446374 /* weady.xcodeproj */;
 				},
 				{
+					ProductGroup = CDF992A32E3B98F400446374 /* Products */;
+					ProjectRef = CDF992A12E3B98F400446374 /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CD53DF452E41E76B0060DA84 /* Products */;
+					ProjectRef = CD53DF432E41E76B0060DA84 /* weady.xcodeproj */;
+				},
+				{
 					ProductGroup = CDF98E0F2E3A58E400446374 /* Products */;
 					ProjectRef = CDF98E0D2E3A58E400446374 /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CDF98FE42E3B7B8800446374 /* Products */;
+					ProjectRef = CDF98FE22E3B7B8800446374 /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CD766E082E41176400E3CC88 /* Products */;
+					ProjectRef = CD766E062E41176400E3CC88 /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CDF98D1D2E29549500446374 /* Products */;
+					ProjectRef = CDF98D1B2E29549500446374 /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CDD46A0D2E411F4C00988115 /* Products */;
+					ProjectRef = CDD46A0B2E411F4C00988115 /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CD1B01872E4114AD00EA74CE /* Products */;
+					ProjectRef = CD1B01852E4114AD00EA74CE /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CD9662FD2E410DC400ED7340 /* Products */;
+					ProjectRef = CD9662FB2E410DC400ED7340 /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CDDDE2C32E4116DA00F22F0B /* Products */;
+					ProjectRef = CDDDE2C12E4116DA00F22F0B /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CDA22E942E411DBC00CB0A18 /* Products */;
+					ProjectRef = CDA22E922E411DBC00CB0A18 /* weady.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -233,6 +367,8 @@
 /* Begin XCBuildConfiguration section */
 		808ED1042E1D9F0100442DA8 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 808ED0FD2E1D9EFF00442DA8 /* weady */;
+			baseConfigurationReferenceRelativePath = Resources/Config/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -297,6 +433,8 @@
 		};
 		808ED1052E1D9F0100442DA8 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 808ED0FD2E1D9EFF00442DA8 /* weady */;
+			baseConfigurationReferenceRelativePath = Resources/Config/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -363,6 +501,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = weady/Info.plist;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "현재 위치를 사용하여 날씨 정보를 제공합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -398,6 +537,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = weady/Info.plist;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "현재 위치를 사용하여 날씨 정보를 제공합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -446,6 +586,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+
+		CD766F6C2E411AB800E3CC88 /* XCRemoteSwiftPackageReference "Moya" */ = {
+
 		5620BA532E3D90E700056C83 /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/evgenyneu/keychain-swift.git";
@@ -483,13 +626,24 @@
 			};
 		};
 		CDF990FA2E3B849100446374 /* XCRemoteSwiftPackageReference "Moya" */ = {
+
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Moya/Moya";
+			repositoryURL = "https://github.com/Moya/Moya.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 15.0.3;
 			};
 		};
+
+		CD766F712E411B1B00E3CC88 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
+
 		CDF990FD2E3B865100446374 /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/evgenyneu/keychain-swift";
@@ -501,6 +655,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+
+		CD766F6D2E411AB800E3CC88 /* CombineMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD766F6C2E411AB800E3CC88 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = CombineMoya;
+		};
+		CD766F6F2E411AB800E3CC88 /* Moya */ = {
+
 		5620BA542E3D90E700056C83 /* KeychainSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5620BA532E3D90E700056C83 /* XCRemoteSwiftPackageReference "keychain-swift" */;
@@ -557,9 +719,15 @@
 			productName = GoogleSignIn;
 		};
 		CDF990FB2E3B849100446374 /* Moya */ = {
+
 			isa = XCSwiftPackageProductDependency;
-			package = CDF990FA2E3B849100446374 /* XCRemoteSwiftPackageReference "Moya" */;
+			package = CD766F6C2E411AB800E3CC88 /* XCRemoteSwiftPackageReference "Moya" */;
 			productName = Moya;
+		};
+		CD766F722E411B1B00E3CC88 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD766F712E411B1B00E3CC88 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 		CDF990FE2E3B865100446374 /* KeychainSwift */ = {
 			isa = XCSwiftPackageProductDependency;

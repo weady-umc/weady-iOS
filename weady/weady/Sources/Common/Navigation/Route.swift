@@ -17,4 +17,8 @@ enum Route: Hashable {
     case weadyboardPostReportDetail(ReportReason, boardId: Int)
     case weadychive
     case mypage
+    
+    case weatheraddlocation
+    case weathersearch
+    case weatherlocation
 }

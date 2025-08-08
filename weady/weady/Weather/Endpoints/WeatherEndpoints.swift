@@ -10,8 +10,9 @@ import Foundation
 import Moya
 
 enum WeatherEndpoints {
-    case getShortWeather(locationID: Int)
-    case getMidTermWeather(locationId: Int)
+    case getShortWeather
+    case getMidTermWeather
+    case getPreview(bCode: String, x: Double, y: Double)
 }
 
 extension WeatherEndpoints: TargetType {
@@ -25,17 +26,20 @@ extension WeatherEndpoints: TargetType {
     
     var path: String {
         switch self{
-        case . getShortWeather(let locationID):
-            return "/weather/short/\(locationID)"
-        case .getMidTermWeather(let locationID):
-            return "/weather/mid-term/\(locationID)"
+        case . getShortWeather:
+            return "/weather/short/"
+        case .getMidTermWeather:
+            return "/weather/mid-term/"
+        case .getPreview:
+            return "/api/v1/weather/preview"
         }
     }
     
     var method: Moya.Method {
         switch self {
-        case .getShortWeather, .getMidTermWeather:
+        case .getShortWeather, .getMidTermWeather, .getPreview:
             return .get
+
         }
     }
     
@@ -43,11 +47,27 @@ extension WeatherEndpoints: TargetType {
         switch self {
         case .getShortWeather, .getMidTermWeather:
             return .requestPlain
+        case let .getPreview(bCode, x, y):
+            let query: [String: Any] = [
+                "b_code": bCode,
+                "x": x,
+                "y": y
+            ]
+            return .requestParameters(parameters: query, encoding: URLEncoding.default)
+                
         }
         
     }
     
     var headers: [String: String]? {
-        return ["Content-Type": "application/json"]
+        var header: [String: String] = ["Content-Type": "application/json"]
+
+        
+        if let accessToken = UserDefaults.standard.string(forKey: "accessToken") {
+            header["Authorization"] = "Bearer \(accessToken)"
         }
+
+        return header
+    }
+
 }
