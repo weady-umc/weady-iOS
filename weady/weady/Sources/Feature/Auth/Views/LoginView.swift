@@ -77,8 +77,14 @@ struct LoginView: View {
             
             // MARK: - 구글 로그인 버튼
             Button {
-                viewModel.loginWithGoogle {
-                    router.push(.basetab)
+                viewModel.loginWithGoogle { success in
+                    if success {
+                        if viewModel.isNewUser ?? false {
+                            router.push(.onboarding)
+                        } else {
+                            router.push(.basetab)
+                        }
+                    }
                 }
             } label: {
                 HStack {

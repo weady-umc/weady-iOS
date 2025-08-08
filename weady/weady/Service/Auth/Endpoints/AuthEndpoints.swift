@@ -52,10 +52,23 @@ extension AuthEndpoints: TargetType {
 
     var headers: [String: String]? {
         var header: [String: String] = [
-            "Content-Type": "application/json"]
-        if let token = AuthManager.shared.getAccessToken() {
-            header["Authorization"] = "Bearer \(token)"
+            "Content-Type": "application/json"
+        ]
+        
+        switch self {
+        case .postLogin(_, let provider):
+            if provider.lowercased() == "kakao" {
+                if let token = AuthManager.shared.getAccessToken() {
+                    header["Authorization"] = "Bearer \(token)"
+                }
+            }
+            return header
+            
+        case .postReissue, .deleteLogout:
+            if let token = AuthManager.shared.getAccessToken() {
+                header["Authorization"] = "Bearer \(token)"
+            }
+            return header
         }
-        return header
     }
 }
