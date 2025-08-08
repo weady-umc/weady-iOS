@@ -17,12 +17,12 @@ struct LoginView: View {
     @State private var currentPage = 0
     
     private let onboardingImages = [
-        "on1", "on2", "on3", "on4", "on5"
+        "onboarding1", "onboarding2", "onboarding3", "onboarding4", "onboarding5"
     ]
     
     var body: some View {
         VStack(spacing: 12) {
-            Spacer()
+            Spacer().frame(height: 27)
             
             // MARK: - 온보딩 슬라이드 이미지 삽입
             TabView(selection: $currentPage) {
@@ -34,10 +34,11 @@ struct LoginView: View {
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .frame(width: 370)
-            .padding(.horizontal, 24)
+            .frame(width: 375, height: 440)
             
-            HStack(spacing: 8) {
+            Spacer().frame(height: 29)
+            
+            HStack(spacing: 20) {
                 ForEach(onboardingImages.indices, id: \.self) { index in
                     Circle()
                         .fill(currentPage == index ? Color.gray300 : Color.gray400)
@@ -46,6 +47,7 @@ struct LoginView: View {
                 }
             }
             
+            Spacer()
             
             // MARK: - 카카오 로그인 버튼
             Button {
