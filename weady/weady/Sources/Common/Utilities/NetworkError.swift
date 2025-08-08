@@ -2,16 +2,7 @@
 //  NetworkError.swift
 //  weady
 //
-//  Created by 고석현 on 7/31/25.
-//
-
-import Foundation
-//
-//  NetworkError.swift
-//  weady
-//
 //  Created by 엄민서 on 7/29/25.
-//
 
 import Foundation
 

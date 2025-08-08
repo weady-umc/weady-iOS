@@ -9,8 +9,11 @@ import SwiftUI
 
 struct WeadyboardPostReportDetailView: View {
     let reason: ReportReason
+    let selectedReasonIndex: Int
+    let boardId: Int
     @State private var customText: String = ""
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject var reportViewModel: WeadyboardReportViewModel
     
     var body: some View {
         VStack(spacing: 0) {
@@ -72,7 +75,9 @@ struct WeadyboardPostReportDetailView: View {
             Spacer()
             
             Button {
-
+                let reportType = ReportTag.reportTypeEnglish(for: selectedReasonIndex)
+                let content = reason.isCustomInput ? customText : reason.detailTitle
+                reportViewModel.report(boardId: boardId, reportType: reportType, content: content)
             } label: {
                 Text("신고하기")
                     .fontName(.bodySemibold16)

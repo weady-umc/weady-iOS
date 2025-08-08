@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WeadyBoardItem: Identifiable, Equatable, Hashable {
     let id = UUID()
+    let boardId: Int
     let imageName: String
     let weather: String
 }
