@@ -31,7 +31,7 @@ struct WeatherLocationView: View {
                         
                     Spacer().frame(height: 25)
                     
-                    WeatherCardView(data: WeatherLocationViewModel.example, isCurrentLocation: true, editMode: false)
+                    WeatherLocationCardView(data: WeatherLocationViewModel.example, isCurrentLocation: true, editMode: false)
                     
                     Spacer().frame(height: 27)
                     
@@ -158,7 +158,7 @@ struct WeatherLocationView: View {
                                 
                             }
                             
-                            WeatherCardView(
+                            WeatherLocationCardView(
                                 data: weather,
                                 isCurrentLocation: false,
                                 editMode: editMode?.wrappedValue == .active
