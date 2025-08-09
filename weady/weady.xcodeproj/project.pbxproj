@@ -18,19 +18,7 @@
 		808EDCE52E3BCD0100442DA8 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 808EDCE42E3BCD0100442DA8 /* GoogleSignIn */; };
 		808EDCE72E3BCD0100442DA8 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 808EDCE62E3BCD0100442DA8 /* GoogleSignInSwift */; };
 		808EDD0F2E3DD89900442DA8 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 808EDD0E2E3DD89900442DA8 /* Kingfisher */; };
-		5620BA552E3D90E700056C83 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA542E3D90E700056C83 /* KeychainSwift */; };
-		5620BA5C2E3DAC7700056C83 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA5B2E3DAC7700056C83 /* CombineMoya */; };
-		5620BA5E2E3DAC7700056C83 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA5D2E3DAC7700056C83 /* Moya */; };
-		5620BA602E3DAC7700056C83 /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA5F2E3DAC7700056C83 /* ReactiveMoya */; };
-		5620BA622E3DAC7700056C83 /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5620BA612E3DAC7700056C83 /* RxMoya */; };
-		5660B2742E419DE100A9C7F5 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 5660B2732E419DE100A9C7F5 /* KakaoSDKCommon */; };
-		5660B2772E41CD5300A9C7F5 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 5660B2762E41CD5300A9C7F5 /* Kingfisher */; };
-		566866E92E41D4C300187030 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 566866E82E41D4C300187030 /* KakaoSDKAuth */; };
-		566866EB2E41D4C300187030 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 566866EA2E41D4C300187030 /* KakaoSDKUser */; };
-		566866ED2E41D4EC00187030 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 566866EC2E41D4EC00187030 /* GoogleSignInSwift */; };
-		569ACB3C2E419ABC00C4D1A1 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 569ACB3B2E419ABC00C4D1A1 /* GoogleSignIn */; };
-		CDF990FC2E3B849100446374 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = CDF990FB2E3B849100446374 /* Moya */; };
-		CDF990FF2E3B865100446374 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = CDF990FE2E3B865100446374 /* KeychainSwift */; };
+
 		808EE6232E46634400442DA8 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 808EE6222E46634400442DA8 /* CombineMoya */; };
 /* End PBXBuildFile section */
 
@@ -339,7 +327,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.weady.Weady;
+				PRODUCT_BUNDLE_IDENTIFIER = com.weady.Weady1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -374,7 +362,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.weady.Weady;
+				PRODUCT_BUNDLE_IDENTIFIER = com.weady.Weady1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
