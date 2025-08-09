@@ -51,7 +51,7 @@ struct WeadychiveView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .onAppear {
+            .task(id: selectedTopTab) {
                 switch selectedTopTab {
                 case .curation:
                     viewModel.CurationLogOutput()
@@ -59,8 +59,9 @@ struct WeadychiveView: View {
                     viewModel.WeadyboardLogOutput(size: 18, page: 0)
                 }
             }
-            .onChange(of: selectedTopTab) { newValue in
-                switch newValue {
+            .onChange(of: navigateToDelete) { isPushing in
+                guard isPushing == false else { return }
+                switch selectedTopTab {
                 case .curation:
                     viewModel.CurationLogOutput()
                 case .weadyboard:
@@ -195,19 +196,23 @@ struct CurationListView: View {
                         Button(action: {
                             // TODO: - 해당 큐레이션 상세 화면으로 이동
                         }) {
-                            if item.firstImgUrl.starts(with: "http") {
-                                AsyncImage(url: URL(string: item.firstImgUrl)) { image in
+                            if item.firstImgUrl.starts(with: "http"), let url = URL(string: item.firstImgUrl) {
+                                AsyncImage(url: url) { image in
                                     image.resizable()
-                                        .aspectRatio(contentMode: .fill)
+                                        .aspectRatio(1, contentMode: .fill)   // ⬅️ 정사각형 타일
+                                        .clipped()
                                 } placeholder: {
                                     Color.gray.opacity(0.3)
+                                        .aspectRatio(1, contentMode: .fill)   // ⬅️ 로딩도 정사각형 유지
                                 }
-                            } else {
+                            } else if !item.firstImgUrl.isEmpty {
                                 Image(item.firstImgUrl)
                                     .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(height: 240)
+                                    .aspectRatio(1, contentMode: .fill)
                                     .clipped()
+                            } else {
+                                Color.gray.opacity(0.2)
+                                    .aspectRatio(1, contentMode: .fill)
                             }
                             
                         }
@@ -243,21 +248,26 @@ struct WeadyboardListView: View {
                         Button(action: {
                             // TODO: - 해당 웨디보드 상세 화면으로 이동
                         }) {
-                            if item.imgUrl.starts(with: "http") {
-                                AsyncImage(url: URL(string: item.imgUrl)) { image in
+                            // Safe optional handling for imgUrl
+                            if let urlStr = item.imgUrl, urlStr.hasPrefix("http"), let url = URL(string: urlStr) {
+                                AsyncImage(url: url) { image in
                                     image.resizable()
-                                        .aspectRatio(contentMode: .fill)
+                                        .aspectRatio(1, contentMode: .fill)
+                                        .clipped()
                                 } placeholder: {
                                     Color.gray.opacity(0.3)
+                                        .aspectRatio(1, contentMode: .fill)
                                 }
-                            } else {
-                                Image(item.imgUrl)
+                            } else if let localName = item.imgUrl, !localName.isEmpty {
+                                Image(localName)
                                     .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(height: 164)
+                                    .aspectRatio(1, contentMode: .fill)
                                     .clipped()
+                            } else {
+                                // imgUrl == nil 또는 빈 문자열일 때 플레이스홀더
+                                Color.gray.opacity(0.2)
+                                    .aspectRatio(1, contentMode: .fill)
                             }
-                            
                         }
                     }
                 }

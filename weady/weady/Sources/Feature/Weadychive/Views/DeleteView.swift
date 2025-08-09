@@ -92,7 +92,7 @@ struct DeleteView: View {
                     case .curation:
                         return viewModel.scrappedCurationItems.map { DeleteItem(id: $0.id, imageUrl: $0.firstImgUrl) }
                     case .weadyboard:
-                        return viewModel.scrappedWeadyboardItems.map { DeleteItem(id: $0.id, imageUrl: $0.imgUrl) }
+                        return viewModel.scrappedWeadyboardItems.map { DeleteItem(id: $0.id, imageUrl: $0.imgUrl ?? "") }
                     }
                 }()
 
@@ -108,43 +108,48 @@ struct DeleteView: View {
 
     @ViewBuilder
     private func gridItemView(for item: DeleteItem) -> some View {
-        ZStack(alignment: .topTrailing) {
-            Button(action: {
-                if selectedItems.contains(item.id) {
-                    selectedItems.remove(item.id)
-                } else {
-                    selectedItems.insert(item.id)
-                }
-            }) {
-                Group {
-                    if item.imageUrl.starts(with: "http") {
-                        AsyncImage(url: URL(string: item.imageUrl)) { image in
-                            image.resizable()
-                                .aspectRatio(contentMode: .fill)
-                        } placeholder: {
-                            Color.gray.opacity(0.3)
-                        }
-                    } else {
-                        Image(item.imageUrl)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    }
-                }
-                .frame(height: type == .curation ? 240 : 164)
-                .clipped()
-                .overlay(
-                    selectedItems.contains(item.id) ? Color.black.opacity(0.4) : Color.clear
-                )
+        Button(action: {
+            if selectedItems.contains(item.id) {
+                selectedItems.remove(item.id)
+            } else {
+                selectedItems.insert(item.id)
             }
-            .buttonStyle(.plain)
-
-            Image(systemName: selectedItems.contains(item.id) ? "checkmark.circle.fill" : "circle")
-                .resizable()
+        }) {
+            Group {
+                if item.imageUrl.isEmpty {
+                    Color.gray.opacity(0.2)
+                        .aspectRatio(1, contentMode: .fill)
+                } else if item.imageUrl.hasPrefix("http"), let url = URL(string: item.imageUrl) {
+                    AsyncImage(url: url) { image in
+                        image.resizable()
+                            .aspectRatio(1, contentMode: .fill)   // ✅ 정사각형 셀
+                    } placeholder: {
+                        Color.gray.opacity(0.3)
+                            .aspectRatio(1, contentMode: .fill)
+                    }
+                } else {
+                    Image(item.imageUrl)
+                        .resizable()
+                        .aspectRatio(1, contentMode: .fill)
+                }
+            }
+            .clipped()
+        }
+        .buttonStyle(.plain)
+        // 선택 시 dim 처리
+        .overlay(
+            selectedItems.contains(item.id) ? Color.black.opacity(0.35) : Color.clear
+        )
+        // 체크마크는 항상 맨 위에 고정
+        .overlay(alignment: .topTrailing) {
+            let isSelected = selectedItems.contains(item.id)
+            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(Color.white)
                 .frame(width: 24, height: 24)
-                .foregroundColor(.white)
-                .background(Color.black.opacity(0.6))
-                .clipShape(Circle())
+                .background(Circle().fill(Color.black.opacity(0.6)))
                 .padding(6)
+                .zIndex(1)
         }
     }
 }
