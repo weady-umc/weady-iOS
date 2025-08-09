@@ -35,29 +35,28 @@ final class WeadychiveViewModel: ObservableObject {
     // MARK: - Init
     init() {
         //TODO: 실제 API 호출로 변경할 것
-//         fetchScrappedCurations()
-//         fetchScrappedBoards()
+         fetchScrappedCurations()
+         fetchScrappedBoards()
         
-        //MARK: -  Mock 데이터로 초기화 (테스트용) . 서버 통신 실패 시 대체용 mock 데이터.
-        scrappedCurationItems = (0..<10).map {
-            CurationItem(
-                id: $0,
-                title: "Mock Curation \($0)",
-                firstImgUrl: $0 % 2 == 0 ? "curation1" : "curation2"
-            )
-        }
-
-        scrappedWeadyboardItems = (0..<18).map {
-            WeadyboardItem(
-                id: $0,
-                username: "User \($0)",
-                imgUrl: "weadyboard\(($0 % 7) + 1)",
-                weatherTagId: $0 % 5
-            )
-        }
+//        //MARK: -  Mock 데이터로 초기화 (테스트용) . 서버 통신 실패 시 대체용 mock 데이터.
+//        scrappedCurationItems = (0..<10).map {
+//            CurationItem(
+//                id: $0,
+//                title: "Mock Curation \($0)",
+//                firstImgUrl: $0 % 2 == 0 ? "curation1" : "curation2"
+//            )
+//        }
+//
+//        scrappedWeadyboardItems = (0..<18).map {
+//            WeadyboardItem(
+//                id: $0,
+//                username: "User \($0)",
+//                imgUrl: "weadyboard\(($0 % 7) + 1)",
+//                weatherTagId: $0 % 5
+//            )
+//        }
         
-        // Moya 로그 테스트
-        CurationLogOutput()
+     
     }
     
     // MARK: - API Calls
@@ -190,6 +189,26 @@ final class WeadychiveViewModel: ObservableObject {
                 print("  큐레이션 개수: \(response.curations.count)")
                 for curation in response.curations {
                     print("   - [\(curation.curationId)] \(curation.curationTitle), URL: \(curation.firstImgUrl)")
+                }
+            case .failure(let error):
+                print("🚨 요청 실패: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    // MARK: - Weadyboard Log Test
+    func WeadyboardLogOutput(size: Int = 10, page: Int = 0) {
+        print("🛠 WeadyboardLogOutput 실행됨 (size: \(size), page: \(page))")
+        let token = KeychainSwift().get("serverAccessToken") ?? "없음"
+        print("🔑 accessToken: \(token)")
+        print("📡 서버에 getScrappedBoardsByUser 요청 전송 시작")
+        service.getScrappedBoardsByUser(size: size, page: page) { result in
+            switch result {
+            case .success(let response):
+                print("📥 응답 수신 성공")
+                print("  총 개수: \(response.content.count)")
+                for board in response.content {
+                    print("   - [boardId: \(board.boardId)] user: \(board.username), tag: \(board.weatherTagId), URL: \(board.imgUrl)")
                 }
             case .failure(let error):
                 print("🚨 요청 실패: \(error.localizedDescription)")

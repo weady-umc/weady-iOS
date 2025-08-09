@@ -51,6 +51,22 @@ struct WeadychiveView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            .onAppear {
+                switch selectedTopTab {
+                case .curation:
+                    viewModel.CurationLogOutput()
+                case .weadyboard:
+                    viewModel.WeadyboardLogOutput(size: 18, page: 0)
+                }
+            }
+            .onChange(of: selectedTopTab) { newValue in
+                switch newValue {
+                case .curation:
+                    viewModel.CurationLogOutput()
+                case .weadyboard:
+                    viewModel.WeadyboardLogOutput(size: 18, page: 0)
+                }
+            }
             // Sheet 표시: 더보기 탭에서 "스크랩 취소하기"를 눌렀을 때 표시
             .sheet(isPresented: $showSheet) {
                 SheetView(showSheet: $showSheet) {
@@ -61,10 +77,10 @@ struct WeadychiveView: View {
             }
             .navigationDestination(isPresented: $navigateToDelete) {
                 if selectedTopTab == .curation {
-                    DeleteView(type: .curation, viewModel: WeadychiveViewModel())
+                    DeleteView(type: .curation, viewModel: viewModel)
                         .navigationBarBackButtonHidden(true)
                 } else {
-                    DeleteView(type: .weadyboard, viewModel: WeadychiveViewModel())
+                    DeleteView(type: .weadyboard, viewModel: viewModel)
                         .navigationBarBackButtonHidden(true)
                 }
             }
