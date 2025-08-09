@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct WeatherCardView: View {
+struct WeatherLocationCardView: View {
     let data: WeatherData
     let isCurrentLocation: Bool
     let editMode: Bool
@@ -87,7 +87,7 @@ struct WeatherCardView: View {
         backgroundImage: "weather_cloudy"
     )
     
-    WeatherCardView(data: example, isCurrentLocation: false, editMode: true)
+    WeatherLocationCardView(data: example, isCurrentLocation: false, editMode: true)
 }
 
 

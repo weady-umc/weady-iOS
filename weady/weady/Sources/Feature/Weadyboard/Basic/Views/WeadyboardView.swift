@@ -74,7 +74,7 @@ struct WeadyboardView: View {
                 HStack {
                     Spacer()
                     Button(action: {
-                        router.push(.weadyboardUpload) // 게시글 업로드 화면으로 이동
+                        //router.push(.weadyboardUpload) // 게시글 업로드 화면으로 이동
                     }) {
                         HStack(spacing: 6) {
                             Image("plusicon")
@@ -104,7 +104,7 @@ struct WeadyboardView: View {
     @ViewBuilder
     private func boardImageCard(item: BoardPreviewDTO) -> some View {
         Button {
-            router.push(.weadyboardPost(boardId: item.boardId))
+            router.push(.weadyboardPost)
         } label: {
             ZStack(alignment: .topTrailing) {
 

@@ -41,15 +41,12 @@ struct AppRootView: View {
                         HomeView()
                     case .weadyboard:
                         WeadyboardView()
-                    case .weadyboardPost(let boardId):
-                        WeadyboardPostView(isTabBarHidden: $isTabBarHidden, boardId: boardId)
-                    case .weadyboardPostReportDetail(let reason, let boardId):
-                        WeadyboardPostReportDetailView(
-                            reason: reason,
-                            selectedReasonIndex: reportViewModel.selectedReasonIndex ?? 0,
-                            boardId: boardId,
-                            reportViewModel: reportViewModel
-                        )
+                    case .weadyboardPost:
+                        WeadyboardPostView(isTabBarHidden: $isTabBarHidden, boardId: 1)
+//                    case .weadyboardPostReportDetail(ReportReason, let boardId):
+//                        WeadyboardPostReportDetailView(
+//                            
+//                        )
                     case .weadychive:
                         WeadychiveView()
                     case .mypage:
@@ -66,6 +63,9 @@ struct AppRootView: View {
                     case .weatherlocation:
                         WeatherLocationView()
 
+                   // case .weadyboardUpload:
+                        
+                        
                     }
                 }
         }
