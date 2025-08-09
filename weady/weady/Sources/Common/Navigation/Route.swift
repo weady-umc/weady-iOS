@@ -19,4 +19,7 @@ enum Route: Hashable {
     case weadyboardUpload
     case weadychive
     case mypage
+    case weatheraddlocation
+    case weathersearch
+    case weatherlocation
 }

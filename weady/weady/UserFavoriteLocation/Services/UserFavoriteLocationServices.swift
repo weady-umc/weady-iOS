@@ -6,9 +6,10 @@
 //
 /*
 import Foundation
+import Moya
 
 final class UserFavoriteLocationServices {
-    private let provider: MoyaProvider<UserFavoriteLocationEndpoints>()
+    private let provider = MoyaProvider<UserFavoriteLocationEndpoints>()
     
     func fetchFavoriteLocations(completion: @escaping (Result<[UserFavoriteLocation], Error>) -> Void) {
         provider.request(.getUserFavoriteLocation) { result in
@@ -27,16 +28,18 @@ final class UserFavoriteLocationServices {
     }
     
     func addFavoriteLocation(hCode: String, completion: @escaping (Result<Int, Error>) -> Void) {
-        switch result {
-        case .success(let response):
-            do {
-                let decoded = try JSONDecoder().decode(PostFavoriteLocationResponse.self, from: response.data)
-                completion(.success(decoded.data.locationID))
-            } catch {
+        provider.request(.getUserFavoriteLocation) { result in
+            switch result {
+            case .success(let response):
+                do {
+                    let decoded = try JSONDecoder().decode(PostFavoriteLocationResponse.self, from: response.data)
+                    completion(.success(decoded.data.locationId))
+                } catch {
+                    completion(.failure(error))
+                }
+            case .failure(let error):
                 completion(.failure(error))
             }
-        case .failure(let error):
-            completion(.failure(error))
         }
     }
     
@@ -52,7 +55,7 @@ final class UserFavoriteLocationServices {
         }
     }
     func deleteFavoriteLocation(favoriteId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
-        provider.request(.deleteFavoriteLocation(favoriteId: favoriteId)) { result in
+        provider.request(.deleteFavoriteLocation(favoriteID: favoriteId)) { result in
             switch result {
             case .success:
                 completion(.success(()))
