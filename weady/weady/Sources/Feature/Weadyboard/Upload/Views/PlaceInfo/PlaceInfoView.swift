@@ -2,7 +2,8 @@ import SwiftUI
 
 struct PlaceInfoView: View {
     @Environment(\.dismiss) private var dismiss
-    @State var viewModel: PlaceViewModel
+    @Bindable var viewModel: PlaceViewModel
+    
     @State private var isSearching = false
 
     var body: some View {

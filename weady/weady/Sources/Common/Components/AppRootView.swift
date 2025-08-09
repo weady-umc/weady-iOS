@@ -54,7 +54,6 @@ struct AppRootView: View {
                         WeadychiveView()
                     case .mypage:
                         MyPageView()
-                        
                     }
                 }
         }

@@ -10,6 +10,11 @@ struct UploadView: View {
     @State private var fashionViewModel = FashionViewModel()
     @State private var placeViewModel = PlaceViewModel()
     
+    //MARK: - 업로드 상태 관리
+    @State private var isUploading = false
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
+    
     //MARK: - 등록 버튼 활성화 조건 (사진 1장 + 날씨 태그)
     private var isFormValid: Bool {
         viewModel.localImages.count >= 1 &&
@@ -40,53 +45,60 @@ struct UploadView: View {
                         NavBtn(title: "날씨 정보 추가", isRequired: true) {
                             AnyView(WeatherInfoView(viewModel: weatherViewModel))
                         }
-                        .onDisappear {
-                            viewModel.weatherModel = weatherViewModel.model
-                        }
                         Divider()
 
                         NavBtn(title: "패션 정보 추가") {
                             AnyView(FashionInfoView(viewModel: fashionViewModel))
-                        }
-                        .onDisappear {
-                            viewModel.fashionModel = fashionViewModel.fashion
                         }
                         Divider()
 
                         NavBtn(title: "장소 정보 추가") {
                             AnyView(PlaceInfoView(viewModel: placeViewModel))
                         }
-                        .onDisappear {
-                            viewModel.placeModel.places = placeViewModel.selectedPlaces
-                        }
                         Divider()
 
                         ToggleBtn(label: "커뮤니티 게시", isOn: $viewModel.isPublic)
                         Divider()
 
-                        ToggleBtn(label: "유료 광고 포함", isOn: $viewModel.includesAd)
+                        ToggleBtn(label: "유료 광고 포함", isOn: $viewModel.isPublic)
                         Divider()
                     }
 
                     //MARK: - 등록 버튼
                     Button(action: {
                         Task {
+                            isUploading = true
                             do {
                                 try await viewModel.submitPost()
+                                isUploading = false
+                                dismiss()
                             } catch {
-                                print("업로드 실패: \(error)")
+                                isUploading = false
+                                errorMessage = error.localizedDescription
+                                showErrorAlert = true
                             }
                         }
                     }) {
-                        Text("등록하기")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .fontName(.bodyMedium16)
-                            .background(isFormValid ? Color.black100 : Color.gray800)
-                            .foregroundStyle(Color.white100)
-                            .cornerRadius(8)
+                        if isUploading {
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                        } else {
+                            Text("등록하기")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .fontName(.bodyMedium16)
+                                .background(isFormValid ? Color.black100 : Color.gray800)
+                                .foregroundStyle(Color.white100)
+                                .cornerRadius(8)
+                        }
                     }
-                    .disabled(!isFormValid)
+                    .disabled(!isFormValid || isUploading)
+                    .alert("업로드 실패", isPresented: $showErrorAlert) {
+                        Button("확인", role: .cancel) { }
+                    } message: {
+                        Text(errorMessage)
+                    }
                 }
                 .padding(.horizontal, geometry.size.width * 0.05)
                 .padding(.bottom, geometry.size.height * 0.03)

@@ -75,7 +75,3 @@ struct WeatherInfoView: View {
         }
     }
 }
-
-#Preview {
-    WeatherInfoView(viewModel: WeatherViewModel())
-}

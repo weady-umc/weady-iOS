@@ -11,7 +11,7 @@ public struct UploadPlace: Codable {
 }
 
 //MARK: - 게시물 작성에 필요한 데이터
-public struct UploadData: Codable {
+public struct UploadModel: Codable {
     let isPublic: Bool               // 커뮤니티 게시 여부 (공개, 보관)
     let content: String              // 내용
     let imageDtoList: [UploadImage]  // 사진
@@ -22,20 +22,18 @@ public struct UploadData: Codable {
     let styleIdList: [Int]           // 패션 태그 (브랜드명, 제품명)
 }
 
-//MARK: - 게시물 업로드 DTO
-struct UploadRequest: Codable {
-    let isPublic: Bool
-    let content: String
-    let seasonTagId: Int?
-    let temperatureTagId: Int?
-    let weatherTagId: Int?
-    let placeDtoList: [Place]
-    let styleIdList: [Int]
-    let brandDtoList: [BrandDto]
-    let imageDtoList: [UploadImage]
-}
-
-struct BrandDto: Codable {
-    let brand: String
-    let product: String
+extension UploadModel {
+    var toCreateBoardRequestDTO: CreateBoardRequestDTO {
+        CreateBoardRequestDTO(
+            isPublic: self.isPublic,
+            content: self.content,
+            weatherTagId: self.weatherTagId,
+            temperatureTagId: self.temperatureTagId,
+            seasonTagId: self.seasonTagId,
+            boardPlaceRequestDtoList: self.placeDtoList.map {
+                PlaceDTO(placeName: $0.placeName, placeAddress: $0.placeAddress)
+            },
+            styleIds: self.styleIdList
+        )
+    }
 }
