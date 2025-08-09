@@ -74,7 +74,7 @@ struct WeadyboardView: View {
                 HStack {
                     Spacer()
                     Button(action: {
-                        // 게시글 업로드 화면으로 이동
+                        router.push(.weadyboardUpload) // 게시글 업로드 화면으로 이동
                     }) {
                         HStack(spacing: 6) {
                             Image("plusicon")
