@@ -91,7 +91,7 @@ struct WeatherHomeView: View {
     
     private var SegmentView: some View {
         HStack(spacing: 0) {
-            ForEach(WeatherModel.allCases, id: \.id) { segment in sheetSegment(segment: segment)
+            ForEach(WeatherHomeModel.allCases, id: \.id) { segment in sheetSegment(segment: segment)
                 
             }
         }
@@ -99,7 +99,7 @@ struct WeatherHomeView: View {
         .padding(.horizontal, 24)
     }
     
-    func sheetSegment(segment: WeatherModel) -> some View {
+    func sheetSegment(segment: WeatherHomeModel) -> some View {
         VStack(spacing: 8) {
             Text(segment.title)
                 .foregroundStyle(viewModel.selectedSegment == segment ? Color.gray100 : Color.gray800)

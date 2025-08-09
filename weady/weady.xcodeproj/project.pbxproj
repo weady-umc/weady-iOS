@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-
 		808EDAE32E38927700442DA8 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 808EDAE22E38927700442DA8 /* KeychainSwift */; };
 		808EDAEE2E38A3B900442DA8 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 808EDAED2E38A3B900442DA8 /* Moya */; };
 		808EDAF92E3925BB00442DA8 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 808EDAF82E3925BB00442DA8 /* Alamofire */; };
@@ -19,12 +18,12 @@
 		808EDCE52E3BCD0100442DA8 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 808EDCE42E3BCD0100442DA8 /* GoogleSignIn */; };
 		808EDCE72E3BCD0100442DA8 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 808EDCE62E3BCD0100442DA8 /* GoogleSignInSwift */; };
 		808EDD0F2E3DD89900442DA8 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 808EDD0E2E3DD89900442DA8 /* Kingfisher */; };
-
 		808EE6232E46634400442DA8 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 808EE6222E46634400442DA8 /* CombineMoya */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		808ED0FB2E1D9EFF00442DA8 /* weady.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = weady.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD9C36D82E470E9B0036A75E /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -84,6 +83,11 @@
 			children = (
 				808ED0FB2E1D9EFF00442DA8 /* weady.app */,
 			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD9C36DA2E470E9B0036A75E /* Products */ = {
+			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -159,6 +163,12 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 808ED0FC2E1D9EFF00442DA8 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = CD9C36DA2E470E9B0036A75E /* Products */;
+					ProjectRef = CD9C36D82E470E9B0036A75E /* weady.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				808ED0FA2E1D9EFF00442DA8 /* weady */,

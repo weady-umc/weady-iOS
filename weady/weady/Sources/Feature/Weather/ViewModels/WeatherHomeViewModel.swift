@@ -11,6 +11,6 @@ import Observation
 
 @Observable
 class WeatherHomeViewModel{
-    var selectedSegment: WeatherModel = .first
+    var selectedSegment: WeatherHomeModel = .first
     
 }
