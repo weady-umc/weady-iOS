@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum WeatherModel: Int, CaseIterable, Identifiable {
+enum WeatherHomeModel: Int, CaseIterable, Identifiable {
     case first
     case second
     case third

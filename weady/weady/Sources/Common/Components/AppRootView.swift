@@ -41,8 +41,8 @@ struct AppRootView: View {
                         HomeView()
                     case .weadyboard:
                         WeadyboardView()
-                    case .weadyboardPost(let boardId):
-                        WeadyboardPostView(isTabBarHidden: $isTabBarHidden, boardId: boardId)
+                    case .weadyboardPost:
+//                        WeadyboardPostView(isTabBarHidden: $isTabBarHidden)
                     case .weadyboardPostReportDetail(let reason, let boardId):
                         WeadyboardPostReportDetailView(
                             reason: reason,

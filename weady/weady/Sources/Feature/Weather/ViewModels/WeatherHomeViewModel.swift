@@ -10,7 +10,12 @@ import SwiftUI
 import Observation
 
 @Observable
+<<<<<<< Updated upstream
 class WeatherHomeViewModel {
+=======
+class WeatherHomeViewModel{
+    var selectedSegment: WeatherHomeModel = .first
+>>>>>>> Stashed changes
     
     // MARK: - 상태
     var selectedSegment: WeatherModel = .first
