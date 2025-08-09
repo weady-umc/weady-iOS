@@ -23,8 +23,8 @@ struct CurationItem: Identifiable, Equatable, Hashable, Decodable {
 // MARK: - 웨디보드 아이템 (API의 ScrappedBoardByUserResponseDto와 동일)
 struct WeadyboardItem: Identifiable, Equatable, Hashable, Decodable {
     let id: Int64
-    let username: String
-    let imgUrl: String
+    let username: String?
+    let imgUrl: String?
     let weatherTagId: Int64
     
     enum CodingKeys: String, CodingKey {

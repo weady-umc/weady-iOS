@@ -26,7 +26,9 @@ final class WeadychiveViewModel: ObservableObject {
     }
     
     var hasScrappedWeadyboards: Bool {
-        scrappedWeadyboardItems.contains { !$0.imgUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        scrappedWeadyboardItems.contains {
+            !($0.imgUrl ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
     }
     
     // MARK: - Service
@@ -55,7 +57,7 @@ final class WeadychiveViewModel: ObservableObject {
 //                weatherTagId: $0 % 5
 //            )
 //        }
-        
+//        
      
     }
     
@@ -87,7 +89,7 @@ final class WeadychiveViewModel: ObservableObject {
     }
     
     /// 사용자별 스크랩한 웨디보드 조회
-    func fetchScrappedBoards(size: Int = 18, page: Int = 0) {
+    func fetchScrappedBoards(size: Int = 10, page: Int = 0) {
         service.getScrappedBoardsByUser(size: size, page: page) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isWeadyboardLoaded = true
