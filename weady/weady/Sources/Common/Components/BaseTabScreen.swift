@@ -30,7 +30,3 @@ struct BaseTabScreen: View {
         .ignoresSafeArea(edges: .bottom)
     }
 }
-
-
-
-#Preview {BaseTabScreen()}

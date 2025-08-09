@@ -8,12 +8,18 @@
 import SwiftUI
 
 enum Route: Hashable {
+    case login
+    case onboarding
     case basetab
     case home
     case weadyboard
     case weadyboardPost
     case weadyboardPostWithItem(WeadyBoardItem)
     case weadyboardPostReportDetail(ReportReason)
+    case weadyboardUpload
     case weadychive
     case mypage
+    case weatheraddlocation
+    case weathersearch
+    case weatherlocation
 }

@@ -4,49 +4,70 @@
 //
 //  Created by 엄민서 on 7/10/25.
 //
-
 import SwiftUI
 
 struct AppRootView: View {
     @State private var router = NavigationRouter()
     @State private var isTabBarHidden = false
     @State private var selectedTab: TabType = .home
-    // 더미데이터 추후에 삭제 예정
-    private let dummyItem = WeadyBoardItem(imageName: "boardex1", weather: "sunny")
-    
+    @EnvironmentObject var reportViewModel: WeadyboardReportViewModel
+    private let isTestingWeatherHomeView = true
+
     var body: some View {
         NavigationStack(path: $router.path) {
-            ZStack(alignment: .bottom) {
-                BaseTabScreen(selectedTab: $selectedTab)
-                
-                if !isTabBarHidden {
-                    BaseTabView(selectedTab: $selectedTab, isTabBarHidden: $isTabBarHidden)
-                        .transition(.move(edge: .bottom))
-                        .animation(.easeInOut, value: isTabBarHidden)
+            SplashView()
+                .environment(router)
+                .navigationBarHidden(true)
+                .navigationDestination(for: Route.self) { route in
+                    switch route {
+                    case .login:
+                        LoginView()
+                            .environment(router)
+                            .navigationBarHidden(true)
+                    case .onboarding:
+                        TermsAgreementView()
+                    case .basetab:
+                        ZStack(alignment: .bottom) {
+                            BaseTabScreen(selectedTab: $selectedTab)
+                            if !isTabBarHidden {
+                                BaseTabView(selectedTab: $selectedTab, isTabBarHidden: $isTabBarHidden)
+                                    .transition(.move(edge: .bottom))
+                                    .animation(.easeInOut, value: isTabBarHidden)
+                            }
+                        }
+                        .ignoresSafeArea(.keyboard, edges: .bottom)
+                        .environment(router)
+                    case .home:
+                        HomeView()
+                    case .weadyboard:
+                        WeadyboardView()
+                    case .weadyboardPost(let boardId):
+                        WeadyboardPostView(isTabBarHidden: $isTabBarHidden, boardId: boardId)
+                    case .weadyboardPostReportDetail(let reason, let boardId):
+                        WeadyboardPostReportDetailView(
+                            reason: reason,
+                            selectedReasonIndex: reportViewModel.selectedReasonIndex ?? 0,
+                            boardId: boardId,
+                            reportViewModel: reportViewModel
+                        )
+                    case .weadychive:
+                        WeadychiveView()
+                    case .mypage:
+                        MyPageView()
+                    case .weatheraddlocation:
+                        WeatherLocationAddView(
+                            viewModel: WeatherLocationAddViewModel(),
+                            locationViewModel: WeatherLocationViewModel(),
+                            selectedPlace: .constant(nil),
+                            weather: ShortWeatherData.example
+                        )
+                    case .weathersearch:
+                        WeatherSearchView(selectedPlace: .constant(nil))
+                    case .weatherlocation:
+                        WeatherLocationView()
+
+                    }
                 }
-            }
-            .ignoresSafeArea(.keyboard, edges: .bottom)
-            .navigationDestination(for: Route.self) { route in
-                switch route {
-                case .basetab:
-                    BaseTabScreen(selectedTab: $selectedTab)
-                case .home:
-                    HomeView()
-                case .weadyboard:
-                    WeadyboardView()
-                case .weadyboardPost:
-                    WeadyboardPostView(isTabBarHidden: $isTabBarHidden, item: dummyItem)
-                case .weadyboardPostWithItem(let item):
-                    WeadyboardPostView(isTabBarHidden: $isTabBarHidden, item: item)
-                case .weadyboardPostReportDetail(let reason):
-                    WeadyboardPostReportDetailView(reason: reason)
-                case .weadychive:
-                    WeadychiveView()
-                case .mypage:
-                    MyPageView()
-                }
-            }
         }
-        .environment(router)
     }
 }

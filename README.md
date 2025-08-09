@@ -182,4 +182,28 @@ if let user = self.veryLongFunctionNameWhichReturnsOptionalUser(),
 
 ## 🗂️ 폴더 컨벤션
 ```
+weady
+├── Resources
+│   ├── Fonts                // 커스텀 폰트 관련 파일
+│   └── Assets.xcassets      // 이미지 및 컬러 에셋 등
+│
+├── Service                  // API 관련 네트워크 레이어
+│   └── [API 이름 폴더]        // 예: Auth, Board, Comment 등
+│       ├── Endpoints        // API Endpoint 정의
+│       ├── RequestDTOs      // 요청 모델 정의
+│       ├── ResponseDTOs     // 응답 모델 정의
+│       └── Service          // 실제 API 호출을 담당하는 서비스 클래스
+│
+├── Sources
+│   ├── Common               // 앱 전반에서 공통으로 사용하는 코드
+│   │   ├── Components       // 공통 UI 컴포넌트 
+│   │   ├── Extensions       // Swift 기본 타입,SwiftUI 확장
+│   │   ├── Navigation       // 라우팅 및 네비게이션 관련 코드
+│   │   └── Utilities        // Helper, Manager, Constants 등 유틸리티성 코드
+│   │
+│   └── Feature              // 기능 단위로 분리된 폴더 (MVVM 구조)
+│       └── [Feature 이름]    // 예: Login, Weadyboard, Comment 등
+│           ├── View         // SwiftUI View
+│           ├── ViewModel    // 상태 및 로직 처리
+│           └── Model        // 도메인 모델 정의
 ```
