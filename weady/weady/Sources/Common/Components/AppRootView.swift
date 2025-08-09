@@ -10,8 +10,6 @@ struct AppRootView: View {
     @State private var router = NavigationRouter()
     @State private var isTabBarHidden = false
     @State private var selectedTab: TabType = .home
-    @EnvironmentObject var reportViewModel: WeadyboardReportViewModel
-    private let isTestingWeatherHomeView = true
 
     var body: some View {
         NavigationStack(path: $router.path) {
@@ -37,35 +35,6 @@ struct AppRootView: View {
                         }
                         .ignoresSafeArea(.keyboard, edges: .bottom)
                         .environment(router)
-                    case .home:
-                        HomeView()
-                    case .weadyboard:
-                        WeadyboardView()
-                    case .weadyboardPost:
-                        WeadyboardPostView(isTabBarHidden: $isTabBarHidden, boardId: 1)
-//                    case .weadyboardPostReportDetail(ReportReason, let boardId):
-//                        WeadyboardPostReportDetailView(
-//                            
-//                        )
-                    case .weadychive:
-                        WeadychiveView()
-                    case .mypage:
-                        MyPageView()
-                    case .weatheraddlocation:
-                        WeatherLocationAddView(
-                            viewModel: WeatherLocationAddViewModel(),
-                            locationViewModel: WeatherLocationViewModel(),
-                            selectedPlace: .constant(nil),
-                            weather: ShortWeatherData.example
-                        )
-                    case .weathersearch:
-                        WeatherSearchView(selectedPlace: .constant(nil))
-                    case .weatherlocation:
-                        WeatherLocationView()
-
-                   // case .weadyboardUpload:
-                        
-                        
                     }
                 }
         }

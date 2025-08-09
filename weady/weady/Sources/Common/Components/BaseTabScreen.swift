@@ -15,13 +15,13 @@ struct BaseTabScreen: View {
             Group {
                 switch selectedTab {
                 case .home:
-                    HomeView()
+                    HomeFlowHost()
                 case .weadyboard:
-                    WeadyboardView()
+                    WeadyboardFlowHost()
                 case .weadychive:
-                    WeadychiveView()
+                    WeadychiveFlowHost()
                 case .mypage:
-                    MyPageView()
+                    MyPageFlowHost()
                 }
             }
             .frame(maxHeight: .infinity)
