@@ -19,6 +19,7 @@ struct SettingView: View {
                 }
             }
             .padding(.bottom, 200)
+            .padding(.top, 100)
             .navigationTitle("설정 및 개인정보")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)

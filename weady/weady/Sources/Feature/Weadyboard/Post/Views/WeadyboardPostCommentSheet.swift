@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct WeadyboardPostCommentSheet: View {
-    @State private var commentText: String = ""
     @FocusState private var isFocused: Bool
-    @State private var comments: [String] = []
-    @StateObject private var keyboard = KeyboardObserver()
+    @StateObject private var viewModel: CommentViewModel
+    
+    init(boardId: Int) {
+        _viewModel = StateObject(wrappedValue: CommentViewModel(boardId: boardId))
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -22,33 +24,29 @@ struct WeadyboardPostCommentSheet: View {
                 .frame(width: 36, height: 4)
                 .padding(.bottom, 8)
             
-            if comments.isEmpty {
+            if viewModel.comments.isEmpty {
                 Text("댓글을 남겨서 의견을 공유해보세요.")
                     .fontName(.metaRegular12)
                     .padding(.top, 80)
-            }
-            
-            ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(comments.indices, id: \.self) { index in
-                        CommentCell(comment: comments[index])
-                            .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(viewModel.comments) { comment in
+                            CommentCell(comment: comment)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
                     }
+                    .padding(.top, 16)
+                    .padding(.horizontal, 16)
                 }
-                .padding(.top, 16)
-                .padding(.horizontal, 16)
             }
             
             commentInputBar
-                .padding(.bottom, keyboard.keyboardHeight - 10)
                 .background(Color.white100)
-
         }
         .background(Color(isFocused ? Color.black30 : Color.white100))
         .ignoresSafeArea(.keyboard, edges: .bottom)
-        .onTapGesture {
-            isFocused = false
-        }
+        .onTapGesture { isFocused = false }
     }
     
     private var commentInputBar: some View {
@@ -59,7 +57,7 @@ struct WeadyboardPostCommentSheet: View {
                 .clipShape(Circle())
             
             ZStack(alignment: .leading) {
-                if commentText.isEmpty {
+                if viewModel.newCommentText.isEmpty {
                     Text("댓글을 남겨서 의견을 공유해보세요.")
                         .fontName(.captionRegular14)
                         .foregroundColor(.gray300)
@@ -67,23 +65,17 @@ struct WeadyboardPostCommentSheet: View {
                 }
                 
                 HStack {
-                    TextField("", text: $commentText)
+                    TextField("", text: $viewModel.newCommentText)
                         .fontName(.captionRegular14)
                         .focused($isFocused)
-                        .onTapGesture {
-                            self.isFocused = true
-                        }
                         .frame(height: 44)
                         .padding(.leading, 14)
                     
                     Button {
-                        if !commentText.isEmpty {
-                            comments.append(commentText)
-                            commentText = ""
-                            isFocused = false
-                        }
+                        viewModel.postComment()
+                        isFocused = false
                     } label: {
-                        Image(commentText.isEmpty ? "sendicon" : "sendicon_activated")
+                        Image(viewModel.newCommentText.isEmpty ? "sendicon" : "sendicon_activated")
                             .resizable()
                             .frame(width: 20, height: 20)
                     }
@@ -99,41 +91,5 @@ struct WeadyboardPostCommentSheet: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 12)
-        
     }
 }
-
-struct CommentCell: View {
-    var comment: String
-    
-    var body: some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image("profileimage")
-                .resizable()
-                .frame(width: 32, height: 32)
-                .clipShape(Circle())
-            
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text("닉네임")
-                        .fontName(.metaMedium10)
-                    Text("방금")
-                        .fontName(.metaRegular10)
-                        .foregroundColor(.gray800)
-                }
-                
-                Text(comment)
-                    .fontName(.captionRegular14)
-                
-                Button {
-                } label: {
-                    Text("답글달기")
-                        .fontName(.metaRegular10)
-                        .foregroundColor(.gray900)
-                }
-            }
-        }
-    }
-}
-
-

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct WeadyboardPostMoreActionSheet: View {
     @Binding var showReportSheet: Bool
+    let boardId: Int
+    @ObservedObject var reportViewModel: WeadyboardReportViewModel
 
     var body: some View {
         VStack(spacing: 0) {
@@ -24,6 +26,7 @@ struct WeadyboardPostMoreActionSheet: View {
                     iconName: "hideicon",
                     title: "게시물 숨기기",
                     action: {
+                        reportViewModel.hide(boardId: boardId)
                     })
 
                 MoreActionButton(

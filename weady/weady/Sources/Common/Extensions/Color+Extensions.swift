@@ -39,6 +39,13 @@ extension Color {
     static let rain1 = Color(hex: "8BC7FF")
     static let rain2 = Color(hex: "F4FEFF")
     
+    // Login
+    static let login100 = Color(hex: "FEE500")
+    static let login200 = Color(hex: "E33629")
+    static let login300 = Color(hex: "F8BD00")
+    static let login400 = Color(hex: "319F43")
+    static let login500 = Color(hex: "587DBD")
+
     // Default
     static let systemblue = Color(hex: "007AFF")
     static let systemred = Color(hex: "FF3B30")
