@@ -16,7 +16,7 @@ final class WeatherServices {
     
     init() {}
 
-    func fetchShortWeather(locationId: Int, completion: @escaping (Result<ShortWeatherData, Error>) -> Void) {
+    func fetchShortWeather(completion: @escaping (Result<ShortWeatherData, Error>) -> Void) {
         provider.request(.getShortWeather) { result in
             switch result {
             case .success(let response):
@@ -33,7 +33,7 @@ final class WeatherServices {
         }
     }
     
-    func fetchMidTermWeather(locationId: Int, completion: @escaping (Result<[MidTermForecast], Error>) -> Void) {
+    func fetchMidTermWeather(completion: @escaping (Result<[MidTermForecast], Error>) -> Void) {
         provider.request(.getMidTermWeather) { result in
             switch result {
             case .success(let response):

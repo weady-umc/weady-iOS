@@ -32,6 +32,7 @@ enum WeatherHomeModel: Int, CaseIterable, Identifiable {
 
 struct WeatherData: Identifiable, Equatable {
     var id = UUID()
+    var favoriteId: Int? = nil
     var location: String
     var temperature: String
     var highTemperature: String
@@ -41,6 +42,7 @@ struct WeatherData: Identifiable, Equatable {
 
 struct WeatherAddData {
     var id = UUID()
+    var favoriteId: Int?
     var weatherBackground: String
     var place: String
     var temperature: Int
