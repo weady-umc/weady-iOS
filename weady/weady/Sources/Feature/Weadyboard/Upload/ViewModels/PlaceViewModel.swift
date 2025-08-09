@@ -4,6 +4,8 @@ import Observation
 
 @Observable
 final class PlaceViewModel {
+    var model: PlaceModel = PlaceModel()
+    
     private let maxSelection = 3
 
     var searchQuery: String = ""

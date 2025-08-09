@@ -64,7 +64,7 @@ struct PlaceInfoView: View {
                         .resizable()
                         .frame(width: 9, height: 16)
                 }
-            }q
+            }
 
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("완료") {

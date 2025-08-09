@@ -22,4 +22,20 @@ public struct UploadData: Codable {
     let styleIdList: [Int]           // 패션 태그 (브랜드명, 제품명)
 }
 
+//MARK: - 게시물 업로드 DTO
+struct UploadRequest: Codable {
+    let isPublic: Bool
+    let content: String
+    let seasonTagId: Int?
+    let temperatureTagId: Int?
+    let weatherTagId: Int?
+    let placeDtoList: [Place]
+    let styleIdList: [Int]
+    let brandDtoList: [BrandDto]
+    let imageDtoList: [UploadImage]
+}
 
+struct BrandDto: Codable {
+    let brand: String
+    let product: String
+}

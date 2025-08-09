@@ -5,7 +5,7 @@ import CoreLocation
 @Observable
 final class WeatherViewModel {
     // MARK: - 날씨 모델
-    private var model = WeatherModel()
+    var model = WeatherModel()
 
     // MARK: - 현재위치/직접
     enum WeatherInputMode {

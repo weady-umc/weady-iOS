@@ -17,25 +17,16 @@ final class UploadViewModel {
     var localImages: [LocalImage] = []              // UI용 이미지
     private var uploadedImageURLs: [String] = []    // 서버 업로드 후 URL 저장
 
-    var selectedStyleIds: [Int] = []
-    var selectedPlaces: [UploadPlace] = []
+    // MARK: - 날씨, 패션, 장소 추가 화면의 모델 데이터 통합
+    var weatherModel: WeatherModel = .empty
+    var fashionModel: FashionModel = FashionModel()
+    var placeModel: PlaceModel = PlaceModel()
 
-    // MARK: - 날씨 모델 (필수 필드)
-    var weatherTagId: Int?
-    var temperatureTagId: Int?
-    var seasonTagId: Int?
-
-    var isFormValid: Bool {
-        weatherTagId != nil &&
-        temperatureTagId != nil &&
-        seasonTagId != nil
-    }
-
-    // MARK: - API 업로드용 변환
+    // MARK: - API 업로드용 데이터 변환
     func buildRequestBody() -> UploadData? {
-        guard let weather = weatherTagId,
-              let temp = temperatureTagId,
-              let season = seasonTagId else {
+        guard let season = weatherModel.season,
+              let tempBand = weatherModel.temperature,
+              let weatherTag = weatherModel.weather.first else {
             return nil
         }
 
@@ -43,29 +34,71 @@ final class UploadViewModel {
             UploadImage(imgUrl: url, imgOrder: index)
         }
 
+        // 장소 정보 변환
+        let placeDtos: [UploadPlace] = placeModel.places.map {
+            UploadPlace(placeName: $0.placeName, placeAddress: $0.placeAddress)
+        }
+
+        // 스타일 ID만 추출
+        let styleIds: [Int] = fashionModel.selectedStyles.compactMap { Int($0) }
+
         return UploadData(
             isPublic: isPublic,
             content: content,
             imageDtoList: imageDtoList,
-            weatherTagId: weather,
-            temperatureTagId: temp,
-            seasonTagId: season,
-            placeDtoList: selectedPlaces,
-            styleIdList: selectedStyleIds
+            weatherTagId: mapWeatherToId(weatherTag),
+            temperatureTagId: tempBand.id,
+            seasonTagId: mapSeasonToId(season),
+            placeDtoList: placeDtos,
+            styleIdList: styleIds
         )
     }
+    
+    // MARK: - 날씨/계절 태그 → ID 매핑
+    private func mapSeasonToId(_ season: SeasonType) -> Int {
+        switch season {
+        case .spring: return 1
+        case .summer: return 2
+        case .autumn: return 3
+        case .winter: return 4
+        }
+    }
 
+    private func mapWeatherToId(_ weather: WeatherType) -> Int {
+        switch weather {
+        case .sunny: return 1
+        case .cloudy: return 2
+        case .rainy: return 3
+        case .partlyCloudy: return 4
+        case .snowy: return 5
+        case .windy: return 6
+        }
+    }
+    
     // MARK: - 게시물 업로드
     func submitPost() async throws {
-        // TODO: - 이미지 먼저 업로드 후 URL 획득 (추후 이미지 업로드 API 연동)
+        // 1. 이미지 먼저 업로드 (이 부분은 mock)
         uploadedImageURLs = try await uploadImages(localImages)
 
+        // 2. 최종 업로드용 데이터 생성
         guard let requestData = buildRequestBody(),
               let url = URL(string: "https://your-api.com/api/v1/posts") else {
             print("업로드 데이터 누락")
             return
         }
 
+        // 디버깅용 출력
+        print("<업로드 데이터 확인>")
+        print("isPublic:", requestData.isPublic)
+        print("content:", requestData.content)
+        print("imageDtoList:", requestData.imageDtoList)
+        print("seasonTagId:", requestData.seasonTagId)
+        print("temperatureTagId:", requestData.temperatureTagId)
+        print("weatherTagId:", requestData.weatherTagId)
+        print("placeDtoList:", requestData.placeDtoList)
+        print("styleIdList:", requestData.styleIdList)
+
+        // 3. POST 요청 전송
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

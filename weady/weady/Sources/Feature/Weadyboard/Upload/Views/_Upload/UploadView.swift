@@ -4,13 +4,19 @@ struct UploadView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel = UploadViewModel()
     
-    // 날씨 정보 화면
+    //MARK: - 날씨, 패션, 장소 모델 연결
     @State private var showWeatherInfo = false
     @State private var weatherViewModel = WeatherViewModel()
-    
     @State private var fashionViewModel = FashionViewModel()
-    
     @State private var placeViewModel = PlaceViewModel()
+    
+    //MARK: - 등록 버튼 활성화 조건 (사진 1장 + 날씨 태그)
+    private var isFormValid: Bool {
+        viewModel.localImages.count >= 1 &&
+        viewModel.weatherModel.season != nil &&
+        viewModel.weatherModel.temperature != nil &&
+        !viewModel.weatherModel.weather.isEmpty
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -34,15 +40,24 @@ struct UploadView: View {
                         NavBtn(title: "날씨 정보 추가", isRequired: true) {
                             AnyView(WeatherInfoView(viewModel: weatherViewModel))
                         }
+                        .onDisappear {
+                            viewModel.weatherModel = weatherViewModel.model
+                        }
                         Divider()
 
                         NavBtn(title: "패션 정보 추가") {
                             AnyView(FashionInfoView(viewModel: fashionViewModel))
                         }
+                        .onDisappear {
+                            viewModel.fashionModel = fashionViewModel.fashion
+                        }
                         Divider()
 
                         NavBtn(title: "장소 정보 추가") {
                             AnyView(PlaceInfoView(viewModel: placeViewModel))
+                        }
+                        .onDisappear {
+                            viewModel.placeModel.places = placeViewModel.selectedPlaces
                         }
                         Divider()
 
@@ -66,11 +81,12 @@ struct UploadView: View {
                         Text("등록하기")
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(viewModel.isFormValid ? Color.black100 : Color.gray800)
+                            .fontName(.bodyMedium16)
+                            .background(isFormValid ? Color.black100 : Color.gray800)
                             .foregroundStyle(Color.white100)
                             .cornerRadius(8)
                     }
-                    .disabled(!viewModel.isFormValid)
+                    .disabled(!isFormValid)
                 }
                 .padding(.horizontal, geometry.size.width * 0.05)
                 .padding(.bottom, geometry.size.height * 0.03)
