@@ -18,6 +18,7 @@
 		808EDCE52E3BCD0100442DA8 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 808EDCE42E3BCD0100442DA8 /* GoogleSignIn */; };
 		808EDCE72E3BCD0100442DA8 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 808EDCE62E3BCD0100442DA8 /* GoogleSignInSwift */; };
 		808EDD0F2E3DD89900442DA8 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 808EDD0E2E3DD89900442DA8 /* Kingfisher */; };
+
 		808EE6232E46634400442DA8 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 808EE6222E46634400442DA8 /* CombineMoya */; };
 /* End PBXBuildFile section */
 

@@ -38,7 +38,7 @@ struct ApiResponseSliceScrappedBoardByUserResponseDto: Codable {
 struct CurationDto: Codable {
     let curationId: Int64
     let curationTitle: String
-    let backgroundImgUrl: String
+    let firstImgUrl: String
 }
 
 struct ScrapBoardResponseDto: Codable {
@@ -69,7 +69,7 @@ struct ScrappedBoardByUserResponseDto: Codable {
     let weatherTagId: Int64
 }
 
-// MARK: - 부가 DTOs (웨디보드랑 겹침) 
+// MARK: - 부가 DTOs (웨디보드랑 겹침)
 
 struct PageableObject: Codable {
     let paged: Bool

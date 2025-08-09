@@ -65,6 +65,7 @@ struct AppRootView: View {
                         WeatherSearchView(selectedPlace: .constant(nil))
                     case .weatherlocation:
                         WeatherLocationView()
+
                     }
                 }
         }
