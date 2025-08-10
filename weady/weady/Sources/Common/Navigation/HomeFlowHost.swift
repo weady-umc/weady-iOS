@@ -8,45 +8,58 @@
 import SwiftUI
 import Observation
 
+// MARK: - HomeRoute
+/// Home 플로우에서 사용하는 라우트 정의
 enum HomeRoute: Hashable {
-    case root
-    case weatherAddLocation
-    case weatherSearch
-    case weatherLocation
+    case home
+    case weatheraddlocation
+    case weathersearch
+    case weatherlocation
 }
 
+// MARK: - HomeRouter
+/// 홈 플로우의 NavigationPath와 push/pop/reset 제공
 @Observable
 final class HomeRouter {
+    // MARK: Properties
     var path = NavigationPath()
+    
+    // MARK: Navigation Actions
     func push(_ route: HomeRoute) { path.append(route) }
     func pop() { if !path.isEmpty { path.removeLast() } }
     func reset() { path = NavigationPath() }
 }
 
+// MARK: - HomeFlowHost
+/// 홈 플로우 전용 NavigationStack
+/// 홈 관련 화면 전환은 여기에서 관리
 struct HomeFlowHost: View {
+    // MARK: Properties
     @State private var router = HomeRouter()
 
+    // MARK: Body
     var body: some View {
         NavigationStack(path: $router.path) {
             HomeView()
                 .navigationDestination(for: HomeRoute.self) { route in
                     switch route {
-                    case .root:
+                    case .home:
                         HomeView()
-                    case .weatherAddLocation:
+                    case .weatheraddlocation:
                         WeatherLocationAddView(
                             viewModel: WeatherLocationAddViewModel(),
                             locationViewModel: WeatherLocationViewModel(),
                             selectedPlace: .constant(nil),
                             weather: ShortWeatherData.example
                         )
-                    case .weatherSearch:
+                    case .weathersearch:
                         WeatherSearchView(selectedPlace: .constant(nil))
-                    case .weatherLocation:
+                    case .weatherlocation:
                         WeatherLocationView()
                     }
                 }
         }
+        // 필요 시 하위 뷰에서 @Environment(HomeRouter.self)로 직접 push/pop 가능
         .environment(router)
     }
 }
