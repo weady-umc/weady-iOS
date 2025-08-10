@@ -11,7 +11,7 @@ struct WeatherLocationView: View {
     @StateObject private var viewModel =  WeatherLocationViewModel()
     @Environment(\.dismiss) private var dismiss
     @Environment(\.editMode) private var editMode
-    @Environment(NavigationRouter.self) var router
+    @Environment(HomeRouter.self) var router
     @State private var selectedPlace: AddressDocument? = nil
 
 
@@ -31,7 +31,7 @@ struct WeatherLocationView: View {
                         
                     Spacer().frame(height: 25)
                     
-                    WeatherCardView(data: WeatherLocationViewModel.example, isCurrentLocation: true, editMode: false)
+                    WeatherLocationCardView(data: WeatherLocationViewModel.example, isCurrentLocation: true, editMode: false)
                     
                     Spacer().frame(height: 27)
                     
@@ -55,7 +55,7 @@ struct WeatherLocationView: View {
                             EditButton()
                         }
                 }
-                .navigationDestination(for: Route.self) { route in
+                .navigationDestination(for: HomeRoute.self) { route in
                         switch route {
                         case .weathersearch:
                             WeatherSearchView(selectedPlace: $selectedPlace)
@@ -158,7 +158,7 @@ struct WeatherLocationView: View {
                                 
                             }
                             
-                            WeatherCardView(
+                            WeatherLocationCardView(
                                 data: weather,
                                 isCurrentLocation: false,
                                 editMode: editMode?.wrappedValue == .active

@@ -10,7 +10,7 @@ import SwiftUI
 struct WeatherHomeView: View {
     @Bindable var viewModel: WeatherHomeViewModel = .init()
     private let shortData = ShortWeatherData.example
-    @Environment(NavigationRouter.self) var router
+    @Environment(HomeRouter.self) var router
     @State private var path = NavigationPath()
 
 
@@ -30,7 +30,7 @@ struct WeatherHomeView: View {
                 
 
             }
-            .navigationDestination(for: Route.self) { route in
+            .navigationDestination(for: HomeRoute.self) { route in
                 switch route {
                 case .weatherlocation:
                     WeatherLocationView()
@@ -91,7 +91,7 @@ struct WeatherHomeView: View {
     
     private var SegmentView: some View {
         HStack(spacing: 0) {
-            ForEach(WeatherModel.allCases, id: \.id) { segment in sheetSegment(segment: segment)
+            ForEach(WeatherHomeModel.allCases, id: \.id) { segment in sheetSegment(segment: segment)
                 
             }
         }
@@ -99,7 +99,7 @@ struct WeatherHomeView: View {
         .padding(.horizontal, 24)
     }
     
-    func sheetSegment(segment: WeatherModel) -> some View {
+    func sheetSegment(segment: WeatherHomeModel) -> some View {
         VStack(spacing: 8) {
             Text(segment.title)
                 .foregroundStyle(viewModel.selectedSegment == segment ? Color.gray100 : Color.gray800)

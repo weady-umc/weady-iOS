@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WeadyboardFilterSheet: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(NavigationRouter.self) private var router
+    @Environment(WeadyboardRouter.self) private var router
     
     @State private var selectedSeasons: Set<String> = []
     @State private var selectedWeathers: Set<String> = []
@@ -28,14 +28,14 @@ struct WeadyboardFilterSheet: View {
     var temperatureRangeText: String {
         let intTemp = Int(temperature)
         switch intTemp {
-        case ..<(-5): return "-6℃"
+        case ..<(-5): return "~ -6℃"
         case -5...5:  return "-5℃ ~ 5℃"
         case 6...11:  return "6℃ ~ 11℃"
         case 12...16: return "12℃ ~ 16℃"
         case 17...22: return "17℃ ~ 22℃"
         case 23...26: return "23℃ ~ 26℃"
         case 27...30: return "27℃ ~ 30℃"
-        default:      return "31℃"
+        default:      return "31℃ ~"
         }
     }
     
