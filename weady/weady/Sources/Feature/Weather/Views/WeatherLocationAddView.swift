@@ -12,7 +12,7 @@ struct WeatherLocationAddView: View {
     @ObservedObject var locationViewModel: WeatherLocationViewModel
     @Environment(\.dismiss) private var dismiss
     @Binding var selectedPlace: AddressDocument?
-    @EnvironmentObject var router: NavigationRouter
+    @Environment(HomeRouter.self) private var router
 
 
 
