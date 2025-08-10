@@ -19,7 +19,7 @@ struct WeadyboardFilterSheet: View {
     let weatherTags: [(label: String, iconName: String)] = [
         ("맑은 날", "sunnyIcon"),
         ("구름 많은 날", "cloudyIcon"),
-        ("비 오는 날", "rainIcony"),
+        ("비 오는 날", "rainyIcon"),
         ("눈 오는 날", "snowyIcon"),
         ("흐린 날", "partlycloudy"),
         ("바람 많은 날", "windyIcon")
