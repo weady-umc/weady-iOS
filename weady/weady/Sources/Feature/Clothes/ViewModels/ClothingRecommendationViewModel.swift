@@ -17,40 +17,33 @@ final class ClothingRecommendationViewModel: ObservableObject {
     @Published var chartItems: [ChartItem] = []
     @Published var tags: Tags?
 
-    private var cancellables = Set<AnyCancellable>()
-    private let token: String
+    private let service: FashionService
 
-    init(token: String) {
-        self.token = token
+    init(service: FashionService = FashionService()) {
+        self.service = service
         fetchFashionDetail()
     }
 
     func fetchFashionDetail() {
-        guard let url = URL(string: "https://weadyapi.pro/api/v1/fashion/detail") else { return }
-        var req = URLRequest(url: url)
-        req.httpMethod = "GET"
-        req.setValue("application/json", forHTTPHeaderField: "Accept")
-        req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        service.getFashionDetail { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let dto):
+                    let resp = dto.toDomain()
+                    let d = resp.data
+                    self?.addressText = [d.address1, d.address2, d.address3, d.address4]
+                        .filter { !$0.isEmpty }
+                        .joined(separator: " ")
+                    self?.feelTemp = Int(d.recommendation.feelTmp)
+                    self?.clothingName = d.recommendation.clothing.name
+                    self?.clothingImageUrl = URL(string: d.recommendation.clothing.imageUrl)
+                    self?.chartItems = d.chart
+                    self?.tags = d.tags
 
-        URLSession.shared.dataTaskPublisher(for: req)
-            .map(\.data)
-            .decode(type: FashionDetailResponse.self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                if case .failure(let error) = completion {
+                case .failure(let error):
                     print("패션 디테일 로드 실패:", error)
                 }
-            } receiveValue: { [weak self] resp in
-                let d = resp.data
-                self?.addressText = [d.address1, d.address2, d.address3, d.address4]
-                    .filter { !$0.isEmpty }
-                    .joined(separator: " ")
-                self?.feelTemp = Int(d.recommendation.feelTmp)
-                self?.clothingName = d.recommendation.clothing.name
-                self?.clothingImageUrl = URL(string: d.recommendation.clothing.imageUrl)
-                self?.chartItems = d.chart
-                self?.tags = d.tags
             }
-            .store(in: &cancellables)
+        }
     }
 }
