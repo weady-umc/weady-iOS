@@ -9,7 +9,7 @@ import SwiftUI
 import Kingfisher
 
 struct WeadyboardView: View {
-    @Environment(NavigationRouter.self) private var router
+    @Environment(WeadyboardRouter.self) private var router
     @State private var isFilterPresented = false
     @StateObject private var viewModel = WeadyboardViewModel()
     
@@ -74,7 +74,7 @@ struct WeadyboardView: View {
                 HStack {
                     Spacer()
                     Button(action: {
-                        //router.push(.weadyboardUpload) // 게시글 업로드 화면으로 이동
+                        router.push(.weadyboardUpload)
                     }) {
                         HStack(spacing: 6) {
                             Image("plusicon")
@@ -104,7 +104,7 @@ struct WeadyboardView: View {
     @ViewBuilder
     private func boardImageCard(item: BoardPreviewDTO) -> some View {
         Button {
-            router.push(.weadyboardPost)
+            router.push(.weadyboardPost(boardId: item.boardId))  
         } label: {
             ZStack(alignment: .topTrailing) {
 

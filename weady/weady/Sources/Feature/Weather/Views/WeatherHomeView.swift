@@ -10,7 +10,7 @@ import SwiftUI
 struct WeatherHomeView: View {
     @Bindable var viewModel: WeatherHomeViewModel = .init()
     private let shortData = ShortWeatherData.example
-    @Environment(NavigationRouter.self) var router
+    @Environment(HomeRouter.self) var router
     @State private var path = NavigationPath()
 
 
@@ -30,7 +30,7 @@ struct WeatherHomeView: View {
                 
 
             }
-            .navigationDestination(for: Route.self) { route in
+            .navigationDestination(for: HomeRoute.self) { route in
                 switch route {
                 case .weatherlocation:
                     WeatherLocationView()

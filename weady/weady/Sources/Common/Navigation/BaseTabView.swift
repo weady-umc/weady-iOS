@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+// MARK: - BaseTabView
+/// 하단 탭바
+/// selectedTab 바인딩을 통해 전역 AppTabController와 연결
+
 struct BaseTabView: View {
     @Binding var selectedTab: TabType
     @Binding var isTabBarHidden: Bool

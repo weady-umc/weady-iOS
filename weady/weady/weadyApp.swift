@@ -14,8 +14,7 @@ import GoogleSignInSwift
 
 @main
 struct weadyApp: App {
-    @State private var router = NavigationRouter()
-
+    
     init() {
         let kakaoNativeAppKey = (Bundle.main.infoDictionary?["KAKAO_NATIVE_APP_KEY"] as? String) ?? ""
         KakaoSDK.initSDK(appKey: kakaoNativeAppKey)
@@ -24,7 +23,6 @@ struct weadyApp: App {
     var body: some Scene {
         WindowGroup {
             AppRootView()
-                .environment(router)
                 .onOpenURL { url in
                     if AuthApi.isKakaoTalkLoginUrl(url) {
                         _ = AuthController.handleOpenUrl(url: url)
