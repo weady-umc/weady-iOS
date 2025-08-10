@@ -96,15 +96,15 @@ struct WeadyboardView: View {
         .sheet(isPresented: $isFilterPresented) {
             WeadyboardFilterSheet()
         }
-                .task {
-                    viewModel.fetchBoards()
-                }
+        .task {
+            viewModel.fetchBoards()
+        }
     }
     
     @ViewBuilder
     private func boardImageCard(item: BoardPreviewDTO) -> some View {
         Button {
-            router.push(.weadyboardPost(boardId: item.boardId))
+            router.push(.weadyboardPostWithItem(item))
         } label: {
             ZStack(alignment: .topTrailing) {
 

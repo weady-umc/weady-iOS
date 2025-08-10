@@ -18,17 +18,24 @@ struct BoardDetailResponseDTO: Decodable {
     let imgCount: Int?
     let imageDtoList: [BoardImageDTO]
     let content: String
-    let weatherTagId: Int
-    let temperatureTagId: Int
     let seasonTagId: Int
+    let temperatureTagId: Int
+    let weatherTagId: Int
     let placeDtoList: [PlaceDTO]
     let styleIdList: [Int]
+    let brandDtoList: [BrandDTO]
     let createdAt: String
+    let updatedAt: String?
 }
 
 struct BoardImageDTO: Decodable {
     let imgUrl: String
     let imgOrder: Int
+}
+
+struct BrandDTO: Decodable, Hashable {
+    let brand: String
+    let product: String
 }
 
 struct BoardLikeResponseDTO: Decodable {
@@ -40,7 +47,9 @@ struct BoardListResponseDTO: Decodable {
     let content: [BoardPreviewDTO]
 }
 
-struct BoardPreviewDTO: Codable, Hashable, Equatable {
+
+struct BoardPreviewDTO: Codable, Hashable, Equatable, Identifiable {
+    var id: Int { boardId }
     let boardId: Int
     let userId: Int
     let imgUrl: String?

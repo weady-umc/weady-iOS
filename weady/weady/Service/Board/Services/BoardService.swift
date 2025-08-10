@@ -12,6 +12,9 @@ final class BoardService: NetworkManager {
     
     typealias Endpoint = BoardEndpoints
     
+    typealias BoardListWrapped = ApiResponse<BoardListResponseDTO>
+    typealias BoardDetailWrapped = ApiResponse<BoardDetailResponseDTO>
+    
     let provider: MoyaProvider<BoardEndpoints>
     
     public init(provider: MoyaProvider<BoardEndpoints>? = nil) {
@@ -21,6 +24,7 @@ final class BoardService: NetworkManager {
         self.provider = provider ?? MoyaProvider<BoardEndpoints>(plugins: plugins)
     }
     
+    // MARK: - 게시글 전체 조회
     func fetchBoards(
         seasonTagId: Int?,
         weatherTagId: Int?,
@@ -28,24 +32,46 @@ final class BoardService: NetworkManager {
         size: Int = 10,
         completion: @escaping (Result<BoardListResponseDTO, NetworkError>) -> Void
     ) {
-        request(target: .getBoards(seasonTagId: seasonTagId, weatherTagId: weatherTagId, temperatureTagId: temperatureTagId, size: size), decodingType: BoardListResponseDTO.self, completion: completion)
-    }
-    
-    func fetchBoardDetail(boardId: Int, completion: @escaping (Result<BoardDetailResponseDTO, NetworkError>) -> Void) {
         request(
-            target: .getBoardDetail(boardId: boardId),
-            decodingType: BoardDetailResponseDTO.self
+            target: .getBoards(seasonTagId: seasonTagId, weatherTagId: weatherTagId, temperatureTagId: temperatureTagId, size: size),
+            decodingType: BoardListWrapped.self
         ) { result in
             switch result {
-            case .success(let data):
-                completion(.success(data))
-
+            case .success(let wrapped):
+                if let data = wrapped.data {
+                    completion(.success(data))
+                } else {
+                    completion(.failure(.decodingError))
+                }
             case .failure(let error):
                 completion(.failure(error))
             }
         }
     }
     
+    // MARK: - 게시글 상세 조회
+    func fetchBoardDetail(
+        boardId: Int,
+        completion: @escaping (Result<BoardDetailResponseDTO, NetworkError>) -> Void
+    ) {
+        request(
+            target: .getBoardDetail(boardId: boardId),
+            decodingType: BoardDetailWrapped.self
+        ) { result in
+            switch result {
+            case .success(let wrapped):
+                if let data = wrapped.data {
+                    completion(.success(data))
+                } else {
+                    completion(.failure(.decodingError))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    // MARK: - 게시글 작성
     func createBoard(data: CreateBoardRequestDTO, completion: @escaping (Result<BoardDetailResponseDTO, NetworkError>) -> Void) {
         request(
             target: .createBoard(data: data),
@@ -54,6 +80,7 @@ final class BoardService: NetworkManager {
         )
     }
     
+    // MARK: - 게시글 수정
     func updateBoard(boardId: Int, data: UpdateBoardRequestDTO, completion: @escaping (Result<BoardDetailResponseDTO, NetworkError>) -> Void) {
         request(
             target: .updateBoard(boardId: boardId, data: data),
@@ -62,6 +89,7 @@ final class BoardService: NetworkManager {
         )
     }
     
+    // MARK: - 게시글 삭제
     func deleteBoard(boardId: Int, completion: @escaping (Result<Void, NetworkError>) -> Void) {
         requestStatusCode(
             target: .deleteBoard(boardId: boardId),
@@ -69,6 +97,7 @@ final class BoardService: NetworkManager {
         )
     }
     
+    // MARK: - 게시글 신고
     func reportBoard(boardId: Int, data: ReportBoardRequestDTO, completion: @escaping (Result<Void, NetworkError>) -> Void) {
         requestStatusCode(
             target: .reportBoard(boardId: boardId, data: data),
@@ -76,6 +105,7 @@ final class BoardService: NetworkManager {
         )
     }
     
+    // MARK: - 게시글 숨기기
     func hideBoard(boardId: Int, completion: @escaping (Result<Void, NetworkError>) -> Void) {
         requestStatusCode(
             target: .hideBoard(boardId: boardId),
@@ -83,6 +113,7 @@ final class BoardService: NetworkManager {
         )
     }
     
+    // MARK: - 게시글 숨기기 취소
     func unhideBoard(boardId: Int, completion: @escaping (Result<Void, NetworkError>) -> Void) {
         requestStatusCode(
             target: .unhideBoard(boardId: boardId),
@@ -90,6 +121,7 @@ final class BoardService: NetworkManager {
         )
     }
     
+    // MARK: - 게시글 좋아요
     func likeBoard(boardId: Int, completion: @escaping (Result<BoardLikeResponseDTO, NetworkError>) -> Void) {
         request(
             target: .likeBoard(boardId: boardId),
@@ -98,6 +130,7 @@ final class BoardService: NetworkManager {
         )
     }
     
+    // MARK: - 게시글 좋아요 취소
     func unlikeBoard(boardId: Int, completion: @escaping (Result<BoardLikeResponseDTO, NetworkError>) -> Void) {
         request(
             target: .unlikeBoard(boardId: boardId),

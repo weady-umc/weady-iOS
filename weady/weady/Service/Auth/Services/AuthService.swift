@@ -68,12 +68,16 @@ final class AuthService: NetworkManager {
     public func login(data: LoginRequestDTO, provider: String, completion: @escaping (Result<LoginResponseDTO, NetworkError>) -> Void) {
         request(
             target: .postLogin(data: data, provider: provider),
-            decodingType: LoginResponseDTO.self
+            decodingType: ApiResponse<LoginResponseDTO>.self
         ) { result in
             switch result {
-            case .success(let data):
-                completion(.success(data))
-
+            case .success(let response):
+                guard let loginData = response.data else {
+                    completion(.failure(.decodingError))
+                    return
+                }
+                completion(.success(loginData))
+                
             case .failure(let error):
                 completion(.failure(error))
             }
