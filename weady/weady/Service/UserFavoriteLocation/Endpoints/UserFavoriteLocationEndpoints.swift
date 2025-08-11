@@ -11,7 +11,7 @@ import KeychainSwift
 
 enum UserFavoriteLocationEndpoints {
     case getUserFavoriteLocation
-    case postUserFavoriteLocation(hCode: String)
+    case postUserFavoriteLocation(bCode: String)
     case patchDefaultFavoriteLocation(locationID: Int)
     case deleteFavoriteLocation(favoriteID: Int)
     
@@ -20,7 +20,7 @@ enum UserFavoriteLocationEndpoints {
 extension UserFavoriteLocationEndpoints: TargetType {
     
     public var baseURL: URL {
-        guard let url = URL(string: "https://weadyapi.pro") else {
+        guard let url = URL(string: "https://weadyapi.pro/api/v1") else {
             fatalError("잘못된 URL")
         }
         return url
@@ -29,11 +29,11 @@ extension UserFavoriteLocationEndpoints: TargetType {
     var path: String {
         switch self{
         case .getUserFavoriteLocation, .postUserFavoriteLocation:
-            return "/user/favorites"
+            return "/users/favorites"
         case .patchDefaultFavoriteLocation:
-            return "/user/favorites/default"
+            return "/users/favorites/default"
         case .deleteFavoriteLocation(let favoriteId):
-            return "/user/favorites/\(favoriteId)"
+            return "/users/favorites/\(favoriteId)"
         }
     }
     
@@ -54,8 +54,8 @@ extension UserFavoriteLocationEndpoints: TargetType {
         switch self {
         case .getUserFavoriteLocation:
             return .requestPlain
-        case .postUserFavoriteLocation(let hCode):
-            let body = PostFavoriteLocationRequest(hCode: hCode)
+        case .postUserFavoriteLocation(let bCode):
+            let body = PostFavoriteLocationRequest(bCode: bCode)
             return .requestJSONEncodable(body)
         case .patchDefaultFavoriteLocation(let locationID):
             let body = PatchDefaultFavoriteLocationRequest(userFavoriteLocationId: locationID)
@@ -66,14 +66,17 @@ extension UserFavoriteLocationEndpoints: TargetType {
         
         
     }
-    //serverAccessToken 이 로그인 시 저장한 엑세스토큰의 key
     var headers: [String : String]? {
-        guard let accessToken = KeychainSwift().get("serverAccessToken") else {
-            return ["Content-Type" : "application/json"]
+        let token = UserDefaults.standard.string(forKey: "accessToken")
+        if let token, !token.isEmpty {
+            return [
+                "Authorization": "Bearer \(token)",
+                "accept": "application/json",
+                "Content-Type": "application/json"
+            ]
+        } else {
+            return ["accept": "application/json"]
         }
-        return [
-            "Content-Type" : "application/json",
-            "Authorization" : "Bearer \(accessToken)"
-        ]
     }
+
 }

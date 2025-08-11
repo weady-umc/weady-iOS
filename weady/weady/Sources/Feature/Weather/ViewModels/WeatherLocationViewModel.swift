@@ -56,3 +56,75 @@ class WeatherLocationViewModel: ObservableObject {
             }
         }
 }
+
+// MARK: - Networking (즐겨찾기 목록/추가/삭제/대표설정)
+extension WeatherLocationViewModel {
+
+    /// 서버에서 즐겨찾기 목록 조회 → 화면용 WeatherData로 매핑
+    func loadFavorites() {
+        UserFavoriteLocationServices().fetchFavoriteLocations { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let list):
+                self.favoriteLocations = list.map { dto in
+                    WeatherData(
+                        id: UUID(uuidString: dto.bCode) ?? UUID(), // bCode로 고정 ID 시도
+                        favoriteId: dto.favoriteId,
+                        location: [dto.locationAddress1,
+                                   dto.locationAddress2,
+                                   dto.locationAddress3,
+                                   dto.locationAddress4]
+                            .filter { !$0.isEmpty }
+                            .joined(separator: " "),
+                        temperature: String(Int(dto.currentTemp)),
+                        highTemperature: String(Int(dto.actualTmx)),
+                        lowTemperature: String(Int(dto.actualTmn)),
+                        // skyStatus 필드가 응답에 없으니 임시 매핑(원하면 서버 값으로 교체)
+                        backgroundImage: self.mapSkyStatusToImage("CLOUDY")
+                    )
+                }
+            case .failure(let err):
+                print("⭐️ 즐겨찾기 조회 실패:", err)
+            }
+        }
+    }
+
+    /// 서버에 즐겨찾기 추가 (bCode 기준)
+    func addFavoriteToServer(bCode: String, completion: @escaping (Bool) -> Void) {
+        UserFavoriteLocationServices().addFavoriteLocation(bCode: bCode) { result in
+            switch result {
+            case .success:
+                completion(true)
+            case .failure(let err):
+                print("⭐️ 즐겨찾기 추가 실패:", err)
+                completion(false)
+            }
+        }
+    }
+
+    /// 서버 즐겨찾기 삭제
+    func deleteFavoriteFromServer(favoriteId: Int, completion: @escaping (Bool) -> Void) {
+        UserFavoriteLocationServices().deleteFavoriteLocation(favoriteId: favoriteId) { result in
+            switch result {
+            case .success:
+                completion(true)
+            case .failure(let err):
+                print("⭐️ 즐겨찾기 삭제 실패:", err)
+                completion(false)
+            }
+        }
+    }
+
+    /// 대표 즐겨찾기 설정
+    func setDefaultFavorite(locationID: Int, completion: @escaping (Bool) -> Void) {
+        UserFavoriteLocationServices().updateDefaultFavoriteLocation(locationID: locationID) { result in
+            switch result {
+            case .success:
+                completion(true)
+            case .failure(let err):
+                print("⭐️ 대표 설정 실패:", err)
+                completion(false)
+            }
+        }
+    }
+}
