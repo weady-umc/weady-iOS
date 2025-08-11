@@ -19,23 +19,15 @@ extension NetworkManager {
         provider.request(target) { result in
             switch result {
             case .success(let response):
-                do {
-                    let decoder = JSONDecoder()
-                    decoder.keyDecodingStrategy = .convertFromSnakeCase
-                    let decoded = try decoder.decode(T.self, from: response.data)
-                    completion(.success(decoded))
-                } catch {
-                    print("[❌ 디코딩 실패]")
-                    print("🧾 URL: \(target.path)")
-                    print("📡 Raw Response: \(String(data: response.data, encoding: .utf8) ?? "N/A")")
-                    print("🧩 Decoding Error: \(error)")
-                    completion(.failure(.decodingError))
-                }
-
+                self.handleResponse(
+                    response,
+                    target: target,
+                    decodingType: decodingType,
+                    completion: completion
+                )
             case .failure(let error):
-                print("[❌ 네트워크 에러]")
-                print("🧨 \(error)")
-                completion(.failure(.networkError(message: error.localizedDescription)))
+                let networkError = self.handleNetworkError(error)
+                completion(.failure(networkError))
             }
         }
     }
