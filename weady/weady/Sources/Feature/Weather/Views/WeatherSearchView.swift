@@ -56,9 +56,7 @@ struct WeatherSearchView: View {
                     viewModel: addViewModel,
                     locationViewModel: locationViewModel,
                     selectedPlace: $selectedPlace,
-                    onComplete: {
-                        router.push(.weatherlocation)
-                    }, weather: weather
+                    weather: weather
                 )
                 .environment(router)
             }
@@ -144,6 +142,6 @@ struct WeatherSearchView: View {
 struct WeatherSearchView_Previews: PreviewProvider {
     static var previews: some View {
         WeatherSearchView(selectedPlace: .constant(nil))
-            .environmentObject(NavigationRouter())
+            .environment(HomeRouter())
     }
 }

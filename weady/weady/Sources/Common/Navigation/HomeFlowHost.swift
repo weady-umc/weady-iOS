@@ -15,6 +15,7 @@ enum HomeRoute: Hashable {
     case weatheraddlocation
     case weathersearch
     case weatherlocation
+
 }
 
 // MARK: - HomeRouter

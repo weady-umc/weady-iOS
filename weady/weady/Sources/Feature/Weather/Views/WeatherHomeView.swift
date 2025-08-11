@@ -16,10 +16,7 @@ struct WeatherHomeView: View {
 
     
     var body: some View {
-        NavigationStack(path: Binding(
-            get: { router.path },
-            set: { router.path = $0 }
-        )) {
+        
             VStack{
                 SegmentView
                 
@@ -30,16 +27,7 @@ struct WeatherHomeView: View {
                 
 
             }
-            .navigationDestination(for: HomeRoute.self) { route in
-                switch route {
-                case .weatherlocation:
-                    WeatherLocationView()
-                default:
-                    HomeView()
-                }
-            }
-            
-            }
+           
         }
 
     
@@ -63,9 +51,7 @@ struct WeatherHomeView: View {
                         .foregroundStyle(Color.white100)
 
                     Button(action: {
-                        print("🔵 current router.path before push: \(router.path)")
                         router.push(.weatherlocation)
-                        print("🟢 current router.path after push: \(router.path)")
                     }) {
                         Image("downIcon")
                     }
@@ -127,6 +113,6 @@ struct WeatherHomeView: View {
 
 #Preview {
     WeatherHomeView()
-        .environment(NavigationRouter())
+        .environment(HomeRouter())
 }
 

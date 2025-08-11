@@ -12,11 +12,8 @@ struct WeatherLocationAddView: View {
     @ObservedObject var locationViewModel: WeatherLocationViewModel
     @Environment(\.dismiss) private var dismiss
     @Binding var selectedPlace: AddressDocument?
-    @Environment(HomeRouter.self) private var router
+    @Environment(HomeRouter.self) private var homeRouter
 
-
-
-    var onComplete: (() -> Void)? = nil
     
     let weather: ShortWeatherData
     
@@ -85,8 +82,13 @@ struct WeatherLocationAddView: View {
                             locationViewModel.addFavorite(from: place, with: weatherData)
                         }
                         dismiss()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            onComplete?()  // 시트 밖에서 push
+                        
+                        if !homeRouter.path.isEmpty {
+                        homeRouter.pop()   // HomeView로
+                                            }
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            homeRouter.push(.weatherlocation)
                         }
                     }) {
                         ZStack {
@@ -259,5 +261,5 @@ struct rainWind :View {
         selectedPlace: .constant(dummyPlace),
         weather: ShortWeatherData.example
     )
-    .environmentObject(NavigationRouter())
+    .environment(HomeRouter())
 }

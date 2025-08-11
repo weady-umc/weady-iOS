@@ -17,10 +17,7 @@ struct WeatherLocationView: View {
 
     
     var body: some View {
-        NavigationStack(path: Binding(
-            get: { router.path },
-            set: { router.path = $0 }
-        )) {
+        
             ZStack(alignment: .top) {
                 Color.white.ignoresSafeArea()
                 VStack{
@@ -44,7 +41,7 @@ struct WeatherLocationView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
-                            dismiss()
+                            router.pop()
                         }) {
                             Image("backicon")
                                 .foregroundColor(.black)
@@ -69,7 +66,7 @@ struct WeatherLocationView: View {
                     
             }
         }
-    }
+    
     
     private var searchBar: some View {
         
@@ -198,7 +195,23 @@ struct WeatherLocationView: View {
 
 }
 
-#Preview {
-    WeatherLocationView()
-        .environment(NavigationRouter())
+private struct PreviewHost<Content: View>: View {
+    @State private var router = HomeRouter()
+    let content: () -> Content
+    var body: some View {
+        NavigationStack(path: $router.path) {
+            content()
+        }
+        .environment(router)
+    }
 }
+
+#Preview {
+    PreviewHost { WeatherHomeView() }       // WeatherLocationView() 등 교체해서 확인
+}
+
+
+#Preview {
+    HomeFlowHost()
+}
+
