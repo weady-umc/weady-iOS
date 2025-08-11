@@ -12,6 +12,7 @@ import Observation
 /// Home 플로우에서 사용하는 라우트 정의
 enum HomeRoute: Hashable {
     case home
+    case weatherhome
     case weatheraddlocation
     case weathersearch
     case weatherlocation
@@ -36,7 +37,8 @@ final class HomeRouter {
 struct HomeFlowHost: View {
     // MARK: Properties
     @State private var router = HomeRouter()
-
+    @State private var weatherStore = HomeWeatherStore()
+    
     // MARK: Body
     var body: some View {
         NavigationStack(path: $router.path) {
@@ -45,6 +47,8 @@ struct HomeFlowHost: View {
                     switch route {
                     case .home:
                         HomeView()
+                    case .weatherhome:
+                        WeatherHomeView()
                     case .weatheraddlocation:
                         WeatherLocationAddView(
                             viewModel: WeatherLocationAddViewModel(),
@@ -61,5 +65,6 @@ struct HomeFlowHost: View {
         }
         // 필요 시 하위 뷰에서 @Environment(HomeRouter.self)로 직접 push/pop 가능
         .environment(router)
+        .environment(weatherStore)
     }
 }

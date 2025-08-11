@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct HomeView: View {
+    @Environment(HomeRouter.self) private var router
+    @Environment(HomeWeatherStore.self) private var weatherStore
+    
     var body: some View {
         
         Spacer().frame(height: 105)
@@ -15,7 +18,15 @@ struct HomeView: View {
         TopView
         
         Button{
+            router.push(.weatherhome)
             
+            Group {
+                            if let add = weatherStore.lastAdd {
+                                WeatherHomeCard(add)
+                            } else {
+                                DefaultWeatherCard           // 아래로 이름도 정리
+                            }
+                        }
         } label: {
             WeatherView
         }
@@ -93,6 +104,30 @@ struct HomeView: View {
                 
         }
     }
+    @ViewBuilder
+        private func WeatherHomeCard(_ weather: WeatherAddData) -> some View {
+            ZStack {
+                Image(weather.weatherBackground)
+                    .resizable().aspectRatio(contentMode: .fit)
+                    .frame(width: 335.57, height: 147)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                HStack {
+                    Text("\(weather.temperature)º")
+                        .foregroundStyle(.white)
+                        .fontName(.homeRegular30)
+
+                    VStack {
+                        HStack {
+                            Image("placeIcon").resizable().frame(width: 8, height: 11.43)
+                            Text(weather.place).foregroundStyle(.white).fontName(.homeMedium11)
+                        }
+                        Text("최저 \(weather.lowTemperature)º | 최고 \(weather.highTemperature)º")
+                            .foregroundStyle(.white).fontName(.metaRegular10)
+                    }
+                }
+            }
+        }
     
     private var ClothesView: some View {
         HStack{
@@ -145,4 +180,5 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+        .environment(HomeRouter())
 }

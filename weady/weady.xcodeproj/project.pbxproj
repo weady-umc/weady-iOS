@@ -23,6 +23,7 @@
 
 /* Begin PBXFileReference section */
 		808ED0FB2E1D9EFF00442DA8 /* weady.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = weady.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD2FA9E62E4A132E0052E85F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDF98D1B2E29549500446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -83,6 +84,11 @@
 			children = (
 				808ED0FB2E1D9EFF00442DA8 /* weady.app */,
 			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD2FA9E82E4A132E0052E85F /* Products */ = {
+			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -167,6 +173,10 @@
 				{
 					ProductGroup = CDF98D1D2E29549500446374 /* Products */;
 					ProjectRef = CDF98D1B2E29549500446374 /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CD2FA9E82E4A132E0052E85F /* Products */;
+					ProjectRef = CD2FA9E62E4A132E0052E85F /* weady.xcodeproj */;
 				},
 			);
 			projectRoot = "";

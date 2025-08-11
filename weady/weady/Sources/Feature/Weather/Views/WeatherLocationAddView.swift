@@ -13,6 +13,7 @@ struct WeatherLocationAddView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var selectedPlace: AddressDocument?
     @Environment(HomeRouter.self) private var router
+    @Environment(HomeWeatherStore.self) private var weatherStore
 
 
 
@@ -83,11 +84,14 @@ struct WeatherLocationAddView: View {
                     Button(action: {
                         if let place = selectedPlace, let weatherData = viewModel.weather {
                             locationViewModel.addFavorite(from: place, with: weatherData)
+                            weatherStore.lastShort = weather              // (ShortWeatherData)
+                            weatherStore.lastAdd   = viewModel.weather
                         }
                         dismiss()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             onComplete?()  // 시트 밖에서 push
                         }
+                        
                     }) {
                         ZStack {
                             Image("whitebackground")
