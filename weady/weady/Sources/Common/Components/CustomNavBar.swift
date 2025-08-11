@@ -11,8 +11,11 @@ struct CustomNavBar: View {
     let viewTitle: String
     var showBackButton: Bool = false
     var showAlarmButton: Bool = false
+    var showSubmitButton: Bool = false
+    var showBottomDivider: Bool = true
     var backAction: (() -> Void)? = nil
     var alarmAction: (() -> Void)? = nil
+    var submitAction: (() -> Void)? = nil
 
     var body: some View {
         VStack(spacing: 0) {
@@ -46,16 +49,28 @@ struct CustomNavBar: View {
                             .frame(width: 18, height: 20)
                             .frame(width: 44, height: 44)
                     }
+                } else if showSubmitButton {
+                    Button(action: {
+                        submitAction?()
+                    }) {
+                        Text("완료")
+                            .fontName(.captionMedium14)
+                            .foregroundStyle(Color.black100)
+                            .frame(width: 44, height: 44)
+                    }
                 } else {
                     Spacer().frame(width: 44, height: 44)
                 }
             }
             .padding(.horizontal, 15)
             .padding(.top, 15)
-
-            Rectangle()
-                .fill(Color.gray700)
-                .frame(height: 1)
+            
+            // 네비게이션바 아래에 선 있으면 true로 설정
+            if showBottomDivider {
+                Rectangle()
+                    .fill(Color.gray700)
+                    .frame(height: 1)
+            }
         }
         .background(Color.white100)
     }
