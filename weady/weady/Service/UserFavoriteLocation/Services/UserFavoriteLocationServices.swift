@@ -4,7 +4,7 @@
 //
 //  Created by Yoonseo on 7/31/25.
 //
-/*
+
 import Foundation
 import Moya
 
@@ -15,6 +15,10 @@ final class UserFavoriteLocationServices {
         provider.request(.getUserFavoriteLocation) { result in
             switch result {
             case .success(let response):
+                print("🔎 status:", response.statusCode)
+                print("🔎 body:", String(data: response.data, encoding: .utf8) ?? "nil")
+                // 성공(200~299)일 때만 디코드
+                guard (200...299).contains(response.statusCode) else { return }
                 do {
                     let decoded = try JSONDecoder().decode(UserFavoriteLocationResponse.self, from: response.data)
                     completion(.success(decoded.data))
@@ -25,10 +29,11 @@ final class UserFavoriteLocationServices {
                 completion(.failure(error))
             }
         }
+
     }
     
-    func addFavoriteLocation(hCode: String, completion: @escaping (Result<Int, Error>) -> Void) {
-        provider.request(.getUserFavoriteLocation) { result in
+    func addFavoriteLocation(bCode: String, completion: @escaping (Result<Int, Error>) -> Void) {
+        provider.request(.postUserFavoriteLocation(bCode: bCode)) { result in
             switch result {
             case .success(let response):
                 do {
@@ -66,4 +71,4 @@ final class UserFavoriteLocationServices {
     }
 
 }
-*/
+

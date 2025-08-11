@@ -24,6 +24,7 @@
 /* Begin PBXFileReference section */
 		808ED0FB2E1D9EFF00442DA8 /* weady.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = weady.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD2FA5F02E4A02410052E85F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CDF98D1B2E29549500446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -87,6 +88,7 @@
 			sourceTree = "<group>";
 		};
 		CD2FA5F22E4A02410052E85F /* Products */ = {
+		CDF98D1D2E29549500446374 /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -167,6 +169,8 @@
 				{
 					ProductGroup = CD2FA5F22E4A02410052E85F /* Products */;
 					ProjectRef = CD2FA5F02E4A02410052E85F /* weady.xcodeproj */;
+					ProductGroup = CDF98D1D2E29549500446374 /* Products */;
+					ProjectRef = CDF98D1B2E29549500446374 /* weady.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -199,6 +203,8 @@
 /* Begin XCBuildConfiguration section */
 		808ED1042E1D9F0100442DA8 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 808ED0FD2E1D9EFF00442DA8 /* weady */;
+			baseConfigurationReferenceRelativePath = Resources/Config/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -255,6 +261,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				SUPPORTED_DESTINATIONS = "iphoneos ipados macos";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -262,6 +269,8 @@
 		};
 		808ED1052E1D9F0100442DA8 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 808ED0FD2E1D9EFF00442DA8 /* weady */;
+			baseConfigurationReferenceRelativePath = Resources/Config/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -311,6 +320,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				SUPPORTED_DESTINATIONS = "iphoneos ipados macos";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -335,6 +345,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -372,6 +383,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
