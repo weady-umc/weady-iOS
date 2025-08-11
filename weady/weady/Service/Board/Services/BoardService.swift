@@ -12,9 +12,6 @@ final class BoardService: NetworkManager {
     
     typealias Endpoint = BoardEndpoints
     
-    typealias BoardListWrapped = ApiResponse<BoardListResponseDTO>
-    typealias BoardDetailWrapped = ApiResponse<BoardDetailResponseDTO>
-    
     let provider: MoyaProvider<BoardEndpoints>
     
     public init(provider: MoyaProvider<BoardEndpoints>? = nil) {
@@ -29,24 +26,19 @@ final class BoardService: NetworkManager {
         seasonTagId: Int?,
         weatherTagId: Int?,
         temperatureTagId: Int?,
-        size: Int = 10,
+        size: Int = 20,
         completion: @escaping (Result<BoardListResponseDTO, NetworkError>) -> Void
     ) {
         request(
-            target: .getBoards(seasonTagId: seasonTagId, weatherTagId: weatherTagId, temperatureTagId: temperatureTagId, size: size),
-            decodingType: BoardListWrapped.self
-        ) { result in
-            switch result {
-            case .success(let wrapped):
-                if let data = wrapped.data {
-                    completion(.success(data))
-                } else {
-                    completion(.failure(.decodingError))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+            target: .getBoards(
+                seasonTagId: seasonTagId,
+                weatherTagId: weatherTagId,
+                temperatureTagId: temperatureTagId,
+                size: size
+            ),
+            decodingType: BoardListResponseDTO.self,
+            completion: completion
+        )
     }
     
     // MARK: - 게시글 상세 조회
@@ -56,19 +48,9 @@ final class BoardService: NetworkManager {
     ) {
         request(
             target: .getBoardDetail(boardId: boardId),
-            decodingType: BoardDetailWrapped.self
-        ) { result in
-            switch result {
-            case .success(let wrapped):
-                if let data = wrapped.data {
-                    completion(.success(data))
-                } else {
-                    completion(.failure(.decodingError))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+            decodingType: BoardDetailResponseDTO.self,
+            completion: completion
+        )
     }
     
     // MARK: - 게시글 작성
@@ -139,4 +121,3 @@ final class BoardService: NetworkManager {
         )
     }
 }
-//d

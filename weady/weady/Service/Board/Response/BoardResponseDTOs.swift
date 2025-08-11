@@ -13,8 +13,8 @@ struct BoardDetailResponseDTO: Decodable {
     let userName: String
     let userProfileImageUrl: String?
     let isPublic: Bool
-    var goodStatus: Bool
-    var goodCount: Int?
+    let goodStatus: Bool
+    let goodCount: Int
     let imgCount: Int?
     let imageDtoList: [BoardImageDTO]
     let content: String
@@ -45,8 +45,13 @@ struct BoardLikeResponseDTO: Decodable {
 
 struct BoardListResponseDTO: Decodable {
     let content: [BoardPreviewDTO]
+    let first: Bool?
+    let last: Bool?
+    let size: Int?
+    let number: Int?
+    let numberOfElements: Int?
+    let empty: Bool?
 }
-
 
 struct BoardPreviewDTO: Codable, Hashable, Equatable, Identifiable {
     var id: Int { boardId }

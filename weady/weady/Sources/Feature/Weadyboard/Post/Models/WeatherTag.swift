@@ -5,18 +5,17 @@
 //  Created by 엄민서 on 7/31/25.
 //
 
-
 enum WeatherTag: Int {
     case sunny = 0, cloudy, rainy, snowy, partlyCloudy, windy
 
     static func iconName(for id: Int) -> String {
         switch id {
-        case 0: return "sunnyIcon"
-        case 1: return "cloudyIcon"
-        case 2: return "rainyIcon"
-        case 3: return "snowyIcon"
-        case 4: return "partlycloudy"
-        case 5: return "windyIcon"
+        case 0: return "filter_sunny"
+        case 1: return "filter_cloudy"
+        case 2: return "filter_rainy"
+        case 3: return "filter_snowy"
+        case 4: return "filter_partlycloudy"
+        case 5: return "filter_windy"
         default: return ""
         }
     }
@@ -35,13 +34,13 @@ enum WeatherTag: Int {
     
     static func imageName(for id: Int) -> String {
             switch id {
-            case 0: return "sunnyIcon"
-            case 1: return "cloudyIcon"
-            case 2: return "rainyIcon"
-            case 3: return "snowyIcon"
-            case 4: return "partlycloudy"
-            case 5: return "windyIcon"
-            default: return "defaultWeather"
+            case 0: return "filter_sunny"
+            case 1: return "filter_cloudy"
+            case 2: return "filter_rainy"
+            case 3: return "filter_snowy"
+            case 4: return "filter_partlycloudy"
+            case 5: return "filter_windy"
+            default: return ""
             }
         }
 }

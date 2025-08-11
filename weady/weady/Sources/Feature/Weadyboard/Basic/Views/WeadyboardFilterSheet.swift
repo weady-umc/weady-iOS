@@ -9,162 +9,152 @@ import SwiftUI
 
 struct WeadyboardFilterSheet: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(WeadyboardRouter.self) private var router
-    
-    @State private var selectedSeasons: Set<String> = []
-    @State private var selectedWeathers: Set<String> = []
+
+    let onApply: (BoardFilterCriteria) -> Void
+    var initialCriteria: BoardFilterCriteria = .init()
+
+    @StateObject private var tagVM = TagViewModel()
+
     @State private var temperature: Double = 10
-    
-    let seasonTags = ["봄", "여름", "가을", "겨울"]
-    let weatherTags: [(label: String, iconName: String)] = [
-        ("맑은 날", "sunnyIcon"),
-        ("구름 많은 날", "cloudyIcon"),
-        ("비 오는 날", "rainyIcon"),
-        ("눈 오는 날", "snowyIcon"),
-        ("흐린 날", "partlycloudy"),
-        ("바람 많은 날", "windyIcon")
-    ]
-    
-    var temperatureRangeText: String {
-        let intTemp = Int(temperature)
-        switch intTemp {
-        case ..<(-5): return "~ -6℃"
-        case -5...5:  return "-5℃ ~ 5℃"
-        case 6...11:  return "6℃ ~ 11℃"
-        case 12...16: return "12℃ ~ 16℃"
-        case 17...22: return "17℃ ~ 22℃"
-        case 23...26: return "23℃ ~ 26℃"
-        case 27...30: return "27℃ ~ 30℃"
-        default:      return "31℃ ~"
-        }
+
+    private func weatherIconName(for tagId: Int) -> String {
+        WeatherTag.imageName(for: tagId)
     }
-    
-    var temperatureStatusText: String {
-        let intTemp = Int(temperature)
-        switch intTemp {
-        case ..<(-5): return "한파 수준의 날이에요"
-        case -5...5:  return "매우 추운 날이에요"
-        case 6...11:  return "쌀쌀한 날이에요"
-        case 12...16: return "선선한 날이에요"
-        case 17...22: return "따뜻한 날이에요"
-        case 23...26: return "다소 더운 날이에요"
-        case 27...30: return "더운 날이에요"
-        default:      return "폭염 수준의 날이에요"
-        }
+
+    init(
+        onApply: @escaping (BoardFilterCriteria) -> Void,
+        initialCriteria: BoardFilterCriteria = .init()
+    ) {
+        self.onApply = onApply
+        self.initialCriteria = initialCriteria
     }
-    
+
     var body: some View {
         VStack(spacing: 0) {
-            
-            CustomNavBar(
-                viewTitle: "필터",
-                showBackButton: true,
-                showSubmitButton: true,
-                showBottomDivider: false,
-                backAction: {
-                    router.pop()
-                }
-            )
-            
             Spacer()
             
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    // 계절 필터
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("계절")
-                            .fontName(.metaSemibold12)
-                            .foregroundColor(.black100)
-                            .padding(.leading, 10)
-                        
-                        Rectangle()
-                            .fill(Color.gray600)
-                            .frame(height: 1)
-                        
-                        HStack(spacing: 10) {
-                            ForEach(seasonTags, id: \.self) { season in
+            header
+
+            if tagVM.isLoading {
+                ProgressView()
+                    .padding(.top, 24)
+                Spacer()
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+
+                        // MARK: - 계절
+                        sectionTitle("계절")
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)) {
+                            ForEach(tagVM.seasons, id: \.id) { tag in
                                 FilterTag(
-                                    text: season,
-                                    isSelected: selectedSeasons.contains(season),
+                                    text: tag.name,
+                                    isSelected: tagVM.selectedSeasonIds.contains(tag.id),
                                     selectedBackground: .black100,
                                     selectedTextColor: .white100,
                                     unselectedBackground: .white400,
                                     unselectedTextColor: .black100
                                 ) {
-                                    if selectedSeasons.contains(season) {
-                                        selectedSeasons.remove(season)
+                                    if tagVM.selectedSeasonIds.contains(tag.id) {
+                                        tagVM.selectedSeasonIds.remove(tag.id)
                                     } else {
-                                        selectedSeasons.insert(season)
+                                        tagVM.selectedSeasonIds.insert(tag.id)
                                     }
                                 }
                             }
                         }
-                    }
-                    
-                    // 기온 필터
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("기온")
-                            .fontName(.metaSemibold12)
-                            .foregroundColor(.black100)
-                            .padding(.leading, 10)
-                        
-                        Rectangle()
-                            .fill(Color.gray600)
-                            .frame(height: 1)
-                        
-                        VStack(spacing: 2) {
-                            Text(temperatureRangeText)
+
+                        // MARK: - 기온
+                        sectionTitle("기온")
+                        VStack(spacing: 8) {
+                            Text(tagVM.temperatureRangeText(for: temperature))
                                 .fontName(.metaSemibold12)
                                 .foregroundColor(.black100)
-                            
-                            Text(temperatureStatusText)
+
+                            Text(tagVM.temperatureStatusText(for: temperature))
                                 .fontName(.metaMedium10)
                                 .foregroundColor(.black100)
                         }
-                        .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
-                        
+                        .multilineTextAlignment(.center)
+
                         GradientSliderView(value: $temperature, range: -6...31)
-                    }
-                    
-                    // 날씨 필터
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("날씨")
-                            .fontName(.metaSemibold12)
-                            .foregroundColor(.black100)
-                            .padding(.leading, 10)
-                        
-                        Rectangle()
-                            .fill(Color.gray600)
-                            .frame(height: 1)
-                        
+                            .padding(.horizontal, 8)
+
+                        // MARK: - 날씨
+                        sectionTitle("날씨")
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 15) {
-                            ForEach(weatherTags, id: \.label) { tag in
+                            ForEach(tagVM.weathers, id: \.id) { tag in
                                 FilterIconTag(
-                                    label: tag.label,
-                                    imageName: tag.iconName,
-                                    isSelected: selectedWeathers.contains(tag.label),
+                                    label: tag.name,
+                                    imageName: weatherIconName(for: tag.id),
+                                    isSelected: tagVM.selectedWeatherIds.contains(tag.id),
                                     selectedBackground: .black100,
                                     selectedTextColor: .white100,
                                     unselectedBackground: .white400,
                                     unselectedTextColor: .black100
                                 ) {
-                                    if selectedWeathers.contains(tag.label) {
-                                        selectedWeathers.remove(tag.label)
+                                    if tagVM.selectedWeatherIds.contains(tag.id) {
+                                        tagVM.selectedWeatherIds.remove(tag.id)
                                     } else {
-                                        selectedWeathers.insert(tag.label)
+                                        tagVM.selectedWeatherIds.insert(tag.id)
                                     }
                                 }
                                 .frame(height: 26)
                             }
                         }
                     }
+                    .padding(20)
                 }
-                .padding(20)
             }
         }
         .background(Color.white)
         .presentationDetents([.height(567)])
         .presentationDragIndicator(.hidden)
+        .onAppear {
+            tagVM.loadAll(initialCriteria: initialCriteria)
+
+            if let tId = initialCriteria.temperatureTagId {
+                temperature = tagVM.sliderValue(from: tId)
+            } else {
+                temperature = 10
+            }
+        }
+    }
+
+    private var header: some View {
+        HStack {
+            Button { dismiss() } label: {
+                Image(systemName: "chevron.left").foregroundColor(.black)
+            }
+            Spacer()
+            Text("필터")
+                .fontName(.bodySemibold16)
+            Spacer()
+            Button {
+                let criteria = tagVM.buildCriteria(from: temperature)
+                onApply(criteria)
+                dismiss()
+            } label: {
+                Text("완료")
+                    .fontName(.captionMedium14)
+                    .foregroundColor(.black)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+    }
+
+    private func sectionTitle(_ title: String) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .fontName(.metaSemibold12)
+                .foregroundColor(.black100)
+                .padding(.leading, 10)
+
+            Rectangle()
+                .fill(Color.gray600)
+                .frame(height: 1)
+        }
     }
 }
