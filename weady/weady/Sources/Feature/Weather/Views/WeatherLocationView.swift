@@ -207,7 +207,7 @@ private struct PreviewHost<Content: View>: View {
 }
 
 #Preview {
-    PreviewHost { WeatherHomeView() }       // WeatherLocationView() 등 교체해서 확인
+    PreviewHost { WeatherLocationView() }       // WeatherLocationView() 등 교체해서 확인
 }
 
 
