@@ -27,6 +27,7 @@ struct AppRootView: View {
     @State private var isTabBarHidden = false
     
     @State private var selectedTab: TabType = .home
+    @StateObject private var toastCenter = ToastCenter.shared
     
     // MARK: Body
     var body: some View {
@@ -67,7 +68,8 @@ struct AppRootView: View {
                 }
         }
         .environment(router)
-        .environmentObject(router)
-        .environmentObject(weadyboardBridge)
+//        .environmentObject(router)
+//        .environmentObject(weadyboardBridge)
+        .environmentObject(toastCenter)
     }
 }
