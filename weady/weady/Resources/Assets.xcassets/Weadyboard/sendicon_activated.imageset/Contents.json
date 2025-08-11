@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "sendicon_activated.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

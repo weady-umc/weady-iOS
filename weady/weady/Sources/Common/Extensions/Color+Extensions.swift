@@ -39,6 +39,13 @@ extension Color {
     static let rain1 = Color(hex: "8BC7FF")
     static let rain2 = Color(hex: "F4FEFF")
     
+    // Login
+    static let login100 = Color(hex: "FEE500")
+    static let login200 = Color(hex: "E33629")
+    static let login300 = Color(hex: "F8BD00")
+    static let login400 = Color(hex: "319F43")
+    static let login500 = Color(hex: "587DBD")
+
     // Default
     static let systemblue = Color(hex: "007AFF")
     static let systemred = Color(hex: "FF3B30")
@@ -49,28 +56,28 @@ extension Color {
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-        let scanner = Scanner(string: hex)
+        var hexString = hex
 
         if hex.hasPrefix("#") {
-            scanner.currentIndex = hex.index(after: hex.startIndex)
+            hexString = String(hex.dropFirst())
         }
 
-        var rgba: UInt64 = 0
-        scanner.scanHexInt64(&rgba)
+        var int = UInt64()
+        Scanner(string: hexString).scanHexInt64(&int)
 
         let r, g, b, a: Double
 
-        switch hex.count {
-        case 7: // #RRGGBB
-            r = Double((rgba & 0xFF0000) >> 16) / 255.0
-            g = Double((rgba & 0x00FF00) >> 8) / 255.0
-            b = Double(rgba & 0x0000FF) / 255.0
+        switch hexString.count {
+        case 6: // RRGGBB
+            r = Double((int >> 16) & 0xFF) / 255.0
+            g = Double((int >> 8) & 0xFF) / 255.0
+            b = Double(int & 0xFF) / 255.0
             a = 1.0
-        case 9: // #RRGGBBAA
-            r = Double((rgba & 0xFF000000) >> 24) / 255.0
-            g = Double((rgba & 0x00FF0000) >> 16) / 255.0
-            b = Double((rgba & 0x0000FF00) >> 8) / 255.0
-            a = Double(rgba & 0x000000FF) / 255.0
+        case 8: // RRGGBBAA
+            r = Double((int >> 24) & 0xFF) / 255.0
+            g = Double((int >> 16) & 0xFF) / 255.0
+            b = Double((int >> 8) & 0xFF) / 255.0
+            a = Double(int & 0xFF) / 255.0
         default:
             r = 0; g = 0; b = 0; a = 1
         }
