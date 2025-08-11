@@ -12,7 +12,7 @@ import Observation
 /// 전역 탭 상태 컨트롤러 (어디서든 @Environment로 접근)
 
 @Observable
-final class AppTabController: ObservableObject {
+final class AppTabController {
     // MARK: Properties
     var selected: TabType = .home
     // MARK: Methods
