@@ -9,8 +9,7 @@ import SwiftUI
 //MARK: - Main 웨디카이브 뷰
 struct WeadychiveView: View {
     @StateObject private var viewModel = WeadychiveViewModel()
-    @Environment(NavigationRouter.self) private var router: NavigationRouter?
-  
+    @Environment(WeadychiveRouter.self) private var router
     
  
     // MARK: - 프로퍼티
@@ -337,8 +336,11 @@ struct NoCurationView: View {
 
 // MARK: - NoWeadyboardView (스크랩된 웨디보드 없는 경우)
 struct NoWeadyboardView: View {
-    @Environment(NavigationRouter.self) private var router: NavigationRouter?
-   
+    @Environment(WeadychiveRouter.self) private var router
+    // 일단 이런식으로 추가하면 연결되도록 해놨습니다 !
+    @Environment(AppTabController.self) private var tab
+    @Environment(WeadyboardRouteBridge.self) private var weadyboardBridge
+    
     var body: some View {
         VStack {
             VStack(spacing: 20) {
@@ -348,7 +350,9 @@ struct NoWeadyboardView: View {
                     .padding(.horizontal)
 
                 Button(action: {
-                    router?.push(.weadyboard) // 웨디보드 탐색 화면으로 이동
+//                    router?.push(.weadyboard) // 웨디보드 탐색 화면으로 이동
+                    // 이런식으로 웨디보드로 연결될 듯합니다 
+                    tab.switchTo(.weadyboard)
                 }) {
                     Text("웨디보드 보러가기")
                         .fontName(.captionSemibold14)

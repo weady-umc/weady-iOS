@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// TODO: 온보딩 api 연결하면 이 파일 삭제
+
 struct BaseTabContainerView: View {
     @State private var selectedTab: TabType = .home
     @State private var isTabBarHidden: Bool = false

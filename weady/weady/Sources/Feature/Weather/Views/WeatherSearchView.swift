@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WeatherSearchView: View {
     
-    @Environment(NavigationRouter.self) var router
+    @Environment(HomeRouter.self) var router
     @StateObject private var viewModel = WeatherSearchViewModel()
     @Environment(\.dismiss) private var dismiss
     @Binding var selectedPlace: AddressDocument?

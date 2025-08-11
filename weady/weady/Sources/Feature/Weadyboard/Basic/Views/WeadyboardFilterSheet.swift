@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WeadyboardFilterSheet: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(NavigationRouter.self) private var router
+    @Environment(WeadyboardRouter.self) private var router
     
     @State private var selectedSeasons: Set<String> = []
     @State private var selectedWeathers: Set<String> = []
