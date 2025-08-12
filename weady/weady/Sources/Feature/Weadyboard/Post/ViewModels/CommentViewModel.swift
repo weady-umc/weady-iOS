@@ -14,23 +14,27 @@ final class CommentViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private let boardId: Int
-    private let service = CommentService()
+    private let service: CommentService
 
-    init(boardId: Int) {
+    init(boardId: Int, service: CommentService = CommentService()) {
         self.boardId = boardId
+        self.service = service
     }
 
     // 댓글 조회
-    func fetch(size: Int = 10) {
+    func fetch(size: Int = 20) {
         isLoading = true
-        service.fetchComments(boardId: boardId, size: size) { [weak self] result in
-            DispatchQueue.main.async {
+        errorMessage = nil
+        service.fetchComments(boardId: boardId, size: size) { [weak self] (result: Result<[CommentResponseDTO], NetworkError>) in
+            Task { @MainActor in
                 guard let self else { return }
                 self.isLoading = false
                 switch result {
                 case .success(let list):
                     self.comments = list
+                    self.errorMessage = nil
                 case .failure(let err):
+                    self.comments = []
                     self.errorMessage = err.localizedDescription
                 }
             }
@@ -38,74 +42,26 @@ final class CommentViewModel: ObservableObject {
     }
 
     // 댓글 작성
-    func post(content: String, parentId: Int? = nil) {
-        isLoading = true
-        service.postComment(boardId: boardId, parentId: parentId, content: content) { [weak self] result in
-            DispatchQueue.main.async {
+    func post(content: String, parentId: Int?) {
+        errorMessage = nil
+        service.postComment(boardId: boardId, parentId: parentId, content: content) { [weak self] (result: Result<SingleCommentResponseDTO, NetworkError>) in
+            Task { @MainActor in
                 guard let self else { return }
-                self.isLoading = false
                 switch result {
                 case .success(let created):
-
-                    let newItem = CommentResponseDTO(
-                        commentId: created.commentId,
-                        parentId: created.parentId,
-                        username: created.username,
-                        profileImageUrl: created.profileImageUrl,
-                        content: created.content,
-                        childCommentsList: [],
-                        createdAt: created.createdAt
-                    )
-                    if let parentId, let idx = self.comments.firstIndex(where: { $0.commentId == parentId }) {
-                        var parent = self.comments[idx]
-                        var children = parent.childCommentsList
-                        let child = ChildCommentResponseDTO(
-                            commentId: created.commentId,
-                            parentId: parentId,
-                            username: created.username,
-                            profileImageUrl: created.profileImageUrl,
-                            content: created.content,
-                            createdAt: created.createdAt
-                        )
-                        children.append(child)
-                        parent = CommentResponseDTO(
-                            commentId: parent.commentId,
-                            parentId: parent.parentId,
-                            username: parent.username,
-                            profileImageUrl: parent.profileImageUrl,
-                            content: parent.content,
-                            childCommentsList: children,
-                            createdAt: parent.createdAt
-                        )
-                        self.comments[idx] = parent
-                    } else {
-                        self.comments.insert(newItem, at: 0)
-                    }
-                case .failure(let err):
-                    self.errorMessage = err.localizedDescription
-                }
-            }
-        }
-    }
-
-    // 댓글 삭제
-    func delete(commentId: Int) {
-        isLoading = true
-        service.deleteComment(commentId: commentId) { [weak self] result in
-            DispatchQueue.main.async {
-                guard let self else { return }
-                self.isLoading = false
-                switch result {
-                case .success:
-                    if let idx = self.comments.firstIndex(where: { $0.commentId == commentId }) {
-                        self.comments.remove(at: idx)
-                        return
-                    }
-                    for i in self.comments.indices {
-                        if let childIdx = self.comments[i].childCommentsList.firstIndex(where: { $0.commentId == commentId }) {
-                            var parent = self.comments[i]
+                    if let parentId = created.parentId {
+                        if let idx = self.comments.firstIndex(where: { $0.commentId == parentId }) {
+                            var parent = self.comments[idx]
                             var children = parent.childCommentsList
-                            children.remove(at: childIdx)
+                            let child = ChildCommentResponseDTO(
+                                commentId: created.commentId,
+                                parentId: parentId,
+                                username: created.username,
+                                profileImageUrl: created.profileImageUrl,
+                                content: created.content,
+                                createdAt: created.createdAt
+                            )
+                            children.append(child)
                             parent = CommentResponseDTO(
                                 commentId: parent.commentId,
                                 parentId: parent.parentId,
@@ -115,14 +71,42 @@ final class CommentViewModel: ObservableObject {
                                 childCommentsList: children,
                                 createdAt: parent.createdAt
                             )
-                            self.comments[i] = parent
-                            break
+                            self.comments[idx] = parent
                         }
+                    } else {
+                        let mapped = CommentResponseDTO(
+                            commentId: created.commentId,
+                            parentId: created.parentId,
+                            username: created.username,
+                            profileImageUrl: created.profileImageUrl,
+                            content: created.content,
+                            childCommentsList: [],
+                            createdAt: created.createdAt
+                        )
+                        self.comments.insert(mapped, at: 0)
                     }
+                    self.errorMessage = nil
                 case .failure(let err):
                     self.errorMessage = err.localizedDescription
                 }
             }
         }
     }
+
+    // 댓글 삭제
+    func delete(commentId: Int) {
+            errorMessage = nil
+            service.deleteComment(commentId: commentId) { [weak self] (result: Result<EmptyResponse, NetworkError>) in
+                Task { @MainActor in
+                    guard let self else { return }
+                    switch result {
+                    case .success:
+                        self.comments.removeAll { $0.commentId == commentId }
+                        self.errorMessage = nil
+                    case .failure(let err):
+                        self.errorMessage = err.localizedDescription
+                    }
+                }
+            }
+        }
 }

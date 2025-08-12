@@ -7,33 +7,12 @@
 
 import Foundation
 
+// 목록 응답(data 내부)
 struct CommentListResponseDTO: Decodable {
     let content: [CommentResponseDTO]
-    
-    let pageable: PageableInfoDTO?
-    let first: Bool?
-    let size: Int?
-    let number: Int?
-    let sort: SortInfoDTO?
-    let numberOfElements: Int?
-    let last: Bool?
-    let empty: Bool?
-    
-    struct PageableInfoDTO: Decodable {
-        let paged: Bool?
-        let pageNumber: Int?
-        let pageSize: Int?
-        let offset: Int?
-        let sort: SortInfoDTO?
-        let unpaged: Bool?
-    }
-    struct SortInfoDTO: Decodable {
-        let sorted: Bool?
-        let empty: Bool?
-        let unsorted: Bool?
-    }
 }
 
+// POST 성공 시 단일 댓글(data 내부)
 struct SingleCommentResponseDTO: Decodable {
     let commentId: Int
     let parentId: Int?
@@ -43,6 +22,7 @@ struct SingleCommentResponseDTO: Decodable {
     let createdAt: String
 }
 
+// 목록
 struct CommentResponseDTO: Decodable, Identifiable {
     var id: Int { commentId }
     
@@ -55,6 +35,7 @@ struct CommentResponseDTO: Decodable, Identifiable {
     let createdAt: String
 }
 
+// 대댓글
 struct ChildCommentResponseDTO: Decodable, Identifiable {
     var id: Int { commentId }
     

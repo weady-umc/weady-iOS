@@ -44,7 +44,7 @@ struct WeadyboardPostView: View {
                         Spacer()
                         WeadyboardUserHeaderView(
                             userName: post.userName,
-                            userProfileImageUrl: post.userProfileImageUrl ?? "profile",
+                            userProfileImageUrl: post.userProfileImageUrl,
                             onMoreTap: { showMoreSheet = true }
                         )
                         
@@ -54,6 +54,7 @@ struct WeadyboardPostView: View {
                             goodStatus: viewModel.post?.goodStatus ?? false,
                             goodCount: viewModel.post?.goodCount ?? 0,
                             commentCount: 0,
+//                            commentCount: viewModel.post?.commentCount ?? 0,
                             onLikeTap: {
                                 if viewModel.post?.goodStatus == true {
                                     viewModel.unlikeBoard()
