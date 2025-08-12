@@ -7,40 +7,42 @@
 
 import Foundation
 
-// 댓글 리스트 응답
+// 목록 응답(data 내부)
 struct CommentListResponseDTO: Decodable {
     let content: [CommentResponseDTO]
 }
 
-// 단일 댓글 응답 (POST)
+// POST 성공 시 단일 댓글(data 내부)
 struct SingleCommentResponseDTO: Decodable {
     let commentId: Int
     let parentId: Int?
     let username: String
-    let profileImageUrl: String
+    let profileImageUrl: String?
     let content: String
     let createdAt: String
 }
 
+// 목록
 struct CommentResponseDTO: Decodable, Identifiable {
     var id: Int { commentId }
-
+    
     let commentId: Int
     let parentId: Int?
     let username: String
-    let profileImageUrl: String
+    let profileImageUrl: String?
     let content: String
     let childCommentsList: [ChildCommentResponseDTO]
     let createdAt: String
 }
 
+// 대댓글
 struct ChildCommentResponseDTO: Decodable, Identifiable {
     var id: Int { commentId }
-
+    
     let commentId: Int
-    let parentId: Int
+    let parentId: Int?
     let username: String
-    let profileImageUrl: String
+    let profileImageUrl: String?
     let content: String
     let createdAt: String
 }

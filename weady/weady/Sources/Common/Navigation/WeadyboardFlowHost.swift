@@ -48,7 +48,7 @@ struct WeadyboardFlowHost: View {
                     case .weadyboard:
                         WeadyboardView()
                     case .weadyboardPost(let boardId):
-                        WeadyboardPostView(isTabBarHidden: .constant(true), boardId: boardId)
+                        WeadyboardPostView(boardId: boardId, isTabBarHidden: .constant(true))
                     case .weadyboardPostReportDetail(let reason, let boardId):
                         WeadyboardPostReportDetailView(
                             reason: reason,

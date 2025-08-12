@@ -27,6 +27,13 @@ protocol NetworkManager {
         completion: @escaping (Result<T?, NetworkError>) -> Void
     )
     
+    // 2.5. 래퍼 없이 바디를 T로 직접 디코딩 (data 없는 응답 등)
+    func requestRaw<T: Decodable>(
+        target: Endpoint,
+        decodingType: T.Type,
+        completion: @escaping (Result<T, NetworkError>) -> Void
+    )
+    
     // 3. 상태 코드만 확인
     func requestStatusCode(
         target: Endpoint,
