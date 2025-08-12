@@ -39,6 +39,12 @@ struct ImgDto: Codable {
     }
 }
 
+struct curationDTO: Codable {
+    let curationId: Int64
+    let curationTitle: String
+    let backgroundImgUrl: String
+}
+
 // MARK: - ApiResponseCurationByLocationResponseDto
 struct ApiResponseCurationByLocationResponseDto: Codable {
     let code: Int
@@ -58,7 +64,7 @@ struct CurationByLocationResponseDto: Codable {
     let locationName: String
     let season: String
     let weather: String
-    let curations: [CurationDto]
+    let curations: [curationDTO] //웨디카이브 DTO
 
     enum CodingKeys: String, CodingKey {
         case locationId

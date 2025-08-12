@@ -66,7 +66,7 @@ extension CurationServices {
     }
 
     /// [GET] /api/v1/curation/location/{locationId}
-    /// 지역별 큐레이션 조회
+    /// 지역별 큐레이션 조회 ( 내 주변)
     func getCurationsByLocation(locationId: Int64,
                                 completion: @escaping (Result<ApiResponseCurationByLocationResponseDto, APIError>) -> Void) {
         request(.getCurationsByLocation(locationId: Int(locationId)), completion: completion)
