@@ -31,9 +31,6 @@ struct WeadyboardPostCommentSheet: View {
             if viewModel.isLoading {
                 ProgressView().padding(.top, 24)
                 Spacer()
-            } else if let error = viewModel.errorMessage {
-                Text(error).foregroundColor(.red).padding()
-                Spacer()
             } else if viewModel.comments.isEmpty {
                 Text("댓글을 남겨서 의견을 공유해보세요.")
                     .fontName(.metaRegular12)
@@ -48,7 +45,6 @@ struct WeadyboardPostCommentSheet: View {
                         }
                         .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                         .listRowSeparator(.hidden)
-
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 viewModel.delete(commentId: comment.commentId)
@@ -61,13 +57,11 @@ struct WeadyboardPostCommentSheet: View {
                 .listStyle(.plain)
             }
 
-            // 하단 입력바
             inputBar
                 .padding(.bottom, max(12, keyboard.height))
                 .background(Color.white.ignoresSafeArea(edges: .bottom))
         }
-        .onReceive(keyboard.$height) { _ in
-        }
+        .onReceive(keyboard.$height) { _ in }
         .onAppear {
             viewModel.fetch(size: 20)
         }

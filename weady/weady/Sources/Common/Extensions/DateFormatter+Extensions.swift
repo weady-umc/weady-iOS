@@ -8,16 +8,38 @@
 import Foundation
 
 private enum _DateCache {
-    // 서버 기본 포맷
+    // 서버 기본(초 단위, TZ 미표기 → UTC 가정)
     static let serverBasic: DateFormatter = {
         let f = DateFormatter()
         f.calendar = Calendar(identifier: .gregorian)
         f.locale = Locale(identifier: "ko_KR")
-        f.timeZone = TimeZone(secondsFromGMT: 0) // TZ 미표기 → UTC로 가정
+        f.timeZone = TimeZone(secondsFromGMT: 0)
         f.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         return f
     }()
 
+    // 서버(소수점이 길이 가변, TZ 미표기 → UTC 가정)
+    // 여러 패턴을 순차 시도
+    static let serverFractionalFormats: [DateFormatter] = {
+        let patterns = [
+            "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSSSSS",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSSSS",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSSS",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSS",
+            "yyyy-MM-dd'T'HH:mm:ss.SSS"
+        ]
+        return patterns.map { p in
+            let f = DateFormatter()
+            f.calendar = Calendar(identifier: .gregorian)
+            f.locale = Locale(identifier: "ko_KR")
+            f.timeZone = TimeZone(secondsFromGMT: 0)
+            f.dateFormat = p
+            return f
+        }
+    }()
+
+    // 표준 ISO8601 (타임존 포함일 때만 기대)
     static let iso8601: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -54,6 +76,25 @@ public extension String {
 
     /// 서버가 주는 날짜 문자열을 Date로 변환
     func asServerDate() -> Date? {
+        // 1) 타임존 포함 ISO8601 (예: ...Z, +09:00 등)
+        if self.contains("Z") || self.contains("+") || self.contains("-") && self.contains("T") {
+            if let d = _DateCache.iso8601.date(from: self) {
+                return d
+            }
+        }
+
+        // 2) 가변 소수점(UTC 가정)
+        if self.contains(".") {
+            for f in _DateCache.serverFractionalFormats {
+                if let d = f.date(from: self) { return d }
+            }
+            // 소수점 버리고 기본 포맷 재시도 (예: split(".").first)
+            if let base = self.split(separator: ".").first, let d = _DateCache.serverBasic.date(from: String(base)) {
+                return d
+            }
+        }
+
+        // 3) 기본 포맷(UTC 가정)
         if let d = _DateCache.serverBasic.date(from: self) {
             return d
         }
@@ -74,8 +115,8 @@ public extension String {
 
     /// 상대 시간(방금 전, n분 전, n시간 전, n일 전, 7일↑은 yyyy.MM.dd HH:mm)
     func relativeTimeString(now: Date = Date(),
-                                timeZone: TimeZone = .current,
-                                locale: Locale = Locale(identifier: "ko_KR")) -> String {
+                            timeZone: TimeZone = .current,
+                            locale: Locale = Locale(identifier: "ko_KR")) -> String {
         guard let date = asServerDate() else { return self }
 
         let interval = Int(now.timeIntervalSince(date))

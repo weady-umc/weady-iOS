@@ -95,18 +95,18 @@ final class CommentViewModel: ObservableObject {
 
     // 댓글 삭제
     func delete(commentId: Int) {
-            errorMessage = nil
-            service.deleteComment(commentId: commentId) { [weak self] (result: Result<EmptyResponse, NetworkError>) in
-                Task { @MainActor in
-                    guard let self else { return }
-                    switch result {
-                    case .success:
-                        self.comments.removeAll { $0.commentId == commentId }
-                        self.errorMessage = nil
-                    case .failure(let err):
-                        self.errorMessage = err.localizedDescription
-                    }
+        errorMessage = nil
+        service.deleteComment(commentId: commentId) { [weak self] (result: Result<Void, NetworkError>) in
+            Task { @MainActor in
+                guard let self else { return }
+                switch result {
+                case .success:
+                    self.comments.removeAll { $0.commentId == commentId }
+                    self.errorMessage = nil
+                case .failure(let err):
+                    self.errorMessage = err.localizedDescription
                 }
             }
         }
+    }
 }

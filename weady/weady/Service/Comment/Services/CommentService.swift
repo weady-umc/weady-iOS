@@ -30,76 +30,45 @@ final class CommentService: NetworkManager {
     ) {
         self.request(
             target: .getComments(boardId: boardId, size: size),
-            decodingType: ApiResponse<CommentListResponseDTO>.self
+            decodingType: CommentListResponseDTO.self
         ) { result in
             switch result {
-            case .success(let wrapped):
-                // 정상 경로
-                if let content = wrapped.data?.content {
-                    completion(.success(content))
-                } else {
-                    completion(.success([]))
-                }
-                
-            case .failure(let error):
-                // 래퍼 디코딩 실패일 때만 보조 경로로 복구
-                if case .decodingError = error {
-                    self.provider.request(.getComments(boardId: boardId, size: size)) { res in
-                        switch res {
-                        case .success(let response):
-                            do {
-                                // 최상위 JSON에서 data.content만 뽑아 재디코딩
-                                let top = try JSONSerialization.jsonObject(with: response.data, options: []) as? [String: Any]
-                                let dataObj = top?["data"] as? [String: Any]
-                                let contentObj = dataObj?["content"] as? [Any] ?? []
-                                let contentData = try JSONSerialization.data(withJSONObject: contentObj, options: [])
-                                
-                                let decoder = JSONDecoder()
-                                let list = try decoder.decode([CommentResponseDTO].self, from: contentData)
-                                completion(.success(list))
-                            } catch {
-                                completion(.failure(.decodingError))
-                            }
-                        case .failure(let afError):
-                            completion(.failure(.networkError(message: afError.localizedDescription)))
-                        }
-                    }
-                } else {
-                    completion(.failure(error))
-                }
-            }
-        }
-    }
-
-    // MARK: - 댓글 작성
-    func postComment(boardId: Int, parentId: Int? = nil, content: String, completion: @escaping (Result<SingleCommentResponseDTO, NetworkError>) -> Void) {
-        let requestDTO = PostCommentRequestDTO(parentId: parentId, content: content)
-        self.request(
-            target: .postComment(boardId: boardId, requestDTO: requestDTO),
-            decodingType: ApiResponse<SingleCommentResponseDTO>.self
-        ) { result in
-            switch result {
-            case .success(let wrapped):
-                if let data = wrapped.data {
-                    completion(.success(data))
-                } else {
-                    completion(.failure(.unknown))
-                }
+            case .success(let dto):
+                completion(.success(dto.content))
             case .failure(let error):
                 completion(.failure(error))
             }
         }
     }
 
-    // MARK: - 댓글 삭제
-    func deleteComment(commentId: Int, completion: @escaping (Result<EmptyResponse, NetworkError>) -> Void) {
+    // MARK: - 댓글 작성
+    func postComment(
+        boardId: Int,
+        parentId: Int? = nil,
+        content: String,
+        completion: @escaping (Result<SingleCommentResponseDTO, NetworkError>) -> Void
+    ) {
+        let requestDTO = PostCommentRequestDTO(parentId: parentId, content: content)
         self.request(
+            target: .postComment(boardId: boardId, requestDTO: requestDTO),
+            decodingType: SingleCommentResponseDTO.self
+        ) { result in
+            completion(result)
+        }
+    }
+
+    // MARK: - 댓글 삭제
+    func deleteComment(
+        commentId: Int,
+        completion: @escaping (Result<Void, NetworkError>) -> Void
+    ) {
+        self.requestRaw(
             target: .deleteComment(commentId: commentId),
-            decodingType: ApiResponse<EmptyResponse>.self
+            decodingType: ApiResponseNoData.self
         ) { result in
             switch result {
             case .success:
-                completion(.success(EmptyResponse()))
+                completion(.success(()))
             case .failure(let error):
                 completion(.failure(error))
             }
