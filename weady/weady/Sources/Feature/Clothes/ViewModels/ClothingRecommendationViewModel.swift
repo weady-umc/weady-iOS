@@ -19,14 +19,14 @@ final class ClothingRecommendationViewModel: ObservableObject {
     @Published var clothingImageUrl: URL?
     @Published var chartItems: [ChartItem] = []
     @Published var tags: Tags?
-
+    
     private let service: FashionService
-
-
+    
+    
     init(service: FashionService = FashionService()) {
         self.service = service
         fetchFashionDetail()
-
+        
     }
     
     // 외부에서 위치 선택 시 호출
@@ -43,6 +43,7 @@ final class ClothingRecommendationViewModel: ObservableObject {
             components.queryItems = [URLQueryItem(name: "locationId", value: String(id))]
         }
         guard let url = components.url else { return }
+    }
 
 
     func fetchFashionDetail() {
