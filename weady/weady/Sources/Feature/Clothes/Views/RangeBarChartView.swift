@@ -11,6 +11,8 @@ struct RangeBarChartView: View {
     let items: [TempChartModel]
     let baseDate: Date
     var labelColor: Color = .white100
+    var axisColor: Color = .gray700
+    var axisLineWidth: CGFloat = 1.5
     
     private let minTemp = 15
     private let maxTemp = 35
@@ -72,7 +74,7 @@ struct RangeBarChartView: View {
                     p.move(to: CGPoint(x: insetLeft, y: plotH))
                     p.addLine(to: CGPoint(x: insetLeft + plotW, y: plotH))
                 }
-                .stroke(Color.appgray700, lineWidth: 2)
+                .stroke(axisColor, lineWidth: axisLineWidth)
                 
                 // Bars: 연속 구간 병합 후 렌더링 (라운드 끊김 방지)
                 let runs = computeRuns(from: sortedItems)

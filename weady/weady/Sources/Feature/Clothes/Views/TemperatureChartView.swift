@@ -12,25 +12,33 @@ struct TemperatureChartView: View {
     private let injectedItems: [TempChartModel]?
     private let baseDate: Date
     private let labelColor: Color
+    private let axisColor: Color
+    private let axisLineWidth: CGFloat
 
     // 기본 API 호출용
-    init(baseDate: Date = Date(), labelColor: Color = .appwhite100) {
+    init(baseDate: Date = Date(), labelColor: Color = .appwhite100, axisColor: Color = .appgray700, axisLineWidth: CGFloat = 1.5) {
         self.baseDate = baseDate
         self.labelColor = labelColor
+        self.axisColor = axisColor
+        self.axisLineWidth = axisLineWidth
         self.injectedItems = nil
     }
 
     // 외부 ChartItem으로 초기화 (누락 시간 8..21 보정 포함)
-    init(chartItems: [ChartItem], baseDate: Date = Date(), labelColor: Color = .appwhite100) {
+    init(chartItems: [ChartItem], baseDate: Date = Date(), labelColor: Color = .appwhite100, axisColor: Color = .appgray700, axisLineWidth: CGFloat = 1.5) {
         self.baseDate = baseDate
         self.labelColor = labelColor
+        self.axisColor = axisColor
+        self.axisLineWidth = axisLineWidth
         self.injectedItems = TemperatureChartView.normalize(chartItems, baseDate: baseDate)
     }
 
     // 목업 데이터로 초기화
-    init(mock: Bool, baseDate: Date = Date(), labelColor: Color = .appwhite100) {
+    init(mock: Bool, baseDate: Date = Date(), labelColor: Color = .appwhite100, axisColor: Color = .appgray700, axisLineWidth: CGFloat = 1.5) {
         self.baseDate = baseDate
         self.labelColor = labelColor
+        self.axisColor = axisColor
+        self.axisLineWidth = axisLineWidth
         if mock {
             self.injectedItems = TemperatureChartView.makeMockItems(baseDate: baseDate)
         } else {
@@ -40,7 +48,7 @@ struct TemperatureChartView: View {
 
     var body: some View {
         let models = injectedItems ?? vm.items
-        return RangeBarChartView(items: models, baseDate: baseDate, labelColor: labelColor)
+        return RangeBarChartView(items: models, baseDate: baseDate, labelColor: labelColor, axisColor: axisColor, axisLineWidth: axisLineWidth)
             // 크기는 부모에서 .frame(width:height:)로 제어
             .onAppear {
                 if injectedItems == nil {

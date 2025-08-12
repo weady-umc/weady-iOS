@@ -12,6 +12,7 @@ import Charts
 
 struct ClothingRecommendationView: View {
     @StateObject private var vm: ClothingRecommendationViewModel
+    @State private var showLocationPicker = false
     private enum Route: Hashable { case weadyboard }
     
     private enum HelpStep: Hashable { case intro, details }
@@ -47,18 +48,26 @@ struct ClothingRecommendationView: View {
                         Text(vm.addressText)
                             .fontName(.bodySemibold16)
                             .foregroundStyle(.appwhite100)
-                        Image("downIcon")
-                            .resizable()
-                            .frame(width: 10, height: 4)
+                        //지역 선택 화면으로 가는 버튼
+                        Button {
+                            showLocationPicker = true
+                        } label: {
+                            Image("clothesDownIcon")
+                                .resizable()
+                                .frame(width: 10, height: 4)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        
+                        Spacer()
                     }
-                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.horizontal, 120)
                     .padding(.top, 41)
-                    .padding(.bottom, 1)
                     
                     // 추천 옷 이미지
 #if DEBUG
                     // Preview에서는 네트워크 호출 없이 바로 에셋 이미지를 보여주기
-                    Image("thinJacket")
+                    Image("teeShirt")
                         .resizable()
                         .frame(width: 191, height: 173)
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -77,9 +86,9 @@ struct ClothingRecommendationView: View {
                         HStack(spacing: 0){
                             Text("오늘은 ")
                                 .fontName(.titleMedium24)
-                            Text("\(vm.clothingName)")
+                            Text(vm.clothingName)
                                 .fontName(.titleBold24)
-                            Text("이")
+                            Text(vm.subjectParticle)       
                                 .fontName(.titleMedium24)
                         }
                         Text("딱 좋은 날이에요.")
@@ -179,7 +188,7 @@ struct NavigationRowLabel: View {
                 .padding(.trailing, 15)
             OverlappingThumbnails(images: images, size: 28, overlap: 14)
                 .padding(.trailing, 22)
-            Image("rightIcon")
+            Image("clothesRightIcon")
                 .resizable()
                 .frame(width: 23, height: 23)
         }
@@ -227,14 +236,14 @@ extension ClothingRecommendationViewModel {
         let vm = ClothingRecommendationViewModel(token: "")
         vm.addressText = "서초구 양재1동"
         vm.feelTemp = 19
-        vm.clothingName = "얇은 겉옷"
+        vm.clothingName = "반팔"
         vm.clothingImageUrl = Bundle.main.url(forResource: "shirt_icon", withExtension: "png")
         vm.chartItems = (8...21).map { hour in
             // 샘플 온도는 자유롭게
             let samples = [24,26,27,29,30,31,32,31,31,30,28,26,25,24]
             let t = samples[hour - 8]
             return ChartItem(time: hour, feelTmp: Double(t),
-                             clothing: ClothingItem(name: "샘플", imageUrl: "thinJacket"))
+                             clothing: ClothingItem(name: "샘플", imageUrl: "teeShirt"))
         }
         return vm
     }
