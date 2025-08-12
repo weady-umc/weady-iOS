@@ -14,8 +14,8 @@ struct ClothingRecommendationView: View {
     @StateObject private var vm: ClothingRecommendationViewModel
 
     // 실제 앱에서 토큰으로 초기화
-    init(token: String) {
-        _vm = StateObject(wrappedValue: ClothingRecommendationViewModel(token: token))
+    init() {
+        _vm = StateObject(wrappedValue: ClothingRecommendationViewModel())
     }
 
     // Preview에서 더미 VM 주입
@@ -155,7 +155,7 @@ struct NavigationButtonRow: View {
 // MARK: - Preview & Mock
 extension ClothingRecommendationViewModel {
     static var preview: ClothingRecommendationViewModel {
-        let vm = ClothingRecommendationViewModel(token: "")
+        let vm = ClothingRecommendationViewModel()
         vm.addressText = "서초구 양재1동"
         vm.feelTemp = 19
         vm.clothingName = "얇은 겉옷"
