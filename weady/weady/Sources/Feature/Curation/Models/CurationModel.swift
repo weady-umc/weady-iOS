@@ -21,15 +21,69 @@ enum Season: String, CaseIterable, Codable {
 }
 
 enum SkyWeather: String, CaseIterable, Codable {
-    case clear = "맑은 날"
+    case clear = "맑은날"
     case mostlyCloudy = "구름 많은 날"
     case cloudy = "흐린 날"
     case rainy = "비 오는 날"
     case windy = "바람 많은 날"
+    case snowy = "눈 오는 날"
     case unknown
 
     init(server: String) {
         self = SkyWeather(rawValue: server) ?? .unknown
+    }
+}
+
+// MARK: - Presentation tone (domain-safe)
+/// UI에 의존하지 않는 의미색 토큰
+enum SemanticColor: String, Codable, CaseIterable {
+    case springClear     // TODO: 리소스 컬러칩: springClear 색상
+    case springCloudy    // TODO: 리소스 컬러칩: springCloudy 색상
+    case springRainy     // TODO: 리소스 컬러칩: springRainy 색상
+    case summerClear     // TODO: 리소스 컬러칩: summerClear 색상
+    case summerCloudy    // TODO: 리소스 컬러칩: summerCloudy 색상
+    case summerRainy     // TODO: 리소스 컬러칩: summerRainy 색상
+    case autumnClear     // TODO: 리소스 컬러칩: autumnClear 색상
+    case autumnCloudy    // TODO: 리소스 컬러칩: autumnCloudy 색상
+    case autumnRainy     // TODO: 리소스 컬러칩: autumnRainy 색상
+    case winterClear     // TODO: 리소스 컬러칩: winterClear 색상
+    case winterCloudy    // TODO: 리소스 컬러칩: winterCloudy 색상
+    case winterRainy     // TODO: 리소스 컬러칩: winterRainy 색상
+}
+
+/// (season, weather) → 하나의 의미색 토큰
+enum WeatherTone {
+    static func tone(for season: Season, weather: SkyWeather) -> SemanticColor {
+        switch (season, weather) {
+        case (.spring, .clear):
+            return .springClear
+        case (.spring, .mostlyCloudy), (.spring, .cloudy):
+            return .springCloudy
+        case (.spring, .rainy):
+            return .springRainy
+        case (.summer, .clear):
+            return .summerClear
+        case (.summer, .mostlyCloudy), (.summer, .cloudy):
+            return .summerCloudy
+        case (.summer, .rainy):
+            return .summerRainy
+        case (.autumn, .clear):
+            return .autumnClear
+        case (.autumn, .mostlyCloudy), (.autumn, .cloudy):
+            return .autumnCloudy
+        case (.autumn, .rainy):
+            return .autumnRainy
+        case (.winter, .clear):
+            return .winterClear
+        case (.winter, .mostlyCloudy), (.winter, .cloudy):
+            return .winterCloudy
+        case (.winter, .rainy):
+            return .winterRainy
+        case (.winter, .snowy):
+            return .winterCloudy
+        default:
+            return .springClear
+        }
     }
 }
 
@@ -49,19 +103,19 @@ enum WeatherPhrase {
         case (.spring, .clear):          return "맑고 따듯한 봄날"
         case (.spring, .mostlyCloudy):   return "구름이 머무는 봄날"
         case (.spring, .cloudy):         return "구름낀 흐린 봄날"
-        case (.spring, .rainy):          return "비가 내리는 봄날"
-        case (.spring, .windy):          return "바람이 부는 봄날"
+        case (.spring, .rainy):          return "추적추적 비가 내리는 봄날"
+        case (.spring, .windy):          return "바람이 부는 쉬원한 봄날"
 
         case (.summer, .clear):          return "쨍쨍한 여름날"
-        case (.summer, .mostlyCloudy):   return "더운 여름, 구름 낀 날"
-        case (.summer, .cloudy):         return "눅눅한 여름, 흐린 날"
-        case (.summer, .rainy):          return "장맛비 내리는 날"
-        case (.summer, .windy):          return "바람 불어도 뜨거운 여름"
+        case (.summer, .mostlyCloudy):   return "구름이 가득한 여름날"
+        case (.summer, .cloudy):         return "눅눅하고 흐린 여름날"
+        case (.summer, .rainy):          return "장맛비 내리는 여름날"
+        case (.summer, .windy):          return "바람 불어도 뜨거운 여름날"
 
-        case (.autumn, .clear):          return "선선한 가을날"
-        case (.autumn, .mostlyCloudy):   return "구름 낀 가을 하늘"
-        case (.autumn, .cloudy):         return "쓸쓸한 가을, 흐린 날"
-        case (.autumn, .rainy):          return "가을비 내리는 날"
+        case (.autumn, .clear):          return "맑고 선선한 가을날"
+        case (.autumn, .mostlyCloudy):   return "구름 낀 가을날"
+        case (.autumn, .cloudy):         return "쓸쓸하고 흐린 가을날"
+        case (.autumn, .rainy):          return "추적추적 가을비 내리는 날"
         case (.autumn, .windy):          return "선선한 가을바람 부는 날"
 
         case (.winter, .clear):          return "쌀쌀한 겨울 맑은 날"
@@ -69,6 +123,7 @@ enum WeatherPhrase {
         case (.winter, .cloudy):         return "흐리고 추운 겨울날"
         case (.winter, .rainy):          return "겨울비 내리는 날"
         case (.winter, .windy):          return "매서운 겨울바람 부는 날"
+        case(.winter, .snowy):           return "눈 내리는 겨울날"
 
         default:
             return "오늘의 날씨"
@@ -76,7 +131,7 @@ enum WeatherPhrase {
     }
 }
 
-// MARK: - Tags (location chips)
+// MARK: - 추천 장소 (location chips)
 struct LocationTag: Identifiable, Hashable {
     enum Kind: Equatable { case nearby, category }
     let id: Int64
@@ -113,6 +168,7 @@ struct CurationFeed: Equatable {
     let locationName: String
     let header: WeatherHeaderText
     let cards: [CurationCard]
+    let tone: SemanticColor  // headerText.leading & 장소 칩(원) 테두리에 공용으로 사용
 }
 
 // MARK: - Mapper (DTO → Domain)
@@ -128,6 +184,8 @@ enum CurationMapper {
     /// /curation/location/{locationId} 또는 /curation/curationCategory/{id}
     /// 두 API 모두 동일 스키마를 사용하므로 동일 변환 사용
     static func toFeed(from dto: ApiResponseCurationByLocationResponseDto) -> CurationFeed {
+        let season = Season(server: dto.data.season)
+        let weather = SkyWeather(server: dto.data.weather)
         let header = makeHeader(seasonString: dto.data.season, weatherString: dto.data.weather)
         let cards: [CurationCard] = dto.data.curations.map { c in
             CurationCard(
@@ -140,7 +198,8 @@ enum CurationMapper {
             locationId: dto.data.locationId,
             locationName: dto.data.locationName,
             header: header,
-            cards: cards
+            cards: cards,
+            tone: WeatherTone.tone(for: season, weather: weather)
         )
     }
 
@@ -164,6 +223,5 @@ extension WeatherHeaderText {
 }
 
 extension CurationFeed {
-    static let empty = CurationFeed(locationId: 0, locationName: "", header: .placeholder, cards: [])
+    static let empty = CurationFeed(locationId: 0, locationName: "", header: .placeholder, cards: [], tone: .springClear)
 }
-
