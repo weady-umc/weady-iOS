@@ -20,22 +20,13 @@ final class ClothingRecommendationViewModel: ObservableObject {
     @Published var chartItems: [ChartItem] = []
     @Published var tags: Tags?
 
-    private var cancellables = Set<AnyCancellable>()
-    private let token: String
+    private let service: FashionService
 
-    init(token: String) {
-        self.token = token
 
-        // clothingName 변경될 때마다 조사 자동 갱신
-        $clothingName
-            .removeDuplicates()
-            .map { [weak self] name in
-                self?.subjectParticle(for: name) ?? "이"
-            }
-            .assign(to: \.subjectParticle, on: self)
-            .store(in: &cancellables)
+    init(service: FashionService = FashionService()) {
+        self.service = service
+        fetchFashionDetail()
 
-        fetchFashionDetail() // 처음: 현재 위치 기준으로
     }
     
     // 외부에서 위치 선택 시 호출
@@ -53,34 +44,31 @@ final class ClothingRecommendationViewModel: ObservableObject {
         }
         guard let url = components.url else { return }
 
-        var req = URLRequest(url: url)
-        req.httpMethod = "GET"
-        req.setValue("application/json", forHTTPHeaderField: "Accept")
-        req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
-        URLSession.shared.dataTaskPublisher(for: req)
-            .map(\.data)
-            .decode(type: FashionDetailResponse.self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                if case .failure(let error) = completion {
+    func fetchFashionDetail() {
+        service.getFashionDetail { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let dto):
+                    let resp = dto.toDomain()
+                    let d = resp.data
+                    self?.addressText = [d.address1, d.address2, d.address3, d.address4]
+                        .filter { !$0.isEmpty }
+                        .joined(separator: " ")
+                    self?.feelTemp = Int(d.recommendation.feelTmp)
+                    self?.clothingName = d.recommendation.clothing.name
+                    self?.clothingImageUrl = URL(string: d.recommendation.clothing.imageUrl)
+                    self?.chartItems = d.chart
+                    self?.tags = d.tags
+
+
+                case .failure(let error):
                     print("패션 디테일 로드 실패:", error)
                 }
-            } receiveValue: { [weak self] resp in
-                guard let self = self else { return }
-                let d = resp.data
 
-                self.addressText = [d.address1, d.address2, d.address3, d.address4]
-                    .filter { !$0.isEmpty }
-                    .joined(separator: " ")
 
-                self.feelTemp = Int(d.recommendation.feelTmp)
-                self.clothingName = d.recommendation.clothing.name
-                self.clothingImageUrl = URL(string: d.recommendation.clothing.imageUrl)
-                self.chartItems = d.chart
-                self.tags = d.tags
             }
-            .store(in: &cancellables)
+        }
     }
 
     // MARK: - 조사 선택 ('이/가')
