@@ -13,14 +13,14 @@ struct BoardDetailResponseDTO: Decodable {
     let userName: String
     let userProfileImageUrl: String?
     let isPublic: Bool
-    var goodStatus: Bool
-    var goodCount: Int?
+    let goodStatus: Bool
+    let goodCount: Int
     let imgCount: Int?
     let imageDtoList: [BoardImageDTO]
     let content: String
-    let weatherTagId: Int
-    let temperatureTagId: Int
     let seasonTagId: Int
+    let temperatureTagId: Int
+    let weatherTagId: Int
     let placeDtoList: [PlaceDTO]
     let styleIdList: [Int]
     let brandDtoList: [BrandDTO]
@@ -33,6 +33,11 @@ struct BoardImageDTO: Decodable {
     let imgUrl: String
 }
 
+struct BrandDTO: Decodable, Hashable {
+    let brand: String
+    let product: String
+}
+
 struct BoardLikeResponseDTO: Decodable {
     let goodStatus: Bool
     let goodCount: Int
@@ -40,9 +45,16 @@ struct BoardLikeResponseDTO: Decodable {
 
 struct BoardListResponseDTO: Decodable {
     let content: [BoardPreviewDTO]
+    let first: Bool?
+    let last: Bool?
+    let size: Int?
+    let number: Int?
+    let numberOfElements: Int?
+    let empty: Bool?
 }
 
-struct BoardPreviewDTO: Codable, Hashable, Equatable {
+struct BoardPreviewDTO: Codable, Hashable, Equatable, Identifiable {
+    var id: Int { boardId }
     let boardId: Int
     let userId: Int
     let imgUrl: String?

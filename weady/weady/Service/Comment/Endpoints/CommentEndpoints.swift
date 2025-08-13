@@ -51,7 +51,9 @@ extension CommentEndpoints: TargetType {
 
     var headers: [String: String]? {
         var header: [String: String] = [
-            "Content-Type": "application/json"]
+            "Content-Type": "application/json",
+            "Accept-Language": "ko-KR;q=1.0, en-KR;q=0.9"
+        ]
         if let token = AuthManager.shared.getAccessToken() {
             header["Authorization"] = "Bearer \(token)"
         }

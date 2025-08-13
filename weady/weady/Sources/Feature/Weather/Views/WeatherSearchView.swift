@@ -66,7 +66,7 @@ struct WeatherSearchView: View {
 
 
         .onAppear {
-            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU0NTc4NTk4fQ.kUYNRGeWfIPMK8Wdowx-3gpHYNvAJc7E2IkgL2zKR_Mbha-5Bx4xZiSGiCJRJTDWW0Tc6Oe_ksIo3DDh0XsIEw", forKey: "accessToken")
+            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU0NzM3NTU1fQ.foppETPx0LDKmBVgj-ogeflTfReGxsMDXpy88TRocNBKiHkGNlfsr12aoYI8jct4GShYuxaJJA_21AjkJikZjw", forKey: "accessToken")
         }
     }
     
@@ -144,6 +144,6 @@ struct WeatherSearchView: View {
 struct WeatherSearchView_Previews: PreviewProvider {
     static var previews: some View {
         WeatherSearchView(selectedPlace: .constant(nil))
-            .environmentObject(NavigationRouter())
+//            .environmentObject(NavigationRouter())
     }
 }

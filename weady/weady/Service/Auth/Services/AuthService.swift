@@ -71,9 +71,8 @@ final class AuthService: NetworkManager {
             decodingType: LoginResponseDTO.self
         ) { result in
             switch result {
-            case .success(let data):
-                completion(.success(data))
-
+            case .success(let loginData):
+                completion(.success(loginData))
             case .failure(let error):
                 completion(.failure(error))
             }

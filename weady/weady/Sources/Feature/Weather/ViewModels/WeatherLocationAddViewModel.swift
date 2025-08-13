@@ -8,14 +8,14 @@
 import Foundation
 import Observation
 
-@Observable
+
 class WeatherLocationAddViewModel: ObservableObject {
-    var weather: WeatherAddData?
+    @Published var weather: WeatherAddData?
 
     private let service = WeatherServices()
     
     func fetchWeather(locationId: Int) {
-        service.fetchShortWeather(locationId: locationId) { [weak self] result in
+        service.fetchShortWeather{ [weak self] result in
             DispatchQueue.main.async {
                 guard let self else { return }
                 switch result {
@@ -32,16 +32,16 @@ class WeatherLocationAddViewModel: ObservableObject {
         switch status {
         case "CLEAR": return "weatherAdd_sunny"
         case "CLOUDY": return "weatherAdd_cloudy"
-        case "RAIN": return "weatherAdd_rainy"
+        case "RAIN", "RAINY": return "weatherAdd_rainy"
         default: return "weatherAdd_default"
         }
     }
 
-    private func mapSkyStatusToIcon(_ status: String) -> String {
+    static func mapSkyStatusToIcon(_ status: String) -> String {
         switch status {
         case "CLEAR": return "sunnyIcon"
         case "CLOUDY": return "cloudyIcon"
-        case "RAIN": return "rainyIcon"
+        case "RAIN", "RAINY": return "rainyIcon"
         case "WINDY": return "windyIcon"
         default: return "defaultIcon"
         }
@@ -51,7 +51,7 @@ class WeatherLocationAddViewModel: ObservableObject {
         switch status {
         case "CLEAR": return "bigSunnyIcon"
         case "CLOUDY": return "bigCloudyIcon"
-        case "RAIN": return "bigRainyIcon"
+        case "RAIN", "RAINY": return "bigRainyIcon"
         case "WINDY": return "bigWindyIcon"
         default: return "bigDefaultIcon"
         }
@@ -71,7 +71,7 @@ class WeatherLocationAddViewModel: ObservableObject {
             hourlyWeather: data.hourlyForecasts.map {
                 HourlyWeather(
                     time: "\($0.time)시",
-                    iconName: mapSkyStatusToIcon($0.skyStatus), // 시간별에는 기본 아이콘 사용
+                    iconName: WeatherLocationAddViewModel.mapSkyStatusToIcon($0.skyStatus), // 시간별에는 기본 아이콘 사용
                     temp: "\($0.tmp)"
                 )
             }
@@ -82,7 +82,7 @@ class WeatherLocationAddViewModel: ObservableObject {
         switch status {
         case "CLEAR": return "맑음"
         case "CLOUDY": return "흐림"
-        case "RAIN": return "비"
+        case "RAIN", "RAINY": return "비"
         case "WINDY": return "바람"
         default: return "날씨 정보 없음"
         }

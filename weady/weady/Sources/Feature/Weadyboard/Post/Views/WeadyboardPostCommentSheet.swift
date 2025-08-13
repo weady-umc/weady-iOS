@@ -6,90 +6,99 @@
 //
 
 import SwiftUI
+import Combine
 
 struct WeadyboardPostCommentSheet: View {
     @FocusState private var isFocused: Bool
     @StateObject private var viewModel: CommentViewModel
-    
+    @StateObject private var keyboard = KeyboardObserver()
+
+    @State private var inputText: String = ""
+    @State private var isPosting: Bool = false
+
     init(boardId: Int) {
         _viewModel = StateObject(wrappedValue: CommentViewModel(boardId: boardId))
     }
-    
+
+    private var canSend: Bool {
+        !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            Spacer().frame(height: 12)
-            
-            Capsule()
-                .fill(Color.gray400)
-                .frame(width: 36, height: 4)
-                .padding(.bottom, 8)
-            
-            if viewModel.comments.isEmpty {
+            Spacer().frame(height: 20)
+
+            if viewModel.isLoading {
+                ProgressView().padding(.top, 24)
+                Spacer()
+            } else if viewModel.comments.isEmpty {
                 Text("댓글을 남겨서 의견을 공유해보세요.")
                     .fontName(.metaRegular12)
-                    .padding(.top, 80)
+                    .foregroundColor(.black)
+                    .padding(.top, 50)
+                Spacer()
             } else {
-                ScrollView {
-                    VStack(spacing: 16) {
-                        ForEach(viewModel.comments) { comment in
-                            CommentCell(comment: comment)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                List {
+                    ForEach(viewModel.comments) { comment in
+                        CommentCell(comment: comment) { id in
+                            viewModel.delete(commentId: id)
+                        }
+                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                        .listRowSeparator(.hidden)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                viewModel.delete(commentId: comment.commentId)
+                            } label: {
+                                Label("삭제", systemImage: "trash")
+                            }
                         }
                     }
-                    .padding(.top, 16)
-                    .padding(.horizontal, 16)
                 }
+                .listStyle(.plain)
             }
-            
-            commentInputBar
-                .background(Color.white100)
+
+            inputBar
+                .padding(.bottom, max(12, keyboard.height))
+                .background(Color.white.ignoresSafeArea(edges: .bottom))
         }
-        .background(Color(isFocused ? Color.black30 : Color.white100))
-        .ignoresSafeArea(.keyboard, edges: .bottom)
-        .onTapGesture { isFocused = false }
+        .onReceive(keyboard.$height) { _ in }
+        .onAppear {
+            viewModel.fetch(size: 20)
+        }
     }
-    
-    private var commentInputBar: some View {
+
+    private var inputBar: some View {
         HStack(spacing: 8) {
-            Image("profileimage")
-                .resizable()
-                .frame(width: 32, height: 32)
-                .clipShape(Circle())
-            
-            ZStack(alignment: .leading) {
-                if viewModel.newCommentText.isEmpty {
-                    Text("댓글을 남겨서 의견을 공유해보세요.")
-                        .fontName(.captionRegular14)
-                        .foregroundColor(.gray300)
-                        .padding(.leading, 14)
-                }
-                
-                HStack {
-                    TextField("", text: $viewModel.newCommentText)
-                        .fontName(.captionRegular14)
-                        .focused($isFocused)
-                        .frame(height: 44)
-                        .padding(.leading, 14)
-                    
-                    Button {
-                        viewModel.postComment()
-                        isFocused = false
-                    } label: {
-                        Image(viewModel.newCommentText.isEmpty ? "sendicon" : "sendicon_activated")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                    }
-                    .padding(.trailing, 12)
-                }
+            TextField("댓글을 남겨서 의견을 공유해보세요.", text: $inputText)
+                .fontName(.captionRegular14)
+                .padding(.horizontal, 12)
+                .frame(height: 44)
+                .background(Color.white)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10).stroke(Color.gray500, lineWidth: 1)
+                )
+                .focused($isFocused)
+
+            Button {
+                sendTapped()
+            } label: {
+                Image(canSend ? "sendicon_activated" : "sendicon")
             }
-            .frame(height: 44)
-            .background(Color.white100)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.gray500, lineWidth: 1)
-            )
+            .disabled(!canSend || isPosting)
+            .frame(width: 44, height: 44)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 12)
+        .padding(.horizontal, 16)
+        .padding(.top, 6)
+        .padding(.bottom, 10)
+    }
+
+    private func sendTapped() {
+        guard canSend, !isPosting else { return }
+        isFocused = false
+        isPosting = true
+        let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        viewModel.post(content: text, parentId: nil)
+        inputText = ""
+        isPosting = false
     }
 }

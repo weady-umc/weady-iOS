@@ -9,7 +9,7 @@ import SwiftUI
 import Observation
 
 @Observable
-class NavigationRouter: ObservableObject {
+class NavigationRouter {
     var path = NavigationPath()  // 네비게이션 경로를 저장하는 변수
 
     /// 특정 화면을 추가 (Push 기능)
