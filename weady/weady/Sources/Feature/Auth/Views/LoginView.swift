@@ -12,8 +12,14 @@ import KakaoSDKCommon
 import GoogleSignIn
 
 struct LoginView: View {
+    @Environment(\.router) private var router
     @StateObject private var viewModel = LoginViewModel()
-    @Environment(NavigationRouter.self) private var router
+
+    @AppStorage("didCompleteOnboarding") private var didCompleteOnboarding = false
+
+    @State private var didRoute = false
+    @State private var appearedAt = Date.distantPast
+    private let minDelayAfterAppear: TimeInterval = 0.18
     @State private var currentPage = 0
     
     private let onboardingImages = [
@@ -52,13 +58,8 @@ struct LoginView: View {
             // MARK: - 카카오 로그인 버튼
             Button {
                 viewModel.loginWithKakao { success in
-                    if success {
-                        if viewModel.isNewUser ?? false {
-                            router.push(.onboarding)
-                        } else {
-                            router.push(.basetab)
-                        }
-                    }
+                    guard success else { return }
+                    routeAfterLoginOnce()
                 }
             } label: {
                 ZStack {
@@ -81,13 +82,8 @@ struct LoginView: View {
             // MARK: - 구글 로그인 버튼
             Button {
                 viewModel.loginWithGoogle { success in
-                    if success {
-                        if viewModel.isNewUser ?? false {
-                            router.push(.onboarding)
-                        } else {
-                            router.push(.basetab)
-                        }
-                    }
+                    guard success else { return }
+                    routeAfterLoginOnce()
                 }
             } label: {
                 ZStack {
@@ -136,5 +132,38 @@ struct LoginView: View {
             Spacer()
         }
         .padding(.horizontal, 24)
+        .onAppear {
+            appearedAt = Date()
+        }
+        .task {
+            if AuthManager.shared.hasValidSession {
+                routeAfterLoginOnce()
+            }
+        }
+    }
+
+    /// 로그인 이후/이미 로그인 상태에서의 분기를 "한 번만" 수행
+    private func routeAfterLoginOnce() {
+        guard !didRoute else { return }
+        didRoute = true
+
+        Task { @MainActor in
+            let elapsed = Date().timeIntervalSince(appearedAt)
+            if elapsed < minDelayAfterAppear {
+                let remain = minDelayAfterAppear - elapsed
+                try? await Task.sleep(nanoseconds: UInt64(remain * 1_000_000_000))
+            }
+
+            if (viewModel.isNewUser ?? false) == true {
+                didCompleteOnboarding = false
+                router.reset(to: .onboarding)
+            } else {
+                if didCompleteOnboarding {
+                    router.reset(to: .basetab)
+                } else {
+                    router.reset(to: .onboarding)
+                }
+            }
+        }
     }
 }

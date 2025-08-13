@@ -15,6 +15,7 @@ struct CreateBoardRequestDTO: Encodable {
     let seasonTagId: Int
     let boardPlaceRequestDtoList: [PlaceDTO]
     let styleIds: [Int]
+    let boardBrandRequestDtoList: [BrandDTO]
 }
 
 struct UpdateBoardRequestDTO: Encodable {
@@ -35,4 +36,9 @@ struct ReportBoardRequestDTO: Encodable {
 struct PlaceDTO: Codable {
     let placeName: String
     let placeAddress: String
+}
+
+struct BrandDTO: Codable {
+    let brand: String
+    let product: String
 }

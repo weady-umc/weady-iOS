@@ -7,26 +7,40 @@
 
 import Foundation
 import Moya
+import KeychainSwift
 
-public enum TagsEndpoints: TargetType {
-    case clothesStyleCategories(token: String)
+enum TagEndpoints {
+    case getWeatherTags
+    case getTemperatureTags
+    case getSeasonTags
+    case getClothesStyleCategories
+}
 
-    public var baseURL: URL { URL(string: "https://weadyapi.pro")! }
-    public var path: String {
+extension TagEndpoints: TargetType {
+    var baseURL: URL { URL(string: "https://weadyapi.pro")! }
+    
+    var path: String {
         switch self {
-        case .clothesStyleCategories: return "/api/v1/tags/clothes-style-categories"
+        case .getWeatherTags:
+            return "/api/v1/tags/weather-tags"
+        case .getTemperatureTags:
+            return "/api/v1/tags/temperature-tags"
+        case .getSeasonTags:
+            return "/api/v1/tags/season-tags"
+        case .getClothesStyleCategories:
+            return "/api/v1/tags/clothes-style-categories"
         }
     }
-    public var method: Moya.Method { .get }
-    public var task: Task { .requestPlain }   
-    public var headers: [String : String]? {
-        switch self {
-        case .clothesStyleCategories(let token):
-            return [
-                "Authorization": "Bearer \(token)",
-                "Accept": "application/json"
-            ]
-        }
+    
+    var method: Moya.Method { .get }
+    
+    var task: Task { .requestPlain }
+    
+    var headers: [String: String]? {
+        let token = KeychainSwift().get("serverAccessToken")
+        return token != nil
+          ? ["Authorization": "Bearer \(token!)", "Content-Type": "application/json"]
+          : ["Content-Type": "application/json"]
     }
     public var sampleData: Data { Data() }
 }
