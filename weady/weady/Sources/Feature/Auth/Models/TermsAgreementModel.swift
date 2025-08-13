@@ -9,6 +9,7 @@ import Foundation
 
 struct AgreementItem: Identifiable {
     let id = UUID()
+    let termsType: TermsType  
     let title: String
     let isRequired: Bool
     var isOn: Bool

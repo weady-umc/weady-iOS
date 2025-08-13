@@ -10,8 +10,11 @@ import SwiftUI
 struct PreferenceInputView: View {
     @StateObject private var vm: PreferenceInputViewModel
 
-    init(nickname: String) {
+    private let agreements: [OnboardingAgreement]?
+
+    init(nickname: String, agreements: [OnboardingAgreement]? = nil) {
         _vm = StateObject(wrappedValue: PreferenceInputViewModel(nickname: nickname))
+        self.agreements = agreements
     }
 
     var body: some View {
@@ -81,14 +84,13 @@ struct PreferenceInputView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
         }
-        //
+        // 스킵 → StartView 로 이동할 때 agreements 전달
         .fullScreenCover(isPresented: $vm.didTapSkip) {
-            // 건너뛸 때 이동할 뷰
-            StartView(nickname: vm.nickname)
+            StartView(nickname: vm.nickname, agreements: agreements) // 성별/스타일은 아직 없음
         }
+        // 다음 → GenderSelection 로 이동할 때 agreements 전달
         .fullScreenCover(isPresented: $vm.didTapNext) {
-            // 다음에 이동할 뷰
-            GenderSelectionView(nickname: vm.nickname)
+            GenderSelectionView(nickname: vm.nickname, agreements: agreements)
         }
     }
 }

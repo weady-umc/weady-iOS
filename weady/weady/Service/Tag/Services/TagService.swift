@@ -8,54 +8,56 @@
 import Foundation
 import Moya
 
-/// 의류 스타일 태그 조회용 Service 추상화 프로토콜
+// 지금 VM이 쓰는 프로토콜 시그니처 그대로 유지
 protocol TagServiceProtocol {
-  /// 의류 스타일 카테고리 목록 조회
-  func getClothesStyleCategories(
-    completion: @escaping (Result<[ClothesStyleCategoryResponseDTO], NetworkError>) -> Void
-  )
+    func getClothesStyleCategories(
+        completion: @escaping (Result<[ClothesStyleCategoryResponseDTO], Error>) -> Void
+    )
 }
 
-/// 실제 네트워크 호출 구현체
 final class TagService: TagServiceProtocol {
-    private let network = DefaultNetworkManager<TagEndpoints>()
+    private let provider: MoyaProvider<TagsEndpoints>
+    private let tokenProvider: () -> String?
+
+    /// - Parameters:
+    ///   - provider: 테스트/프리뷰 주입용
+    ///   - tokenProvider: 액세스 토큰 공급자 (기본값은 init 본문에서 AuthManager로 설정)
+    init(
+        provider: MoyaProvider<TagsEndpoints>? = nil,
+        tokenProvider: (() -> String?)? = nil
+    ) {
+        self.provider = provider ?? MoyaProvider<TagsEndpoints>()
+        // 기본 인자에서 internal 타입 참조 금지 → 본문에서 설정
+        self.tokenProvider = tokenProvider ?? { AuthManager.shared.getAccessToken() }
+    }
 
     func getClothesStyleCategories(
-        completion: @escaping (Result<[ClothesStyleCategoryResponseDTO], NetworkError>) -> Void
+        completion: @escaping (Result<[ClothesStyleCategoryResponseDTO], Error>) -> Void
     ) {
-        network.request(
-            target: .getClothesStyleCategories,
-            decodingType: [ClothesStyleCategoryResponseDTO].self,
-            completion: completion
-        )
-    }
-}
+        // 토큰 체크
+        guard let token = tokenProvider(), !token.isEmpty else {
+            // 제네릭 추론 이슈 방지 위해 타입 명시
+            let err: Error = URLError(.userAuthenticationRequired)
+            completion(Result<[ClothesStyleCategoryResponseDTO], Error>.failure(err))
+            return
+        }
 
-// Preview／테스트용 목 서비스
-final class MockTagService: TagServiceProtocol {
-  func getClothesStyleCategories(
-    completion: @escaping (Result<[ClothesStyleCategoryResponseDTO], NetworkError>) -> Void
-  ) {
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-          let samples: [ClothesStyleCategoryResponseDTO] = [
-            // ② .init → 풀 타입 이니셜라이저로 변경
-            ClothesStyleCategoryResponseDTO(id: 1,  name: "캐주얼"),
-            ClothesStyleCategoryResponseDTO(id: 2,  name: "미니멀"),
-            ClothesStyleCategoryResponseDTO(id: 3,  name: "클래식"),
-            ClothesStyleCategoryResponseDTO(id: 4,  name: "러블리"),
-            ClothesStyleCategoryResponseDTO(id: 5,  name: "모던"),
-            ClothesStyleCategoryResponseDTO(id: 6,  name: "스트릿"),
-            ClothesStyleCategoryResponseDTO(id: 7,  name: "엘레강스"),
-            ClothesStyleCategoryResponseDTO(id: 8,  name: "프레피"),
-            ClothesStyleCategoryResponseDTO(id: 9,  name: "레트로"),
-            ClothesStyleCategoryResponseDTO(id: 10, name: "시크"),
-            ClothesStyleCategoryResponseDTO(id: 11, name: "애슬레저"),
-            ClothesStyleCategoryResponseDTO(id: 12, name: "빈티지"),
-            ClothesStyleCategoryResponseDTO(id: 13, name: "내추럴"),
-            ClothesStyleCategoryResponseDTO(id: 14, name: "포멀"),
-            ClothesStyleCategoryResponseDTO(id: 15, name: "기타")
-          ]
-          completion(.success(samples))
-      }
-  }
+        provider.request(.clothesStyleCategories(token: token)) { result in
+            switch result {
+            case .success(let res):
+                do {
+                    guard (200..<300).contains(res.statusCode) else {
+                        throw URLError(.badServerResponse)
+                    }
+                    let list = try JSONDecoder().decode([ClothesStyleCategoryResponseDTO].self, from: res.data)
+                    completion(.success(list))
+                } catch {
+                    completion(.failure(error))
+                }
+
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
 }

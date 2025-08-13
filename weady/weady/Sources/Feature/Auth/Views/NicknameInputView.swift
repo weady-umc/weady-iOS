@@ -24,6 +24,11 @@ extension View {
 struct NicknameInputView: View {
     @StateObject private var vm = NicknameInputViewModel()
     @FocusState private var isFocused: Bool
+    private let agreements: [OnboardingAgreement]?
+    
+    init(agreements: [OnboardingAgreement]? = nil) {
+        self.agreements = agreements
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -66,11 +71,11 @@ struct NicknameInputView: View {
                 // 3) 유효성 검사 에러 메시지
                 if vm.shouldShowValidationError {
                     if vm.nickname.isEmpty {
-                        Text("최소 1자 이상 입력해 주세요.")
+                        Text("최소 2자 이상 입력해 주세요.")
                             .font(.caption)
                             .foregroundColor(.red)
                     } else if !vm.isValidNickname {
-                        Text("한글, 영문과 숫자로 15자 이내로 입력해 주세요.")
+                        Text("한글, 영문과 숫자로 2~15자 이내로 입력해 주세요.")
                             .font(.caption)
                             .foregroundColor(.red)
                     }
@@ -94,8 +99,11 @@ struct NicknameInputView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
         }//VStack End
+        .onAppear {
+            print("DEBUG Nickname →", agreements?.map { "\($0.termsType)=\($0.isAgreed)" } ?? [])
+        }
         .fullScreenCover(isPresented: $vm.shouldNavigateNext) {
-            PreferenceInputView(nickname: vm.nickname)
+            PreferenceInputView(nickname: vm.nickname, agreements: agreements)
         }
     }
 }

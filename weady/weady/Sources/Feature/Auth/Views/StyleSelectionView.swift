@@ -12,21 +12,24 @@ struct StyleSelectionView: View {
     @StateObject private var vm: StyleSelectionViewModel
     @State private var showNext = false
 
+    private let gender: GenderCode?
+    private let agreements: [OnboardingAgreement]?
+
+    // init 보강
+    init(nickname: String,
+         gender: GenderCode? = nil,
+         agreements: [OnboardingAgreement]? = nil,
+         service: TagServiceProtocol = TagService()) {
+        let viewModel = StyleSelectionViewModel(nickname: nickname, service: service)
+        _vm = StateObject(wrappedValue: viewModel)
+        self.gender = gender
+        self.agreements = agreements
+    }
+    
     private let columns = Array(
         repeating: GridItem(.flexible(), spacing: 15),
         count: 3
     )
-
-    // VM 주입용 init
-    init(nickname: String,
-             service: TagServiceProtocol = TagService())
-    {
-        let viewModel = StyleSelectionViewModel(
-            nickname: nickname,
-            service: service
-        )
-        _vm = StateObject(wrappedValue: viewModel)
-    }
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -36,15 +39,22 @@ struct StyleSelectionView: View {
             Spacer()
             footerView()
         }
-        .onAppear { vm.loadCategories() }
-        //다음 뷰 연결
-        .fullScreenCover(isPresented: $vm.didTapSkip) {
-            // 건너뛸 때 이동할 뷰
-            StartView(nickname: vm.nickname)
+        .onAppear {
+            print("DEBUG Style →", agreements?.map { "\($0.termsType)=\($0.isAgreed)" } ?? [])
         }
+        .onAppear { vm.loadCategories() }
+        // 다음 → StartView (스타일 포함)
         .fullScreenCover(isPresented: $vm.didTapNext) {
-            // 다음에 이동할 뷰
-            StartView(nickname: vm.nickname)
+            StartView(nickname: vm.nickname,
+                      gender: gender,
+                      styleIds: vm.selectedStyleIds64,
+                      agreements: agreements)
+        }
+        // 스킵 → StartView (스타일 없음)
+        .fullScreenCover(isPresented: $vm.didTapSkip) {
+            StartView(nickname: vm.nickname,
+                      gender: gender,
+                      agreements: agreements)
         }
     }
     
@@ -155,8 +165,9 @@ struct CategoryButton: View {
 struct StyleSelectionView_Previews: PreviewProvider {
     static var previews: some View {
         StyleSelectionView(
-            nickname: "테스트",
-            service: MockTagService()
+            nickname: "테스트"
             )
     }
 }
+
+
