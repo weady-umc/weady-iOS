@@ -16,6 +16,9 @@ final class CurationViewModel: ObservableObject {
     /// 헤더(leading) & 장소 칩(원) 테두리에 공용으로 사용하는 색상
     @Published private(set) var accentColor: Color = .primary
 
+    @Published var noticeText: String? = nil
+    @Published private(set) var lastErrorStatusCode: Int? = nil
+
     // MARK: - States
     enum LoadState: Equatable { case idle, loading, success, failure(String) }
     @Published private(set) var listState: LoadState = .idle
@@ -23,6 +26,48 @@ final class CurationViewModel: ObservableObject {
 
     // MARK: - Dependencies
     private let service = CurationServices.shared
+
+    // MARK: - Error Mapping Helpers
+    private func extractStatusCode(from error: Error) -> Int? {
+        // 최대한 안전하게 statusCode 유추 (APIError 구현에 의존하지 않도록 리플렉션 사용)
+        let mirror = Mirror(reflecting: error)
+        for child in mirror.children {
+            if let label = child.label?.lowercased() {
+                if label.contains("statuscode"), let code = child.value as? Int { return code }
+                if label == "code", let code = child.value as? Int { return code }
+            }
+        }
+        // nested associated values까지 한 번 더 훑기
+        for child in mirror.children {
+            let subMirror = Mirror(reflecting: child.value)
+            for sub in subMirror.children {
+                if let label = sub.label?.lowercased() {
+                    if label.contains("statuscode"), let code = sub.value as? Int { return code }
+                    if label == "code", let code = sub.value as? Int { return code }
+                }
+            }
+        }
+        return nil
+    }
+
+    private func setNotice(for error: Error) {
+        let code = extractStatusCode(from: error)
+        lastErrorStatusCode = code
+        switch code {
+        case 404:
+            noticeText = "주변에 추천 큐레이션이 없어요"
+            cards = []
+        case 500:
+            noticeText = "서버가 에러에요"
+        default:
+            noticeText = "문제가 발생했어요. 잠시 후 다시 시도해 주세요"
+        }
+    }
+
+    private func clearNotice() {
+        noticeText = nil
+        lastErrorStatusCode = nil
+    }
 
     // MARK: - Boot: 최초 진입
     func boot() async {
@@ -68,9 +113,11 @@ final class CurationViewModel: ObservableObject {
             }
             let feed = CurationMapper.toFeed(from: feedDTO)
             apply(feed: feed)
+            clearNotice()
             listState = .success
         } catch {
             listState = .failure(error.localizedDescription)
+            setNotice(for: error)
         }
     }
 
@@ -82,9 +129,12 @@ final class CurationViewModel: ObservableObject {
             }
             let feed = CurationMapper.toFeed(from: feedDTO)
             apply(feed: feed)
+            clearNotice()
             listState = .success
         } catch {
             listState = .failure(error.localizedDescription)
+            setNotice(for: error)
+            cards = []
         }
     }
 
@@ -102,9 +152,11 @@ final class CurationViewModel: ObservableObject {
                 self.service.getCurationDetail(curationId: curationId, completion: cont)
             }
             detail = CurationMapper.toDetail(from: dto)
+            clearNotice()
             detailState = .success
         } catch {
             detailState = .failure(error.localizedDescription)
+            setNotice(for: error)
         }
     }
 

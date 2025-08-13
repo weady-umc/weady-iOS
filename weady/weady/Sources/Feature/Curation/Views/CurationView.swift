@@ -1,10 +1,10 @@
-
-
 import SwiftUI
 
 /// Curation 첫 화면 (PlaceView 레이아웃을 유지하면서 MVVM 바인딩)
 struct CurationView: View {
     @StateObject private var vm = CurationViewModel()
+    
+    
 
     var body: some View {
         NavigationStack {
@@ -14,6 +14,14 @@ struct CurationView: View {
                            trailing: vm.headerText.trailing)
                     .padding(.horizontal, 16)
                     .padding(.top, 8)
+
+                // 상태/에러 안내 배너 (404, 500 등)
+                if let msg = vm.noticeText, !msg.isEmpty {
+                    Text(msg)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 16)
+                }
 
                 // 2) 장소 원형 칩 스크롤
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -29,19 +37,32 @@ struct CurationView: View {
                 }
 
                 // 3) 카드 리스트 (4개)
-                ScrollView {
-                    VStack(spacing: 12) {
-                        ForEach(vm.cards) { card in
-                            Button {
-                                Task { await vm.openDetail(curationId: card.id) }
-                            } label: {
-                                CardRow(title: card.title, imageURL: card.thumbnailURL)
-                            }
-                            .buttonStyle(.plain)
+                if vm.cards.isEmpty {
+                    // 데이터가 없을 때(예: 404) 혹은 아직 로딩 직후
+                    VStack(alignment: .leading, spacing: 8) {
+                        // noticeText가 있으면 그걸, 없으면 기본 안내 문구
+                        Text(vm.noticeText?.isEmpty == false ? (vm.noticeText ?? "") : "")
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundStyle(.secondary)
                             .padding(.horizontal, 16)
-                        }
+                        // noticeText가 비어있다면 공간만 유지 (필요 시 스켈레톤 등 교체 가능)
                     }
-                    .padding(.top, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            ForEach(vm.cards) { card in
+                                Button {
+                                    Task { await vm.openDetail(curationId: card.id) }
+                                } label: {
+                                    CardRow(title: card.title, imageURL: card.thumbnailURL)
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.horizontal, 16)
+                            }
+                        }
+                        .padding(.top, 8)
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
