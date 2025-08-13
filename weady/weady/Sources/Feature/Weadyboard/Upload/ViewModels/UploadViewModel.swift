@@ -14,15 +14,16 @@ final class UploadViewModel {
     
     // MARK: - Properties
     var isPublic: Bool = true
+    var isAdd: Bool = false
     var content: String = ""
     var localImages: [LocalImage] = []
-    var uploadedImageURLs: [String] = []  // 서버에 업로드 후 받은 이미지 URL 리스트
+    var uploadedImageURLs: [String] = []  // 서버 업로드 후 받은 이미지 URL 리스트
     
     var weatherModel: WeatherModel = .empty
     var fashionModel: FashionModel = FashionModel()
     var placeModel: PlaceModel = PlaceModel()
     
-    // DTO 생성
+    // MARK: - DTO 생성
     private func buildRequestBody() -> UploadModel? {
         guard let season = weatherModel.season,
               let tempBand = weatherModel.temperature,
@@ -38,17 +39,23 @@ final class UploadViewModel {
             UploadPlace(placeName: $0.placeName, placeAddress: $0.placeAddress)
         }
 
-        let styleIdList = fashionModel.selectedStyles.compactMap { Int($0) }
-
+        let styleIdList = fashionModel.selectedStyles.map { $0.rawValue }
+        let brandDtoList = fashionModel.selectedTags.map { tag in
+                UploadBrand(brand: tag.brandName, product: tag.productName)
+            }
+        
         return UploadModel(
             isPublic: isPublic,
+            isAdd: isAdd,
             content: content,
             imageDtoList: imageDtoList,
+            imgCount: uploadedImageURLs.count,
             weatherTagId: mapWeatherToId(weatherTag),
             temperatureTagId: tempBand.id,
             seasonTagId: mapSeasonToId(season),
             placeDtoList: placeDtoList,
-            styleIdList: styleIdList
+            styleIds: styleIdList,
+            brandDtoList: brandDtoList
         )
     }
 
@@ -74,36 +81,38 @@ final class UploadViewModel {
     }
     
     // MARK: - 업로드 함수 (async/await + completion wrapper)
-    func submitPost() async {
-            do {
-                // 1. 이미지 업로드 후 URL 획득
-                uploadedImageURLs = try await uploadImages(localImages)
+    func submitPost() async -> Bool {
+        do {
+            // 1. 이미지 업로드 후 URL 획득
+            uploadedImageURLs = try await uploadImages(localImages)
 
-                // 2. DTO 생성
-                guard let uploadModel = buildRequestBody() else {
-                            throw UploadError.invalidData
-                        }
+            // 2. DTO 생성
+            guard let uploadModel = buildRequestBody() else {
+                throw UploadError.invalidData
+            }
 
-                let requestDTO = uploadModel.toCreateBoardRequestDTO
+            let requestDTO = uploadModel.toCreateBoardRequestDTO
 
-                // 3. API 호출 (completion -> async 래핑)
-                try await withCheckedThrowingContinuation { continuation in
-                    boardService.createBoard(data: requestDTO) { result in
-                        switch result {
-                        case .success:
-                            continuation.resume()
-                        case .failure(let error):
-                            continuation.resume(throwing: error)
-                        }
+            // 3. API 호출 (completion -> async 래핑)
+            try await withCheckedThrowingContinuation { continuation in
+                boardService.createBoard(data: requestDTO) { result in
+                    switch result {
+                    case .success:
+                        continuation.resume()
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
                     }
                 }
-                print("!!!!!업로드 성공")
-            } catch {
-                print("업로드 실패:", error.localizedDescription)
             }
+            print("!!!!! 업로드 성공")
+            return true
+        } catch {
+            print("***** 업로드 실패:", error.localizedDescription)
+            return false
         }
+    }
     
-    // MARK: - 이미지 업로드 (Mock)
+    // MARK: - 이미지 업로드 (테스트용)
     private func uploadImages(_ images: [LocalImage]) async throws -> [String] {
         // TODO: 실제 업로드 API 연결 (테스트용 임시 URL 반환)
         return images.map { _ in
@@ -111,6 +120,7 @@ final class UploadViewModel {
         }
     }
     
+    // MARK: - 업로드 에러 세부설명
     enum UploadError: Error, LocalizedError {
         case invalidData
         case uploadFailed(reason: String)

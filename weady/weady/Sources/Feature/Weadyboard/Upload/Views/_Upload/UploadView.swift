@@ -5,7 +5,6 @@ struct UploadView: View {
     @State private var viewModel = UploadViewModel()
     
     //MARK: - 날씨, 패션, 장소 모델 연결
-    @State private var showWeatherInfo = false
     @State private var weatherViewModel = WeatherViewModel()
     @State private var fashionViewModel = FashionViewModel()
     @State private var placeViewModel = PlaceViewModel()
@@ -17,10 +16,15 @@ struct UploadView: View {
     
     //MARK: - 등록 버튼 활성화 조건 (사진 1장 + 날씨 태그)
     private var isFormValid: Bool {
-        viewModel.localImages.count >= 1 &&
-        viewModel.weatherModel.season != nil &&
-        viewModel.weatherModel.temperature != nil &&
-        !viewModel.weatherModel.weather.isEmpty
+        guard viewModel.localImages.count >= 1 else { return false }
+        
+        if weatherViewModel.isUsingCurrentLocation {
+            return weatherViewModel.currentWeather != nil
+        } else {
+            return weatherViewModel.selectedSeason != nil &&
+                   weatherViewModel.selectedTempBand != nil &&
+                   !weatherViewModel.selectedWeatherTags.isEmpty
+        }
     }
 
     var body: some View {
@@ -43,38 +47,70 @@ struct UploadView: View {
                     //MARK: - 정보 추가 버튼들
                     VStack(spacing: 15) {
                         NavBtn(title: "날씨 정보 추가", isRequired: true) {
-                            AnyView(WeatherInfoView(viewModel: weatherViewModel))
+                            AnyView(
+                                WeatherInfoView(viewModel: weatherViewModel) {
+                                    viewModel.weatherModel = weatherViewModel.toWeatherModel()
+                                    print("업로드 모델에 날씨 정보 반영 완료")
+                                }
+                            )
                         }
                         Divider()
 
                         NavBtn(title: "패션 정보 추가") {
-                            AnyView(FashionInfoView(viewModel: fashionViewModel))
+                            AnyView(
+                                FashionInfoView(viewModel: fashionViewModel) {
+                                    viewModel.fashionModel = fashionViewModel.toFashionModel()
+                                    print("업로드 모델에 패션 정보 반영 완료")
+                                }
+                            )
                         }
                         Divider()
 
                         NavBtn(title: "장소 정보 추가") {
-                            AnyView(PlaceInfoView(viewModel: placeViewModel))
+                            AnyView(
+                                PlaceInfoView(viewModel: placeViewModel) {
+                                    viewModel.placeModel = placeViewModel.toPlaceModel()
+                                    print("업로드 모델에 장소 정보 반영 완료")
+
+                                }
+                            )
                         }
                         Divider()
 
                         ToggleBtn(label: "커뮤니티 게시", isOn: $viewModel.isPublic)
                         Divider()
 
-                        ToggleBtn(label: "유료 광고 포함", isOn: $viewModel.isPublic)
+                        ToggleBtn(label: "유료 광고 포함", isOn: $viewModel.isAdd)
                         Divider()
                     }
 
-                    //MARK: - 등록 버튼
+                    // MARK: - 등록 버튼
                     Button(action: {
                         Task {
                             isUploading = true
-                            do {
-                                try await viewModel.submitPost()
+                            viewModel.weatherModel = weatherViewModel.toWeatherModel()
+                            viewModel.fashionModel = fashionViewModel.toFashionModel()
+                            viewModel.placeModel = placeViewModel.toPlaceModel()
+                            
+                            // 디버깅 출력
+                            print("=== 업로드 정보 ===")
+                            print("계절:", viewModel.weatherModel.season ?? "없음")
+                            print("기온:", viewModel.weatherModel.temperature?.id ?? -1)
+                            print("날씨 태그:", viewModel.weatherModel.weather.map { "\($0)" }.joined(separator: ", "))
+                            print("날씨 직접 추가:", viewModel.weatherModel.isManual)
+                            print("스타일:", viewModel.fashionModel.selectedStyles)
+                            print("제품 태그:", viewModel.fashionModel.selectedTags.map { "\($0.brandName) - \($0.productName)" })
+                            print("장소:", viewModel.placeModel.places.map { "\($0.placeName) / \($0.placeAddress)" })
+                            print("===============================")
+
+                            let success = await viewModel.submitPost()
+                            
+                            if success {
                                 isUploading = false
                                 dismiss()
-                            } catch {
+                            } else {
                                 isUploading = false
-                                errorMessage = error.localizedDescription
+                                errorMessage = "업로드에 실패했습니다. 다시 시도해주세요."
                                 showErrorAlert = true
                             }
                         }
