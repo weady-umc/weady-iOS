@@ -33,11 +33,6 @@ struct BoardImageDTO: Decodable {
     let imgUrl: String
 }
 
-struct BrandDTO: Decodable, Hashable {
-    let brand: String
-    let product: String
-}
-
 struct BoardLikeResponseDTO: Decodable {
     let goodStatus: Bool
     let goodCount: Int
