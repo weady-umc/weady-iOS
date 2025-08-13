@@ -18,7 +18,7 @@ enum TagEndpoints {
 
 extension TagEndpoints: TargetType {
     var baseURL: URL { URL(string: "https://weadyapi.pro")! }
-    
+
     var path: String {
         switch self {
         case .getWeatherTags:
@@ -37,10 +37,14 @@ extension TagEndpoints: TargetType {
     var task: Task { .requestPlain }
     
     var headers: [String: String]? {
-        let token = KeychainSwift().get("serverAccessToken")
-        return token != nil
-          ? ["Authorization": "Bearer \(token!)", "Content-Type": "application/json"]
-          : ["Content-Type": "application/json"]
+        var h: [String: String] = [
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        ]
+        if let token = KeychainSwift().get("serverAccessToken"), !token.isEmpty {
+            h["Authorization"] = "Bearer \(token)"
+        }
+        return h
     }
     public var sampleData: Data { Data() }
 }

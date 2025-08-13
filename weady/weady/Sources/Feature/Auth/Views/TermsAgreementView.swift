@@ -6,12 +6,21 @@
 //
 
 import SwiftUI
+import SafariServices
+
+private struct WebLink: Identifiable {
+    let id = UUID()
+    let url: URL
+}
+
 
 struct TermsAgreementView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var router: NavigationRouter
     @StateObject private var viewModel = TermsAgreementViewModel()
     
     @State private var showNicknameInput = false
+    @State private var activeLink: WebLink? // 현재 선택된 약관 URL
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -45,21 +54,41 @@ struct TermsAgreementView: View {
             
             // 개별 항목
             ForEach($viewModel.items) { $item in
-                Button {
-                    item.isOn.toggle()
-                } label: {
-                    HStack {
-                        Image(item.isOn ? "darkCheck" : "lightCheck")
-                            .resizable().aspectRatio(contentMode: .fit)
-                            .frame(width: 20, height: 20)
-                            .padding(.trailing, 10)
-                        Text(item.label)
-                            .fontName(.bodyRegular16)
-                            .foregroundStyle(Color.black100)
+                HStack(spacing: 12) {
+                    Button {
+                        item.isOn.toggle()
+                    } label: {
+                        HStack {
+                            Image(item.isOn ? "darkCheck" : "lightCheck")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20, height: 20)
+                                .padding(.trailing, 10)
+                            Text(item.label)
+                                .fontName(.bodyRegular16)
+                                .foregroundStyle(Color.black100)
+                                .multilineTextAlignment(.leading)
+                        }
                     }
-                    .padding(.bottom, 22)
+                    .buttonStyle(.plain)
+                    
+                    Spacer()
+                    
+                    if let url = item.url {
+                        Button {
+                            activeLink = WebLink(url: url) //
+                        } label: {
+                            Text("보기")
+                                .fontName(.captionSemibold14)
+                                .underline()
+                                .foregroundStyle(Color.gray700)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("\(item.title) 전문 보기")
+                    }
                 }
                 .padding(.horizontal, 10)
+                .padding(.bottom, 22)
             }
             
             Spacer()
@@ -83,10 +112,21 @@ struct TermsAgreementView: View {
         .padding(.horizontal, 20)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button { dismiss() } label: {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                Button {
+                    //
+                    if !router.path.isEmpty {
+                        router.pop()
+                    } else {
+                        dismiss()
+                    }
+                } label: {
+                    Image("authBackIcon")
+                        .resizable()
+                        .frame(width:10, height: 16)
+                        .padding(.leading, 5)
+                        .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -98,7 +138,35 @@ struct TermsAgreementView: View {
                     print("DEBUG Sheet Payload →", p.map { "\($0.termsType)=\($0.isAgreed)" })
                 }
         }
+        
+        // URL 시트 표시
+        .sheet(item: $activeLink) { link in
+            SafariSheet(url: link.url)
+                .ignoresSafeArea()
+        }
+    }
+}
+// SFSafariViewController 래퍼
+private struct SafariSheet: UIViewControllerRepresentable {
+    typealias UIViewControllerType = SFSafariViewController
+    
+    let url: URL
+    
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        let vc = SFSafariViewController(url: url)
+        vc.preferredControlTintColor = .label
+        return vc
+    }
+    
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {
+        // 업데이트 로직 필요 없음
     }
 }
 
-#Preview { TermsAgreementView() }
+
+#Preview {
+    NavigationStack {
+        TermsAgreementView()
+    }
+}
+
