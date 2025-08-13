@@ -32,10 +32,12 @@ struct CurationByCurationIdResponseDto: Codable {
 struct ImgDto: Codable {
     let imgUrl: String
     let imgOrder: Int
+    let imgAddress: String
 
     enum CodingKeys: String, CodingKey {
         case imgUrl
         case imgOrder
+        case imgAddress
     }
 }
 

@@ -3,6 +3,8 @@
 import Foundation
 import Combine
 import SwiftUI
+import Moya
+import KeychainSwift
 
 @MainActor
 final class CurationViewModel: ObservableObject {
@@ -18,6 +20,8 @@ final class CurationViewModel: ObservableObject {
 
     @Published var noticeText: String? = nil
     @Published private(set) var lastErrorStatusCode: Int? = nil
+    @Published var isScrapped : Bool = false
+    @Published var toastMessage: String? = nil
 
     // MARK: - States
     enum LoadState: Equatable { case idle, loading, success, failure(String) }
@@ -98,6 +102,8 @@ final class CurationViewModel: ObservableObject {
         detail = nil
         detailState = .idle
     }
+    
+    
 
     // MARK: - Networking (Feed)
     private func loadNearbyFeed() async {

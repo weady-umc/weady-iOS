@@ -1,4 +1,5 @@
 import SwiftUI
+import KeychainSwift
 
 /// Curation 첫 화면 (PlaceView 레이아웃을 유지하면서 MVVM 바인딩)
 struct CurationView: View {
@@ -148,6 +149,15 @@ private struct CardRow: View {
     }
 }
 
-#Preview("CurationView") {
-    CurationView()
+//#Preview("CurationView") {
+//    CurationView()
+//}
+#Preview("CurationView (API 연결)") {
+    let keychain = KeychainSwift()
+    keychain.set(
+        "ya29.a0AS3H6NwWuWOm7AtByjlVNDyCNwE4tusCy-PHpYGn-qFjVUEz0L1L7U_3QejN-dQHDjFmjNKVAEvwOLSYtUar6hco89BfTz_ku11CU-bLVnHvnTCO17YrGTB79C3zi7DDV5EgvhR2mYKiCfvIB_B0Do8iekjGjwpf7y0k5V4ZaCgYKAZwSARMSFQHGX2MiCtU2hKNQdSPbJ6c77SsMRg0175",
+        forKey: "accessToken"
+    )
+
+    return CurationView()
 }

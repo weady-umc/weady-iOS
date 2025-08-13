@@ -15,11 +15,19 @@ struct DetailCurationView: View {
     let curationId: Int64
 
     @StateObject private var vm = DetailCurationViewModel()
+    @StateObject private var scrapVm = WeadychiveViewModel()
     @State private var currentIndex: Int = 0
+    @State private var isScrapped: Bool = false
 
     var body: some View {
         ZStack(alignment: .top) {
             VStack(spacing: 25) {
+                //시연
+                Button(action: { toggleScrap() }) {
+                    Image(isScrapped ? "scrapfilled" : "scrap")
+                        .padding(.top, 50)
+                }
+                //시연
                 DetailCurationImageCarousel(currentIndex: $currentIndex,
                                             imageURLs: vm.detail?.imageURLs ?? [])
 
@@ -57,8 +65,8 @@ struct DetailCurationView: View {
             }
 
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { /* TODO: Scrap toggle logic */ }) {
-                    Image("scrap")
+                Button(action: { toggleScrap() }) {
+                    Image(isScrapped ? "scrapfilled" : "scrap")
                         .padding(.top, 50)
                 }
             }
@@ -169,6 +177,38 @@ private struct IndicatorBarView: View {
                         .foregroundColor(.white)
                 }
             }
+        }
+    }
+}
+
+extension DetailCurationView {
+    /// 토글: 스크랩 ⇄ 스크랩 취소
+    fileprivate func toggleScrap() {
+        let id = Int(curationId)
+        if isScrapped {
+            scrapVm.removeCurationScrap(curationId: id)
+            // 성공 콜백에서 토글하는 구조가 아니라면, optimistic 업데이트 후 실패 시 롤백
+            isScrapped = true // keep current until result
+            // 실제 구현에서 removeCurationScrap에 completion이 있다면 그 안에서 isScrapped = false 로 변경하세요.
+            // 예시(완전한 형태):
+            // scrapVm.removeCurationScrap(curationId: id) { result in
+            //     switch result {
+            //     case .success: self.isScrapped = false
+            //     case .failure:  break // 필요 시 에러 토스트
+            //     }
+            // }
+            self.isScrapped = false
+        } else {
+            scrapVm.postCurationScrap(curationId: id)
+            // 동일하게 optimistic 처리 후 성공 시 유지, 실패 시 롤백
+            isScrapped = false // keep current until result
+            // scrapVm.postCurationScrap(curationId: id) { result in
+            //     switch result {
+            //     case .success: self.isScrapped = true
+            //     case .failure:  break
+            //     }
+            // }
+            self.isScrapped = true
         }
     }
 }
