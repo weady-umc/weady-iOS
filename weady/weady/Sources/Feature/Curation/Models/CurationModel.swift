@@ -169,6 +169,8 @@ struct CurationCard: Identifiable, Equatable {
 struct CurationDetailImage: Identifiable, Equatable {
     let id: Int // imgOrder
     let url: URL?
+    //TODO: - 추후 수정
+    //let address: String?
 }
 
 struct CurationDetail: Equatable {
@@ -227,6 +229,7 @@ enum CurationMapper {
     }
 
     /// /curation/{curationId} 상세
+    //TODO: - 추후에 수
     static func toDetail(from dto: ApiResponseCurationByCurationIdResponseDto) -> CurationDetail {
         let images: [CurationDetailImage] = dto.data.imgs
             .sorted { $0.imgOrder < $1.imgOrder }
