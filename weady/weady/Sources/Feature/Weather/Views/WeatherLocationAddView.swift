@@ -79,14 +79,24 @@ struct WeatherLocationAddView: View {
                     
                     Spacer().frame(height: 80)
                     
-                    ///즐겨찾기 버튼
-                    Button(action: {
-                        if let place = selectedPlace, let weatherData = viewModel.weather {
-                            locationViewModel.addFavorite(from: place, with: weatherData)
-                        }
-                        dismiss()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            onComplete?()  // 시트 밖에서 push
+            Button(action: {
+                guard let place = selectedPlace,
+                    let weatherData = viewModel.weather else { return }
+
+                // 1. 서버 API로 즐겨찾기 추가
+            locationViewModel.addFavoriteToServer(bCode: place.address.bCode) { success in
+                if success {
+                    print("✅ 서버 즐겨찾기 추가 성공")
+                        // 2. 로컬 목록에도 추가
+                        locationViewModel.addFavorite(from: place, with: weatherData)
+                        // 3. 성공 시 화면 이동
+                        DispatchQueue.main.async {
+                        router.push(.weatherlocation)
+                    }
+                } else {
+                    print("❌ 서버 즐겨찾기 추가 실패")
+                        // 실패 시 Alert을 띄우거나 메시지 표시 가능
+                            }
                         }
                     }) {
                         ZStack {
@@ -259,5 +269,5 @@ struct rainWind :View {
         selectedPlace: .constant(dummyPlace),
         weather: ShortWeatherData.example
     )
-    .environmentObject(NavigationRouter())
+    .environment(HomeRouter())
 }

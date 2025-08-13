@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
+    @Environment(HomeRouter.self) var router
+    
     var body: some View {
         
         Spacer().frame(height: 105)
@@ -15,7 +17,7 @@ struct HomeView: View {
         TopView
         
         Button{
-            
+            router.push(.weatherlocation)
         } label: {
             WeatherView
         }
@@ -49,7 +51,7 @@ struct HomeView: View {
     private var WeatherView: some View {
         
         ZStack{
-            Image("weatherbackground")
+            Image("weather_cloudy")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 335.57, height: 147)
@@ -145,4 +147,5 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+        .environment(HomeRouter())
 }

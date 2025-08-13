@@ -36,9 +36,16 @@ final class UserFavoriteLocationServices {
         provider.request(.postUserFavoriteLocation(bCode: bCode)) { result in
             switch result {
             case .success(let response):
+                print("📦 status:", response.statusCode)
+                print("📦 body:", String(data: response.data, encoding: .utf8) ?? "nil")
+
                 do {
                     let decoded = try JSONDecoder().decode(PostFavoriteLocationResponse.self, from: response.data)
-                    completion(.success(decoded.data.locationId))
+                    if let id = decoded.data?.locationId {
+                        completion(.success(id))
+                    } else {
+                        completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "locationId 없음"])))
+                    }
                 } catch {
                     completion(.failure(error))
                 }
@@ -47,7 +54,7 @@ final class UserFavoriteLocationServices {
             }
         }
     }
-    
+
     func updateDefaultFavoriteLocation(locationID: Int, completion: @escaping (Result<Void, Error>) -> Void) {
         provider.request(.patchDefaultFavoriteLocation(locationID: locationID)) {
              result in

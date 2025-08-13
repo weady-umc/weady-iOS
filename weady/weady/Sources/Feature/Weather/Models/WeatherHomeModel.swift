@@ -28,11 +28,23 @@ enum WeatherHomeModel: Int, CaseIterable, Identifiable {
             return "장소"
         }
     }
+    
+    var route: HomeRoute? {
+        switch self {
+        case .first:
+            return nil
+        case .second:
+            return .clothes
+        case .third:
+            return .place
+        
+        }
+    }
 }
 
-struct WeatherData: Identifiable, Equatable {
+struct WeatherData: Identifiable, Equatable, Hashable {
     var id = UUID()
-    var favoriteId: Int? = nil
+    var favoriteId: Int?
     var location: String
     var temperature: String
     var highTemperature: String

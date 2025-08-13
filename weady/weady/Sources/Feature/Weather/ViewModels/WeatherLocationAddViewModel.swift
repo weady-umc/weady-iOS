@@ -93,7 +93,8 @@ class WeatherLocationAddViewModel: ObservableObject {
 }
 
 
-extension ShortWeatherData {
+extension ShortWeatherData{
+        
     static let example = ShortWeatherData(
         address1: "서울특별시",
         address2: "강남구",

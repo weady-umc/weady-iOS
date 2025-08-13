@@ -51,7 +51,18 @@ final class WeatherServices {
     }
     
     func getPreview(bCode: String, x: Double, y: Double) -> AnyPublisher<ShortWeatherData, Error> {
-        print("🔍 URL 최종 확인: https://yourapi.com/weather/preview?b_code=\(bCode)&x=\(x)&y=\(y)")
+        let target = WeatherEndpoints.getPreview(bCode: bCode, x: x, y: y)
+        let fullURL = target.baseURL.appendingPathComponent(target.path)
+
+        if case let .requestParameters(parameters, encoding) = target.task,
+           var components = URLComponents(url: fullURL, resolvingAgainstBaseURL: false) {
+            if encoding is URLEncoding {
+                components.queryItems = parameters.map { key, value in
+                    URLQueryItem(name: key, value: "\(value)")
+                }
+            }
+            print("🔍 URL 최종 확인: \(components.url?.absoluteString ?? "nil")")
+        }
 
         return provider.requestPublisher(.getPreview(bCode: bCode, x: x, y: y))
             .handleEvents(receiveOutput: { response in

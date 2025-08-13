@@ -15,7 +15,7 @@ class WeatherLocationViewModel: ObservableObject {
     
     
     static let example = WeatherData(
-        id: UUID(),
+        favoriteId: nil,
         location: "서초구 양재1동",
         temperature: "17",
         highTemperature: "25",
@@ -32,7 +32,8 @@ class WeatherLocationViewModel: ObservableObject {
     /// 즐겨찾기 추가 함수
         func addFavorite(from place: AddressDocument, with weather: WeatherAddData) {
             let weatherData = WeatherData(
-                id: UUID(),
+                
+                favoriteId: nil,
                 location: "\(place.address.region2depthName) \(place.address.region3depthName)",
                 temperature: String(weather.temperature),
                 highTemperature: String(weather.highTemperature),
@@ -68,7 +69,6 @@ extension WeatherLocationViewModel {
             case .success(let list):
                 self.favoriteLocations = list.map { dto in
                     WeatherData(
-                        id: UUID(uuidString: dto.bCode) ?? UUID(), // bCode로 고정 ID 시도
                         favoriteId: dto.favoriteId,
                         location: [dto.locationAddress1,
                                    dto.locationAddress2,
