@@ -7,13 +7,13 @@ import SwiftUI
 @MainActor
 final class CurationViewModel: ObservableObject {
 
-    // MARK: - UI Outputs
+    // MARK: - UI Output
     @Published private(set) var headerText: WeatherHeaderText = .placeholder
     @Published private(set) var tags: [LocationTag] = []
     @Published private(set) var selectedTag: LocationTag = .nearby
     @Published private(set) var cards: [CurationCard] = []
     @Published private(set) var detail: CurationDetail? = nil
-    /// 헤더(leading) & 장소 칩(원) 테두리에 공용으로 사용하는 색상
+    /// 날씨 문구) & 장소 칩(원) 테두리에 공용으로 사용하는 색상
     @Published private(set) var accentColor: Color = .primary
 
     @Published var noticeText: String? = nil

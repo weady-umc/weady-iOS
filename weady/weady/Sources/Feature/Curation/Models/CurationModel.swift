@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-// MARK: - Season / Weather (server -> domain)
+// MARK: - 계절태그,날씨태그 -> 날씨 문구 + 컬러칩 달라짐
 enum Season: String, CaseIterable, Codable {
     case spring = "봄"
     case summer = "여름"
@@ -35,8 +35,8 @@ enum SkyWeather: String, CaseIterable, Codable {
     }
 }
 
-// MARK: - Presentation tone (domain-safe)
-/// UI에 의존하지 않는 의미색 토큰
+// MARK: - 컬러칩(날씨 문구 + 장소 칩 테두리 색상)
+
 enum SemanticColor: String, Codable, CaseIterable {
     case springClear
     case springCloudy
@@ -69,7 +69,7 @@ enum SemanticColor: String, Codable, CaseIterable {
     }
 }
 
-/// (season, weather) → 하나의 의미색 토큰
+/// 계절+날씨 조합에 따른 컬러칩
 enum WeatherTone {
     static func tone(for season: Season, weather: SkyWeather) -> SemanticColor {
         switch (season, weather) {
@@ -108,7 +108,7 @@ enum WeatherTone {
 // MARK: - Header Phrase
 /// 상단 문구: [가변] + [고정] 구조
 struct WeatherHeaderText: Equatable {
-    /// ex) "살랑살랑 봄날씨"
+    /// ex) "맑고 따듯한 봄날"
     let leading: String
     /// 고정 텍스트
     let trailing: String = "에는 이런 코스들을 추천해드려요"
@@ -149,7 +149,7 @@ enum WeatherPhrase {
     }
 }
 
-// MARK: - 추천 장소 (location chips)
+// MARK: - 추천 장소
 struct LocationTag: Identifiable, Hashable {
     enum Kind: Equatable { case nearby, category }
     let id: Int64
@@ -189,7 +189,7 @@ struct CurationFeed: Equatable {
     let tone: SemanticColor  // headerText.leading & 장소 칩(원) 테두리에 공용으로 사용
 }
 
-// MARK: - Mapper (DTO → Domain)
+// MARK: - 매핑 (DTO → Domain)
 enum CurationMapper {
     // 공통: season/weather → 헤더 문구
     private static func makeHeader(seasonString: String, weatherString: String) -> WeatherHeaderText {
@@ -209,7 +209,7 @@ enum CurationMapper {
             CurationCard(
                 id: c.curationId,
                 title: c.curationTitle,
-                thumbnailURL: URL(string: c.backgroundImgUrl)
+                thumbnailURL: URL(string: c.backgroundImgUrl) //카드 썸네일 URL
             )
         }
         return CurationFeed(
@@ -221,7 +221,7 @@ enum CurationMapper {
         )
     }
 
-    /// 카테고리 목록 → 태그들 (고정 칩 + 서버 칩 결합은 ViewModel에서 수행)
+    /// 카테고리 목록 → 태그들 (고정 칩 + 서버 칩 카테고리 ID는  ViewModel에서 연결)
     static func toTags(from dto: ApiResponseListCurationCategoryResponseDto) -> [LocationTag] {
         dto.data.map { LocationTag(id: $0.curationCategoryId, name: $0.locationName, kind: .category) }
     }

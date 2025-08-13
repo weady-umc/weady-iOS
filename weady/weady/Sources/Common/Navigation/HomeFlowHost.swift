@@ -15,6 +15,7 @@ enum HomeRoute: Hashable {
     case weatheraddlocation
     case weathersearch
     case weatherlocation
+    case curationdetail(curationId: Int64)
 }
 
 // MARK: - HomeRouter
@@ -56,10 +57,12 @@ struct HomeFlowHost: View {
                         WeatherSearchView(selectedPlace: .constant(nil))
                     case .weatherlocation:
                         WeatherLocationView()
+                    case .curationdetail(let curationId):
+                        DetailCurationView(curationId: curationId)
                     }
                 }
         }
-        // 필요 시 하위 뷰에서 @Environment(HomeRouter.self)로 직접 push/pop 가능
+//         필요 시 하위 뷰에서 @Environment(HomeRouter.self)로 직접 push/pop 가능
         .environment(router)
     }
 }

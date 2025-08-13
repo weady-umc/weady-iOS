@@ -7,7 +7,7 @@ struct CurationView: View {
     
 
     var body: some View {
-        NavigationStack {
+
             VStack(alignment: .leading, spacing: 16) {
                 // 1) 상단 텍스트: [가변] + [고정]
                 HeaderView(leading: vm.headerText.leading,
@@ -52,9 +52,7 @@ struct CurationView: View {
                     ScrollView {
                         VStack(spacing: 12) {
                             ForEach(vm.cards) { card in
-                                Button {
-                                    Task { await vm.openDetail(curationId: card.id) }
-                                } label: {
+                                NavigationLink(value: HomeRoute.curationdetail(curationId: Int64(card.id))) {
                                     CardRow(title: card.title, imageURL: card.thumbnailURL)
                                 }
                                 .buttonStyle(.plain)
@@ -65,8 +63,7 @@ struct CurationView: View {
                     }
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
-        }
+        
         .task { await vm.boot() }
     }
 }
@@ -123,7 +120,7 @@ private struct TagChip: View {
     }
 }
 
-// MARK: - Card Row (썸네일 + 좌하단 타이틀)
+// MARK: - 썸네일
 private struct CardRow: View {
     let title: String
     let imageURL: URL?
@@ -141,12 +138,12 @@ private struct CardRow: View {
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
             // 타이틀 오버레이 (가독성 높이기 위해 살짝 그림자)
-            Text(title)
-                .font(.system(size: 20, weight: .bold))
-                .foregroundColor(.white)
-                .shadow(radius: 2)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
+//            Text(title)
+//                .font(.system(size: 20, weight: .bold))
+//                .foregroundColor(.white)
+//                .shadow(radius: 2)
+//                .padding(.horizontal, 12)
+//                .padding(.vertical, 10)
         }
     }
 }
