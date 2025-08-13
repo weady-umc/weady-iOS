@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 // MARK: - Season / Weather (server -> domain)
 enum Season: String, CaseIterable, Codable {
@@ -37,18 +38,35 @@ enum SkyWeather: String, CaseIterable, Codable {
 // MARK: - Presentation tone (domain-safe)
 /// UI에 의존하지 않는 의미색 토큰
 enum SemanticColor: String, Codable, CaseIterable {
-    case springClear     // TODO: 리소스 컬러칩: springClear 색상
-    case springCloudy    // TODO: 리소스 컬러칩: springCloudy 색상
-    case springRainy     // TODO: 리소스 컬러칩: springRainy 색상
-    case summerClear     // TODO: 리소스 컬러칩: summerClear 색상
-    case summerCloudy    // TODO: 리소스 컬러칩: summerCloudy 색상
-    case summerRainy     // TODO: 리소스 컬러칩: summerRainy 색상
-    case autumnClear     // TODO: 리소스 컬러칩: autumnClear 색상
-    case autumnCloudy    // TODO: 리소스 컬러칩: autumnCloudy 색상
-    case autumnRainy     // TODO: 리소스 컬러칩: autumnRainy 색상
-    case winterClear     // TODO: 리소스 컬러칩: winterClear 색상
-    case winterCloudy    // TODO: 리소스 컬러칩: winterCloudy 색상
-    case winterRainy     // TODO: 리소스 컬러칩: winterRainy 색상
+    case springClear
+    case springCloudy
+    case springRainy
+    case summerClear
+    case summerCloudy
+    case summerRainy
+    case autumnClear
+    case autumnCloudy
+    case autumnRainy
+    case winterClear
+    case winterCloudy
+    case winterRainy
+    
+    var color: Color {
+        switch self {
+        case .springClear: return Color("springClear")
+        case .springCloudy: return Color("springCloudy")
+        case .springRainy: return Color("springRainy")
+        case .summerClear: return Color("summerClear")
+        case .summerCloudy: return Color("summerCloudy")
+        case .summerRainy: return Color("summerRainy")
+        case .autumnClear: return Color("autumnClear")
+        case .autumnCloudy: return Color("autumnCloudy")
+        case .autumnRainy: return Color("autumnRainy")
+        case .winterClear: return Color("winterClear")
+        case .winterCloudy: return Color("winterCloudy")
+        case .winterRainy: return Color("winterRainy")
+        }
+    }
 }
 
 /// (season, weather) → 하나의 의미색 토큰

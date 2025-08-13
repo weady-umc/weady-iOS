@@ -2,6 +2,7 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 @MainActor
 final class CurationViewModel: ObservableObject {
@@ -12,6 +13,8 @@ final class CurationViewModel: ObservableObject {
     @Published private(set) var selectedTag: LocationTag = .nearby
     @Published private(set) var cards: [CurationCard] = []
     @Published private(set) var detail: CurationDetail? = nil
+    /// 헤더(leading) & 장소 칩(원) 테두리에 공용으로 사용하는 색상
+    @Published private(set) var accentColor: Color = .primary
 
     // MARK: - States
     enum LoadState: Equatable { case idle, loading, success, failure(String) }
@@ -88,6 +91,7 @@ final class CurationViewModel: ObservableObject {
     private func apply(feed: CurationFeed) {
         headerText = feed.header
         cards = feed.cards
+        accentColor = feed.tone.color   // SemanticColor → Color("assetName")
     }
 
     // MARK: - Networking (Detail)
