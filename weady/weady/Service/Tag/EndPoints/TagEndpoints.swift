@@ -10,6 +10,9 @@ import Moya
 import KeychainSwift
 
 enum TagEndpoints {
+    case getWeatherTags
+    case getTemperatureTags
+    case getSeasonTags
     case getClothesStyleCategories
 }
 
@@ -18,15 +21,21 @@ extension TagEndpoints: TargetType {
 
     var path: String {
         switch self {
+        case .getWeatherTags:
+            return "/api/v1/tags/weather-tags"
+        case .getTemperatureTags:
+            return "/api/v1/tags/temperature-tags"
+        case .getSeasonTags:
+            return "/api/v1/tags/season-tags"
         case .getClothesStyleCategories:
             return "/api/v1/tags/clothes-style-categories"
         }
     }
-
+    
     var method: Moya.Method { .get }
-
+    
     var task: Task { .requestPlain }
-
+    
     var headers: [String: String]? {
         var h: [String: String] = [
             "Accept": "application/json",

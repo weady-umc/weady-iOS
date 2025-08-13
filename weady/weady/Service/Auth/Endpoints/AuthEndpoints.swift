@@ -51,22 +51,19 @@ extension AuthEndpoints: TargetType {
     }
 
     var headers: [String: String]? {
-        var header: [String: String] = [
-            "Content-Type": "application/json"
-        ]
+        var header: [String: String] = ["Content-Type": "application/json"]
         
         switch self {
-        case .postLogin(_, let provider):
-            if provider.lowercased() == "kakao" {
-                if let token = AuthManager.shared.getAccessToken() {
-                    header["Authorization"] = "Bearer \(token)"
-                }
+        case .postLogin:
+            return header
+        case .postReissue:
+            if let refresh = AuthManager.shared.getRefreshToken() {
+                header["Authorization"] = "Bearer \(refresh)"
             }
             return header
-            
-        case .postReissue, .deleteLogout:
-            if let token = AuthManager.shared.getAccessToken() {
-                header["Authorization"] = "Bearer \(token)"
+        case .deleteLogout:
+            if let access = AuthManager.shared.getAccessToken() {
+                header["Authorization"] = "Bearer \(access)"
             }
             return header
         }

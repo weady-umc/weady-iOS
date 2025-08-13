@@ -11,6 +11,7 @@ struct WeadyboardPostMoreActionSheet: View {
     @Binding var showReportSheet: Bool
     let boardId: Int
     @ObservedObject var reportViewModel: WeadyboardReportViewModel
+    @EnvironmentObject private var toast: ToastCenter
 
     var body: some View {
         VStack(spacing: 0) {
@@ -26,7 +27,14 @@ struct WeadyboardPostMoreActionSheet: View {
                     iconName: "hideicon",
                     title: "게시물 숨기기",
                     action: {
-                        reportViewModel.hide(boardId: boardId)
+                        reportViewModel.hide(boardId: boardId) { result in
+                            switch result {
+                            case .success:
+                                toast.showSuccess("게시물이 숨겨졌습니다.")
+                            case .failure:
+                                toast.showError("숨기기에 실패했습니다. 잠시 후 다시 시도해주세요.")
+                            }
+                        }
                     })
 
                 MoreActionButton(

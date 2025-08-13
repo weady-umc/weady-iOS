@@ -144,6 +144,6 @@ struct WeatherSearchView: View {
 struct WeatherSearchView_Previews: PreviewProvider {
     static var previews: some View {
         WeatherSearchView(selectedPlace: .constant(nil))
-            .environmentObject(NavigationRouter())
+//            .environmentObject(NavigationRouter())
     }
 }
