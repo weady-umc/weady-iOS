@@ -1,21 +1,25 @@
 import Foundation
 import Observation
-import CoreLocation
 
 @Observable
 final class WeatherViewModel {
-    // MARK: - 날씨 모델
-    var model = WeatherModel()
+    var model: WeatherModel = .empty
 
-    // MARK: - 현재위치/직접
+    // MARK: - 상태 변수
+    var isManual: Bool = false
+    var selectedSeason: SeasonType? = nil
+    var selectedTempBand: TemperatureBand? = nil
+    var selectedWeatherTags: [WeatherType] = []
+    var currentWeather: WeatherModel? = nil
+
+    // MARK: - 현재 위치로 추가/직접 추가
     enum WeatherInputMode {
         case currentLocation
         case manual
     }
-
     var inputMode: WeatherInputMode {
-        get { model.isManual ? .manual : .currentLocation }
-        set { model.isManual = (newValue == .manual) }
+        get { isManual ? .manual : .currentLocation }
+        set { isManual = (newValue == .manual) }
     }
 
     var isUsingCurrentLocation: Bool {
@@ -23,50 +27,24 @@ final class WeatherViewModel {
         set { inputMode = newValue ? .currentLocation : .manual }
     }
 
-    // MARK: - 직접 추가 태그
-    // 계절
-    var selectedSeason: SeasonType? {
-        get { model.season }
-        set { model.season = newValue }
+    // MARK: - 버튼 활성화 조건
+    var isFormValid: Bool {
+        if isUsingCurrentLocation {
+            // 현재 위치 사용 시 currentWeather 존재하면 활성화
+            return currentWeather != nil
+        } else {
+            // 직접 입력 시 필수값 체크
+            return selectedSeason != nil && selectedTempBand != nil && !selectedWeatherTags.isEmpty
+        }
     }
 
-    // 기온
-    var selectedTempBand: TemperatureBand? {
-        get { model.temperature }
-        set { model.temperature = newValue }
-    }
-    
-    // 기온 범위 텍스트
-    var tempRangeText: String {
-        selectedTempBand?.tempRangeText ?? ""
-    }
-    
-    // 기온 범위에 따른 상태 텍스트
-    var tempStatusText: String {
-        selectedTempBand?.name ?? ""
-    }
-
-    // 날씨
-    var selectedWeatherTags: [WeatherType] {
-        get { model.weather }
-        set { model.weather = newValue }
-    }
-    
-    // MARK: - 현재 위치 날씨 정보
-    var currentWeather: WeatherModel? = nil
-
-    // MARK: - 태그 토글 (단일 선택)
+    // MARK: - 날씨 토글 (단일 선택)
     func toggleWeatherTag(_ tag: WeatherType) {
         if selectedWeatherTags.contains(tag) {
             selectedWeatherTags.removeAll()
         } else {
             selectedWeatherTags = [tag]
         }
-    }
-
-    // MARK: - 모델 반환
-    func toWeatherModel() -> WeatherModel {
-        return model
     }
 
     // MARK: - 현재 위치 날씨 fetch (더미 구현)
@@ -81,10 +59,17 @@ final class WeatherViewModel {
         }
     }
 
-    // MARK: - 업로드 모델에 적용
-    func applyWeatherToUploadModel(useCurrentLocation: Bool) {
-        let selectedWeather: WeatherModel? = useCurrentLocation ? currentWeather : toWeatherModel()
-        // UploadViewModel.shared.weather = selectedWeather
-        print("적용된 날씨 정보:", selectedWeather ?? WeatherModel.empty)
+    // MARK: - 업로드할 모델 생성
+    func toWeatherModel() -> WeatherModel {
+        if isUsingCurrentLocation, let current = currentWeather {
+            return current
+        } else {
+            return WeatherModel(
+                season: selectedSeason,
+                temperature: selectedTempBand,
+                weather: selectedWeatherTags,
+                isManual: true
+            )
+        }
     }
 }

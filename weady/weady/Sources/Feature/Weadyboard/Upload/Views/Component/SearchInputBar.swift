@@ -6,7 +6,7 @@ struct SearchInputBar: View {
 
     var body: some View {
         HStack {
-            Image(.searchIcon)
+            Image(.uploadSearchIcon)
                 .scaledToFit()
                 .frame(width: 17, height: 17)
 

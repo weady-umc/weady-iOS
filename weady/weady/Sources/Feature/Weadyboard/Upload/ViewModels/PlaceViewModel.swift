@@ -32,4 +32,9 @@ final class PlaceViewModel {
     func removePlace(_ place: Place) {
         selectedPlaces.removeAll { $0 == place }
     }
+    
+    //MARK: - 업로드용 모델 변환
+    func toPlaceModel() -> PlaceModel {
+        return PlaceModel(places: selectedPlaces)
+    }
 }

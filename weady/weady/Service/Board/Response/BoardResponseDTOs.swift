@@ -23,12 +23,14 @@ struct BoardDetailResponseDTO: Decodable {
     let seasonTagId: Int
     let placeDtoList: [PlaceDTO]
     let styleIdList: [Int]
+    let brandDtoList: [BrandDTO]
     let createdAt: String
+    let updatedAt: String
 }
 
 struct BoardImageDTO: Decodable {
-    let imgUrl: String
     let imgOrder: Int
+    let imgUrl: String
 }
 
 struct BoardLikeResponseDTO: Decodable {
