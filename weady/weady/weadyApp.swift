@@ -14,7 +14,7 @@ import GoogleSignInSwift
 
 @main
 struct weadyApp: App {
-    @State private var router = NavigationRouter()
+    @StateObject private var router = NavigationRouter()
     @State private var tabController = AppTabController()
     @State private var weadyboardBridge = WeadyboardRouteBridge()
     @StateObject private var toastCenter = ToastCenter.shared
@@ -28,6 +28,7 @@ struct weadyApp: App {
         WindowGroup {
             AppRootView()
                 .environment(router)
+                .environmentObject(router)
                 .environment(tabController)
                 .environment(weadyboardBridge)
                 .environmentObject(toastCenter)
