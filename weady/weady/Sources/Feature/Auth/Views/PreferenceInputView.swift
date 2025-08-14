@@ -51,18 +51,7 @@ struct PreferenceInputView: View {
             .padding(.top, 39)
             
             Spacer()
-            
-            // 3) 중앙 일러스트 버튼
-            ZStack {
-                Circle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(width: 200, height: 200)
-                Text("웨디 일러스트")
-                    .font(.system(size: 16))
-                    .foregroundColor(.black)
-            }
-            .frame(maxWidth: .infinity)
-            
+
             Spacer().frame(height: 146)
             
             // 4) 하단 버튼들

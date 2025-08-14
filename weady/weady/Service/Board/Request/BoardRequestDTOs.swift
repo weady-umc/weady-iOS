@@ -1,5 +1,5 @@
 //
-//  BoardRequesetDTOs.swift
+//  BoardRequestDTOs.swift
 //  weady
 //
 //  Created by 엄민서 on 7/29/25.
@@ -26,6 +26,7 @@ struct UpdateBoardRequestDTO: Encodable {
     let seasonTagId: Int
     let boardPlaceRequestDtoList: [PlaceDTO]
     let styleIds: [Int]
+    let boardBrandRequestDtoList: [BrandDTO]   
 }
 
 struct ReportBoardRequestDTO: Encodable {
