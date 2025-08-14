@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct HomeView: View {
+    //추가
     @Environment(HomeRouter.self) private var router
+    //
     var body: some View {
         
         Spacer().frame(height: 105)
@@ -28,19 +30,20 @@ struct HomeView: View {
         }
         
         Spacer().frame(height: 29)
-        
-       
+//MARK: -여기 버튼은 예시에요 ! 이런식으로 하시면 될 것 같아요 물론 옷차림 장소 날씨 tab내부에 있고 baseTab도 보여야겠죵
         Button{
+            router.push(.curation)
             
         } label: {
             PlaceView
         }
+    
 
         
         
     }
     
-    
+
     private var TopView: some View {
         Text("키코님, \n오늘은 이런 하루 어때요?")
             .foregroundStyle(Color.black100)
@@ -133,9 +136,7 @@ struct HomeView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 10, height: 15.62)
-                    .onTapGesture {
-                        router.push(.curation)
-                    }
+                    
                         
             }
             

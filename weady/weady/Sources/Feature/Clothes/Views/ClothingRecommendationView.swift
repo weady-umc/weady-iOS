@@ -1,15 +1,3 @@
-////
-////  ClothingRecommendationView.swift
-////  weady
-////
-////  Created by 김영택 on 8/8/25.
-////
-//
-//import SwiftUI
-//import Combine
-//import Charts
-//
-//
 
 
 import SwiftUI
