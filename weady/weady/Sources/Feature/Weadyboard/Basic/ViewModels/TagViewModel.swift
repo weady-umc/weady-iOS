@@ -10,6 +10,7 @@ import Foundation
 @MainActor
 final class TagViewModel: ObservableObject {
 
+    // 서버 응답 DTO
     @Published var seasons: [SeasonTagResponseDTO] = []
     @Published var weathers: [WeatherTagResponseDTO] = []
     @Published var temperatures: [TemperatureTagResponseDTO] = []
@@ -32,8 +33,8 @@ final class TagViewModel: ObservableObject {
         (1, "맑은 날"),
         (2, "구름 많은 날"),
         (3, "비 오는 날"),
-        (4, "눈 오는 날"),
-        (5, "흐린 날"),
+        (4, "흐린 날"),
+        (5, "눈 오는 날"),
         (6, "바람 많은 날")
     ]
 

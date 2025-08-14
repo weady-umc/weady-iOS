@@ -35,7 +35,7 @@ struct WeadyboardMyPostMoreActionSheet: View {
                 )
 
                 MyMoreActionButton(
-                    iconName: "deleteicon",
+                    iconName: "post_deleteicon",
                     title: "게시물 삭제하기",
                     titleColor: Color(UIColor.systemRed),
                     action: { showDeleteAlert = true }
