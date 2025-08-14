@@ -53,8 +53,7 @@ struct WeadyboardPostView: View {
                         WeadyboardActionButtonsView(
                             goodStatus: viewModel.post?.goodStatus ?? false,
                             goodCount: viewModel.post?.goodCount ?? 0,
-                            commentCount: 0,
-//                            commentCount: viewModel.post?.commentCount ?? 0,
+                            commentCount: viewModel.post?.commentCount ?? 0,
                             isScraped: weadychiveVM.isScrapped(boardId: boardId),
                             onLikeTap: {
                                 if viewModel.post?.goodStatus == true {
