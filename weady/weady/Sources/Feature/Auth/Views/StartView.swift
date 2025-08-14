@@ -49,17 +49,6 @@ struct StartView: View {
 
             Spacer().frame(height: 78)
 
-            // 3) 중앙 일러스트 버튼
-            ZStack {
-                Circle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(width: 212, height: 212)
-                Text("웨디 일러스트")
-                    .font(.system(size: 16))
-                    .foregroundColor(.black)
-            }
-            .frame(maxWidth: .infinity)
-
             Spacer()
 
             // 4) 다음 버튼
