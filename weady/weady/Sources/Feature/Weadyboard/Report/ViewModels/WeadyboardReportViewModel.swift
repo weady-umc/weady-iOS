@@ -21,11 +21,12 @@ final class WeadyboardReportViewModel: ObservableObject {
                 switch result {
                 case .success:
                     self?.isSuccess = true
+                    self?.errorMessage = nil
                     completion(.success(()))
                 case .failure(let error):
                     self?.isSuccess = false
                     self?.errorMessage = error.localizedDescription
-                    completion(.failure(error))
+                    completion(.failure(error))             
                 }
             }
         }
