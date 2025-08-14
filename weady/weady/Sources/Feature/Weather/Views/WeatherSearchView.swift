@@ -89,9 +89,14 @@ struct WeatherSearchView: View {
         VStack {
 
             if viewModel.searchResults.isEmpty {
+                
+                Spacer().frame(height: 40)
+                
                 Text("🔍 검색 결과가 없습니다.")
-                    .foregroundColor(.gray)
-                    .padding(.top, 20)
+                    .foregroundColor(.gray300)
+                
+                    
+                    
             } else {
                 List(viewModel.filteredResults, id: \.id) { place in
                     Button(action: {
