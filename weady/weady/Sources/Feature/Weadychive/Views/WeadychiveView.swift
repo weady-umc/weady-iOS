@@ -123,7 +123,7 @@ struct TopBar: View {
     }
 }
 
-// MARK: - Top Tab Enum
+// MARK: - Top Tab
 
 enum TopTab: String, CaseIterable {
     case curation = "스크랩한 큐레이션"
@@ -197,21 +197,24 @@ struct CurationListView: View {
                         }) {
                             if item.firstImgUrl.starts(with: "http"), let url = URL(string: item.firstImgUrl) {
                                 AsyncImage(url: url) { image in
-                                    image.resizable()
-                                        .aspectRatio(1, contentMode: .fill)   // ⬅️ 정사각형 타일
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(height: 300)
                                         .clipped()
                                 } placeholder: {
                                     Color.gray.opacity(0.3)
-                                        .aspectRatio(1, contentMode: .fill)   // ⬅️ 로딩도 정사각형 유지
+                                        .frame(height: 300)
                                 }
                             } else if !item.firstImgUrl.isEmpty {
                                 Image(item.firstImgUrl)
                                     .resizable()
-                                    .aspectRatio(1, contentMode: .fill)
+                                    .scaledToFill()
+                                    .frame(height: 300)
                                     .clipped()
                             } else {
                                 Color.gray.opacity(0.2)
-                                    .aspectRatio(1, contentMode: .fill)
+                                    .frame(height: 300)
                             }
                             
                         }
@@ -247,25 +250,28 @@ struct WeadyboardListView: View {
                         Button(action: {
                             // TODO: - 해당 웨디보드 상세 화면으로 이동
                         }) {
-                            // Safe optional handling for imgUrl
+                           
                             if let urlStr = item.imgUrl, urlStr.hasPrefix("http"), let url = URL(string: urlStr) {
                                 AsyncImage(url: url) { image in
-                                    image.resizable()
-                                        .aspectRatio(1, contentMode: .fill)
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(height: 160)
                                         .clipped()
                                 } placeholder: {
                                     Color.gray.opacity(0.3)
-                                        .aspectRatio(1, contentMode: .fill)
+                                        .frame(height: 160)
                                 }
                             } else if let localName = item.imgUrl, !localName.isEmpty {
                                 Image(localName)
                                     .resizable()
-                                    .aspectRatio(1, contentMode: .fill)
+                                    .scaledToFill()
+                                    .frame(height: 160)
                                     .clipped()
                             } else {
                                 // imgUrl == nil 또는 빈 문자열일 때 플레이스홀더
                                 Color.gray.opacity(0.2)
-                                    .aspectRatio(1, contentMode: .fill)
+                                    .frame(height: 160)
                             }
                         }
                     }
@@ -351,7 +357,7 @@ struct NoWeadyboardView: View {
 
                 Button(action: {
 //                    router?.push(.weadyboard) // 웨디보드 탐색 화면으로 이동
-                    // 이런식으로 웨디보드로 연결될 듯합니다 
+                    // 이런식으로 웨디보드로 연결될 듯합니다
                     tab.switchTo(.weadyboard)
                 }) {
                     Text("웨디보드 보러가기")

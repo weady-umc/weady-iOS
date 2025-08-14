@@ -27,6 +27,7 @@ struct weadyApp: App {
 
     var body: some Scene {
         WindowGroup {
+
             AppRootView()
                 .environment(router)
                 .environmentObject(router)
@@ -40,6 +41,7 @@ struct weadyApp: App {
                     } else if GIDSignIn.sharedInstance.handle(url) {
                     }
                 }
+
         }
     }
 }

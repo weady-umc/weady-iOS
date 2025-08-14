@@ -10,8 +10,19 @@ import SwiftUI
 struct GenderSelectionView: View {
     @StateObject private var vm: GenderSelectionViewModel
     
-    init(nickname: String) {
+    private let agreements: [OnboardingAgreement]
+    
+    init(nickname: String, agreements: [OnboardingAgreement]) {
         _vm = StateObject(wrappedValue: GenderSelectionViewModel(nickname: nickname))
+        self.agreements = agreements
+    }
+    //보조 프로퍼티: VM의 선택값을 서버 코드로 변환
+    private var selectedGenderCode: GenderCode? {
+        switch vm.selected {
+        case .some(.male):   return .M
+        case .some(.female): return .W
+        default:             return nil
+        }
     }
     
     var body: some View {
@@ -93,19 +104,30 @@ struct GenderSelectionView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
         }
-        //다음 뷰 연결
-        .fullScreenCover(isPresented: $vm.didTapSkip) {
-            // 건너뛸 때 이동할 뷰
-            StartView(nickname: vm.nickname)
+        .onAppear {
+            print("DEBUG Gender →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
         }
+        // 스킵 → StartView (성별 없음, agreements 전달)
+        .fullScreenCover(isPresented: $vm.didTapSkip) {
+            StartView(
+                nickname: vm.nickname,
+                gender: .NONE,          // 성별 건너뛰기 NONE 사용
+                styleIds: [],           // 건너뛰기이므로 빈 배열
+                agreements: agreements  // 약관 그대로 릴레이
+            )
+        }
+        // 다음 → StyleSelection (선택 성별/agreements 전달)
         .fullScreenCover(isPresented: $vm.didTapNext) {
-            // 다음에 이동할 뷰
-            StyleSelectionView(nickname: vm.nickname)
+            StyleSelectionView(
+                nickname: vm.nickname,
+                gender: selectedGenderCode,
+                agreements: agreements
+            )
         }
     }
 }
 
-
-#Preview {
-    GenderSelectionView(nickname: "테스트")
-}
+/*#Preview {
+ GenderSelectionView(nickname: "테스트")
+ }
+ */

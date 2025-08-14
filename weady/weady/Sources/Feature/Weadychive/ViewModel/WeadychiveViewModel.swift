@@ -58,7 +58,7 @@ final class WeadychiveViewModel: ObservableObject {
 //                weatherTagId: $0 % 5
 //            )
 //        }
-//        
+//
      
     }
     
@@ -117,7 +117,19 @@ final class WeadychiveViewModel: ObservableObject {
         }
     }
     
-  
+    /// 큐레이션 스크랩 추가
+    func postCurationScrap(curationId: Int) {
+        let dto = ScrapCurationRequestDto(curationId: curationId)
+        service.postScrapCuration(dto: dto) { result in
+            switch result {
+            case .success(let response):
+                print("✅ 큐레이션 스크랩 추가 성공: \(response.isScraped)")
+                self.fetchScrappedCurations()
+            case .failure(let error):
+                print("!!!큐레이션 추가됌요!!!")
+            }
+        }
+    }
     
     /// 큐레이션 스크랩 삭제
     func removeCurationScrap(curationId: Int) {
@@ -128,7 +140,7 @@ final class WeadychiveViewModel: ObservableObject {
                 print("✅ 큐레이션 스크랩 삭제 성공: \(response.isScraped)")
                 self.fetchScrappedCurations()
             case .failure(let error):
-                print("❌ 큐레이션 스크랩 삭제 실패: \(error)")
+                print("!!!큐레이션 삭제됌요!!!")
             }
         }
     }

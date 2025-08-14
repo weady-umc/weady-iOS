@@ -31,8 +31,15 @@ struct DeleteView: View {
         case .weadyboard: return "취소할 항목"
         }
     }
-
-
+    
+    private var itemHeight: CGFloat {
+        switch type {
+        case .curation:
+            return 300
+        case .weadyboard:
+            return 160
+        }
+    }
 
     var columns: [GridItem] {
         switch type {
@@ -118,27 +125,35 @@ struct DeleteView: View {
             Group {
                 if item.imageUrl.isEmpty {
                     Color.gray.opacity(0.2)
-                        .aspectRatio(1, contentMode: .fill)
+                        .frame(height: itemHeight)
+                        .clipped()
                 } else if item.imageUrl.hasPrefix("http"), let url = URL(string: item.imageUrl) {
                     AsyncImage(url: url) { image in
-                        image.resizable()
-                            .aspectRatio(1, contentMode: .fill)   // ✅ 정사각형 셀
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: itemHeight)
+                            .clipped()
                     } placeholder: {
                         Color.gray.opacity(0.3)
-                            .aspectRatio(1, contentMode: .fill)
+                            .frame(height: itemHeight)
+                            .clipped()
                     }
                 } else {
                     Image(item.imageUrl)
                         .resizable()
-                        .aspectRatio(1, contentMode: .fill)
+                        .scaledToFill()
+                        .frame(height: itemHeight)
+                        .clipped()
                 }
             }
-            .clipped()
         }
+        .contentShape(Rectangle())
         .buttonStyle(.plain)
         // 선택 시 dim 처리
         .overlay(
-            selectedItems.contains(item.id) ? Color.black.opacity(0.35) : Color.clear
+            (selectedItems.contains(item.id) ? Color.black.opacity(0.35) : Color.clear)
+                .allowsHitTesting(false)
         )
         // 체크마크는 항상 맨 위에 고정
         .overlay(alignment: .topTrailing) {
@@ -150,6 +165,7 @@ struct DeleteView: View {
                 .background(Circle().fill(Color.black.opacity(0.6)))
                 .padding(6)
                 .zIndex(1)
+                .allowsHitTesting(false)
         }
     }
 }
