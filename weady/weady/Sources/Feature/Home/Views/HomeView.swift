@@ -112,7 +112,7 @@ struct HomeView: View {
         .onAppear {
             // 토큰 세팅
             UserDefaults.standard.set(
-                "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MTgzMDczfQ.FA0WXJieO-2cQsi-I8ig-7PSMfubAmn0gUUfZmjo_CQaspP9bvhhAUTEEzrxHvTGTL7mMf5ZJWYKwSxaDlxgUQ",
+                "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MTg5NTM1fQ.KV1y4_XRyx2BhI3C0zzvZAYSyYcdy_XzxT3VVkcUjE-ql-6wWNzYtWqNtjSRjQ9QKs-FImkyt2G6WX483El9Qw",
                 forKey: "accessToken"
                 
                 
