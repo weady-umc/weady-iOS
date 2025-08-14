@@ -272,5 +272,7 @@ struct rainWind :View {
         selectedPlace: .constant(dummyPlace),
         weather: ShortWeatherData.example
     )
+
     .environment(HomeRouter())
+
 }

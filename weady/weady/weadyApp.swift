@@ -14,6 +14,10 @@ import GoogleSignInSwift
 
 @main
 struct weadyApp: App {
+    @StateObject private var router = NavigationRouter()
+    @State private var tabController = AppTabController()
+    @State private var weadyboardBridge = WeadyboardRouteBridge()
+    @StateObject private var toastCenter = ToastCenter.shared
     
     init() {
         let kakaoNativeAppKey = (Bundle.main.infoDictionary?["KAKAO_NATIVE_APP_KEY"] as? String) ?? ""
@@ -22,13 +26,20 @@ struct weadyApp: App {
 
     var body: some Scene {
         WindowGroup {
+
             AppRootView()
+                .environment(router)
+                .environmentObject(router)
+                .environment(tabController)
+                .environment(weadyboardBridge)
+                .environmentObject(toastCenter)
                 .onOpenURL { url in
                     if AuthApi.isKakaoTalkLoginUrl(url) {
                         _ = AuthController.handleOpenUrl(url: url)
                     } else if GIDSignIn.sharedInstance.handle(url) {
                     }
                 }
+
         }
     }
 }

@@ -10,72 +10,88 @@ import Foundation
 @MainActor
 final class WeadyboardPostViewModel: ObservableObject {
     @Published var post: BoardDetailResponseDTO?
-    @Published var isLoading = false
+    @Published var likeCount: Int = 0
+    @Published var isLiked: Bool = false
+    @Published var isLoading: Bool = false
     @Published var errorMessage: String?
 
-    func fetchPostDetail(boardId: Int) {
+    let boardId: Int
+    private let boardService = BoardService()
+
+    init(boardId: Int) {
+        self.boardId = boardId
+    }
+
+    // 상세 조회
+    func fetchPostDetail() {
         isLoading = true
-        BoardService().fetchBoardDetail(boardId: boardId) { [weak self] result in
+        boardService.fetchBoardDetail(boardId: boardId) { [weak self] result in
             DispatchQueue.main.async {
-                self?.isLoading = false
+                guard let self else { return }
+                self.isLoading = false
                 switch result {
-                case .success(let response):
-                    self?.post = response
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
+                case .success(let dto):
+                    self.post = dto
+                    self.isLiked = dto.goodStatus
+                    self.likeCount = dto.goodCount
+                case .failure(let err):
+                    self.errorMessage = err.localizedDescription
                 }
             }
         }
     }
 
-    func likeBoard(boardId: Int) {
-        BoardService().likeBoard(boardId: boardId) { [weak self] result in
+    // 좋아요 토글 (좋아요 / 취소)
+    func toggleLike() {
+        let call = isLiked ? boardService.unlikeBoard : boardService.likeBoard
+        call(boardId) { [weak self] result in
             DispatchQueue.main.async {
+                guard let self else { return }
                 switch result {
-                case .success(let response):
-                    self?.post?.goodStatus = response.goodStatus
-                    self?.post?.goodCount = response.goodCount
-                case .failure:
-                    break
+                case .success(let res):
+                    // 모델의 let 프로퍼티는 수정할 수 없으므로 ViewModel 상태만 갱신
+                    self.isLiked = res.goodStatus
+                    self.likeCount = res.goodCount
+                    // 화면에서 post.goodStatus / post.goodCount를 참고한다면 재조회로 동기화
+                    self.fetchPostDetail()
+                case .failure(let err):
+                    self.errorMessage = err.localizedDescription
                 }
             }
         }
     }
 
-    func unlikeBoard(boardId: Int) {
-        BoardService().unlikeBoard(boardId: boardId) { [weak self] result in
+    // 게시글 좋아요
+    func likeBoard() {
+        boardService.likeBoard(boardId: boardId) { [weak self] result in
             DispatchQueue.main.async {
+                guard let self else { return }
                 switch result {
-                case .success(let response):
-                    self?.post?.goodStatus = response.goodStatus
-                    self?.post?.goodCount = response.goodCount
-                case .failure:
-                    break
+                case .success(let res):
+                    self.isLiked = res.goodStatus
+                    self.likeCount = res.goodCount
+                    self.fetchPostDetail()
+                case .failure(let err):
+                    self.errorMessage = err.localizedDescription
                 }
             }
         }
     }
 
-    func weatherIconName(for tagId: Int) -> String {
-        WeatherTag.iconName(for: tagId)
-    }
-
-    func weatherLabel(for tagId: Int) -> String {
-        WeatherTag.label(for: tagId)
-    }
-
-    func temperatureText(for tagId: Int) -> String {
-        switch tagId {
-        case 0: return "-6℃"
-        case 1: return "-5℃ ~ 5℃"
-        case 2: return "6℃ ~ 11℃"
-        case 3: return "12℃ ~ 16℃"
-        case 4: return "17℃ ~ 22℃"
-        case 5: return "23℃ ~ 26℃"
-        case 6: return "27℃ ~ 30℃"
-        default: return "31℃"
+    // 게시글 좋아요 취소
+    func unlikeBoard() {
+        boardService.unlikeBoard(boardId: boardId) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success(let res):
+                    self.isLiked = res.goodStatus
+                    self.likeCount = res.goodCount
+                    self.fetchPostDetail()
+                case .failure(let err):
+                    self.errorMessage = err.localizedDescription
+                }
+            }
         }
     }
 }
-
-

@@ -59,7 +59,7 @@ extension BoardEndpoints: TargetType {
             if let season = seasonTagId { params["seasonTagId"] = season }
             if let weather = weatherTagId { params["weatherTagId"] = weather }
             if let temp = temperatureTagId { params["temperatureTagId"] = temp }
-            return .requestParameters(parameters: params, encoding: URLEncoding.default)
+            return .requestParameters(parameters: params, encoding: URLEncoding.queryString)
 
         case .createBoard(let data):
             return .requestJSONEncodable(data)

@@ -19,8 +19,10 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>kakao245c6d9d009eb8b61911baf64cc9471a</string>
+
 				<string>com.googleusercontent.apps.159172544578-mlv2svh221fn33n3hj6uthk7jo40840e</string>
 				<string>159172544578-mlv2svh221fn33n3hj6uthk7jo40840e</string>
+
 			</array>
 		</dict>
 	</array>

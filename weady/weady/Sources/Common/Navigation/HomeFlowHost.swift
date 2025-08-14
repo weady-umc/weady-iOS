@@ -15,9 +15,14 @@ enum HomeRoute: Hashable {
     case weatheradd(AddressDocument, ShortWeatherData)
     case weathersearch
     case weatherlocation
+
     case weatherhome(WeatherData)
     //case clothes
     //case place
+
+    case curationdetail(curationId: Int64)
+    case curation
+
 }
 
 // MARK: - HomeRouter
@@ -42,8 +47,10 @@ struct HomeFlowHost: View {
 
     // MARK: Body
     var body: some View {
+        @Bindable var router = router
         NavigationStack(path: $router.path) {
             HomeView()
+            
                 .navigationDestination(for: HomeRoute.self) { route in
                     switch route {
                     case .home:
@@ -65,14 +72,21 @@ struct HomeFlowHost: View {
                         WeatherSearchView(selectedPlace: .constant(nil))
                     case .weatherlocation:
                         WeatherLocationView()
+
                     //case .place:
                         //CurationView()
                     //case .clothes:
                         //ClothingRecommendationView()
+
+                    case .curationdetail(let curationId):
+                        DetailCurationView(curationId: curationId)
+                    case .curation:
+                        CurationView()
+
                     }
                 }
         }
-        // 필요 시 하위 뷰에서 @Environment(HomeRouter.self)로 직접 push/pop 가능
+//         필요 시 하위 뷰에서 @Environment(HomeRouter.self)로 직접 push/pop 가능
         .environment(router)
     }
 }

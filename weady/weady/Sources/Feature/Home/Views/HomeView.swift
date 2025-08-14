@@ -21,6 +21,7 @@ struct HomeView: View {
     @State private var fashionError: String?
     
     var body: some View {
+
         VStack {
             
             
@@ -121,7 +122,7 @@ struct HomeView: View {
             
             
         }
-        
+
     }
     
     
