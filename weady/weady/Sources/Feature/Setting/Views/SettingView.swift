@@ -12,10 +12,13 @@ struct SettingView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        NavigationView {
+        ZStack {
             VStack(alignment: .leading, spacing: 30) {
                 ForEach(viewModel.sections) { section in
-                    SettingSectionView(section: section)
+                    SettingSectionView(
+                        section: section,
+                        onLogout: { viewModel.requestLogout() }
+                    )
                 }
             }
             .padding(.bottom, 200)
@@ -33,13 +36,34 @@ struct SettingView: View {
                     }
                 }
             }
+            
+            if viewModel.isLoggingOut {
+                ProgressView("로그아웃 중...")
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
+                    .background(Color.black.opacity(0.08))
+                    .cornerRadius(12)
+            }
+        }
+        .onChange(of: viewModel.didLogout) { _, newValue in
+            guard newValue else { return }
+            // TODO: - 일단 로그아웃 시 바로 전 화면으로 전환되도록 설정. 추후 초기화면으로 연결 필요
+            dismiss()
+        }
+        .alert("알림", isPresented: .constant(viewModel.logoutErrorMessage != nil)) {
+            Button("확인", role: .cancel) { viewModel.logoutErrorMessage = nil }
+        } message: {
+            Text(viewModel.logoutErrorMessage ?? "")
         }
     }
 }
 
 struct SettingSectionView: View {
     let section: SettingSection
-
+    
+    var onLogout: () -> Void = {}
+    var onWithdraw: () -> Void = {}
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(section.header)
@@ -51,17 +75,36 @@ struct SettingSectionView: View {
             
             ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                 VStack(spacing: 0) {
-                    Group {
-                        if let destination = item.destination {
-                            NavigationLink(destination: destination) {
-                                SettingRow(title: item.title, rightText: item.rightText, showsChevron: item.showsChevron)
-                            }
-                        } else {
+                    if let destination = item.destination {
+                        NavigationLink(destination: destination) {
                             SettingRow(title: item.title, rightText: item.rightText, showsChevron: item.showsChevron)
                         }
+                        .padding(.horizontal, 20)
+                    } else if item.title == "로그아웃" {
+                        Button {
+                            onLogout()
+                        } label: {
+                            SettingRow(title: item.title, rightText: item.rightText, showsChevron: item.showsChevron)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 20)
+                        .accessibilityLabel("로그아웃")
+                    } else if item.title == "회원탈퇴" {
+                        Button {
+                            onWithdraw()
+                        } label: {
+                            SettingRow(title: item.title, rightText: item.rightText, showsChevron: item.showsChevron)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 20)
+                        .accessibilityLabel("회원탈퇴")
+                    } else {
+                        SettingRow(title: item.title, rightText: item.rightText, showsChevron: item.showsChevron)
+                            .padding(.horizontal, 20)
                     }
-                    .padding(.horizontal, 20)
-
+                    
                     if item.showDivider && index < items.count {
                         Divider()
                             .padding(.horizontal, 20)
@@ -105,7 +148,5 @@ struct SettingRow: View {
 
 
 #Preview {
-    NavigationView {
-        SettingView()
-    }
+    SettingView()
 }
