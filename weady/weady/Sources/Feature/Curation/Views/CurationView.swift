@@ -9,31 +9,32 @@ struct CurationView: View {
 
     var body: some View {
 
+        ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 // 1) 상단 텍스트: [가변] + [고정]
                 HeaderView(leading: vm.headerText.leading,
-                           trailing: vm.headerText.trailing)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
+                           trailing: vm.headerText.trailing,
+                           accent: vm.accentColor)
+                    .padding(.leading, 16)
 
                 // 상태/에러 안내 배너 (404, 500 등)
                 if let msg = vm.noticeText, !msg.isEmpty {
                     Text(msg)
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.secondary)
-                        .padding(.horizontal, 16)
                 }
 
                 // 2) 장소 원형 칩 스크롤
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ForEach(vm.tags) { tag in
-                            TagChip(tag: tag, isSelected: tag.id == vm.selectedTag.id && tag.kind == vm.selectedTag.kind)
+                            TagChip(tag: tag, isSelected: tag.id == vm.selectedTag.id && tag.kind == vm.selectedTag.kind, accent: vm.accentColor)
                                 .onTapGesture {
                                     Task { await vm.select(tag: tag) }
                                 }
                         }
                     }
+                    .padding(.vertical, 8)
                     .padding(.horizontal, 16)
                 }
 
@@ -45,26 +46,26 @@ struct CurationView: View {
                         Text(vm.noticeText?.isEmpty == false ? (vm.noticeText ?? "") : "")
                             .font(.system(size: 15, weight: .regular))
                             .foregroundStyle(.secondary)
-                            .padding(.horizontal, 16)
                         // noticeText가 비어있다면 공간만 유지 (필요 시 스켈레톤 등 교체 가능)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
-                    ScrollView {
-                        VStack(spacing: 12) {
-                            ForEach(vm.cards) { card in
-                                NavigationLink(value: HomeRoute.curationdetail(curationId: Int64(card.id))) {
-                                    CardRow(title: card.title, imageURL: card.thumbnailURL)
-                                }
-                                .buttonStyle(.plain)
-                                .padding(.horizontal, 16)
+                    VStack(spacing: 16) {
+                        ForEach(vm.cards) { card in
+                            NavigationLink(value: HomeRoute.curationdetail(curationId: Int64(card.id))) {
+                                CardRow(title: card.title, imageURL: card.thumbnailURL)
                             }
+                            .buttonStyle(.plain)
+                            .padding(.top, 2)
+                            .padding(.horizontal, 16)
                         }
-                        .padding(.top, 8)
                     }
+                    .padding(.top, 8)
                 }
             }
-        
+            .padding(.horizontal, 16)
+            .padding(.top, 20)
+        }
         .task { await vm.boot() }
     }
 }
@@ -73,19 +74,20 @@ struct CurationView: View {
 private struct HeaderView: View {
     let leading: String
     let trailing: String
+    let accent: Color
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 0) {
                 Text(leading)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(Color(red: 1.0, green: 0.45, blue: 0.6)) // Figma의 포인트색 유사
+                    .fontName(.headingBold20)
+                    .foregroundColor(accent) // Figma의 포인트색 유사
                 Text("에는")
-                    .font(.system(size: 20, weight: .bold))
+                    .fontName(.headingBold20)
                     .foregroundColor(.primary)
             }
             Text(trailing)
-                .font(.system(size: 20, weight: .bold))
+                .fontName(.headingBold20)
         }
     }
 }
@@ -94,6 +96,7 @@ private struct HeaderView: View {
 private struct TagChip: View {
     let tag: LocationTag
     let isSelected: Bool
+    let accent: Color
 
     var body: some View {
         let words = tag.name.split(separator: " ").map(String.init)
@@ -110,10 +113,11 @@ private struct TagChip: View {
             }
         }
         .frame(width: 63, height: 63)
+        .contentShape(Circle())
         .background(
             ZStack {
                 Circle().fill(Color.white)
-                Circle().stroke(isSelected ? Color.yellow : Color.black.opacity(0.85), lineWidth: 1.5)
+                Circle().stroke(isSelected ? accent : Color.black.opacity(0.85), lineWidth: 1.5)
             }
         )
         .frame(width: 63, height: 63)
@@ -133,18 +137,20 @@ private struct CardRow: View {
             } placeholder: {
                 Color.gray.opacity(0.2)
             }
-            .frame(height: 160)
-            .frame(maxWidth: .infinity)
+            .frame(width: 335, height: 100)
             .clipped()
+            .frame(maxWidth: .infinity, alignment: .center)
             .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay(
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.black.opacity(0.0), Color.black.opacity(0.35)]),
+                    startPoint: .center,
+                    endPoint: .bottom
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            )
 
-            // 타이틀 오버레이 (가독성 높이기 위해 살짝 그림자)
-//            Text(title)
-//                .font(.system(size: 20, weight: .bold))
-//                .foregroundColor(.white)
-//                .shadow(radius: 2)
-//                .padding(.horizontal, 12)
-//                .padding(.vertical, 10)
+          
         }
     }
 }

@@ -64,24 +64,24 @@ extension CurationEndpoints: TargetType {
         return .requestPlain
     }
 
-    var headers: [String: String]? {
-        let keychain = KeychainSwift()
-        if let token = keychain.get("serverAccessToken") {
-            return [
-                "Authorization": "Bearer \(token)",
-                "Content-Type": "application/json"
-            ]
-        } else {
-            return [
-                "Content-Type": "application/json"
-            ]
-        }
-    }
 //    var headers: [String: String]? {
-//        return [
-//            "Content-Type": "application/json",
-//            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTExNDE3Mn0.NVYHVLQWrA2cHxNF-5x-rSDBGEt2vD2oaoX4vVF1-75ojpJN48NSwkeqtJ6zyCjliJv60-FhR4fi9Gxv9hjSpA"
-//        ]
+//        let keychain = KeychainSwift()
+//        if let token = keychain.get("serverAccessToken") {
+//            return [
+//                "Authorization": "Bearer \(token)",
+//                "Content-Type": "application/json"
+//            ]
+//        } else {
+//            return [
+//                "Content-Type": "application/json"
+//            ]
+//        }
 //    }
+    var headers: [String: String]? {
+        return [
+            "Content-Type": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTE0NjU2OH0.qbnAAVfrXPFpEPJmmbGmaAx0xnSNoe9-Wb2zFH_RG3istrHBU3rBrr24stJyWp0ZUFWS8WbtZ68Nh1Z5eKGuwA"
+        ]
+    }
     
 }

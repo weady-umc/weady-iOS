@@ -198,3 +198,11 @@ final class CurationViewModel: ObservableObject {
         }
     }
 }
+
+
+
+//// MARK: - View-facing derived properties
+//extension CurationViewModel {
+//    /// (계절+날씨) 기반 컬러칩 최종 색상. View는 이 값을 그대로 사용합니다.
+//    var accentColor: Color { feed.tone.color }
+//}

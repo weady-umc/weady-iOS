@@ -111,7 +111,7 @@ struct WeatherHeaderText: Equatable {
     /// ex) "맑고 따듯한 봄날"
     let leading: String
     /// 고정 텍스트
-    let trailing: String = "에는 이런 코스들을 추천해드려요"
+    let trailing: String = "이런 코스들을 추천해드려요"
 }
 
 enum WeatherPhrase {
@@ -144,7 +144,7 @@ enum WeatherPhrase {
         case(.winter, .snowy):           return "눈 내리는 겨울날"
 
         default:
-            return "오늘의 날씨"
+            return "오늘같이 덥고 습한 여름 날"
         }
     }
 }
@@ -240,7 +240,7 @@ enum CurationMapper {
 
 // MARK: - View seeds (초기값/플레이스홀더)
 extension WeatherHeaderText {
-    static let placeholder = WeatherHeaderText(leading: "오늘의 날씨")
+    static let placeholder = WeatherHeaderText(leading: "오늘같이 덥고 습한 여름날")
 }
 
 extension CurationFeed {
