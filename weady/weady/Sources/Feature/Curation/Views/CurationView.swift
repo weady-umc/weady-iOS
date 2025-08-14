@@ -10,7 +10,7 @@ struct CurationView: View {
     var body: some View {
 
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 10) {
                 // 1) 상단 텍스트: [가변] + [고정]
                 HeaderView(leading: vm.headerText.leading,
                            trailing: vm.headerText.trailing,
@@ -34,7 +34,7 @@ struct CurationView: View {
                                 }
                         }
                     }
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 4)
                     .padding(.horizontal, 16)
                 }
 
@@ -50,21 +50,20 @@ struct CurationView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
-                    VStack(spacing: 16) {
+                    VStack(spacing: 10) {
                         ForEach(vm.cards) { card in
-                            NavigationLink(value: HomeRoute.curationdetail(curationId: Int64(card.id))) {
+                            // NavigationLink(value: HomeRoute.curationdetail(curationId: Int64(card.id))) {
                                 CardRow(title: card.title, imageURL: card.thumbnailURL)
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.top, 2)
+                            // }
+                            // .buttonStyle(.plain)
                             .padding(.horizontal, 16)
                         }
                     }
                     .padding(.top, 8)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 20)
+            .padding(.leading, 12)
+            .padding(.trailing, 12)
         }
         .task { await vm.boot() }
     }
@@ -117,7 +116,7 @@ private struct TagChip: View {
         .background(
             ZStack {
                 Circle().fill(Color.white)
-                Circle().stroke(isSelected ? accent : Color.black.opacity(0.85), lineWidth: 1.5)
+                Circle().stroke(isSelected ? accent : Color.black.opacity(0.85), lineWidth: 5)
             }
         )
         .frame(width: 63, height: 63)
@@ -131,39 +130,24 @@ private struct CardRow: View {
     let imageURL: URL?
 
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            AsyncImage(url: imageURL) { image in
-                image.resizable().scaledToFill()
-            } placeholder: {
-                Color.gray.opacity(0.2)
+        AsyncImage(url: imageURL) { phase in
+            switch phase {
+            case .success(let image):
+                image
+                    .renderingMode(.original)
+                    .resizable()
+                    .scaledToFill()
+            default:
+                Color.clear
             }
-            .frame(width: 335, height: 100)
-            .clipped()
-            .frame(maxWidth: .infinity, alignment: .center)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-            .overlay(
-                LinearGradient(
-                    gradient: Gradient(colors: [Color.black.opacity(0.0), Color.black.opacity(0.35)]),
-                    startPoint: .center,
-                    endPoint: .bottom
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-            )
-
-          
         }
+        .frame(width: 350, height: 100)
+        .clipped()
+        .frame(maxWidth: .infinity, alignment: .center)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
 #Preview("CurationView") {
     CurationView()
 }
-//#Preview("CurationView (API 연결)") {
-//    let keychain = KeychainSwift()
-//    keychain.set(
-//        "ya29.a0AS3H6NwWuWOm7AtByjlVNDyCNwE4tusCy-PHpYGn-qFjVUEz0L1L7U_3QejN-dQHDjFmjNKVAEvwOLSYtUar6hco89BfTz_ku11CU-bLVnHvnTCO17YrGTB79C3zi7DDV5EgvhR2mYKiCfvIB_B0Do8iekjGjwpf7y0k5V4ZaCgYKAZwSARMSFQHGX2MiCtU2hKNQdSPbJ6c77SsMRg0175",
-//        forKey: "accessToken"
-//    )
-//
-//    return CurationView()
-//}
