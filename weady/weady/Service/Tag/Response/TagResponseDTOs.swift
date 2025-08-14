@@ -31,7 +31,7 @@ struct SeasonTagResponseDTO: Identifiable, Decodable, Equatable {
 
 /// 의류 스타일 카테고리 객체
 struct ClothesStyleCategoryResponseDTO: Identifiable, Decodable, Equatable {
-    let id: Int       // 카테고리 ID
-    let name: String  // 카테고리 이름
+    public let id: Int64       // 카테고리 ID
+    public let name: String  // 카테고리 이름
 }
 
