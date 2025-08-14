@@ -27,6 +27,7 @@ final class WeadychiveService: NetworkManager {
     
     // MARK: - DTO 생성 함수
     
+    //큐레이션 생성
     public func makeScrapCurationDTO(curationId: Int64) -> ScrapCurationRequestDto {
         return ScrapCurationRequestDto(curationId: Int(curationId))
     }
@@ -42,12 +43,12 @@ final class WeadychiveService: NetworkManager {
         request(target: .getScrappedCurations, decodingType: ScrappedCurationByUserResponseDto.self, completion: completion)
     }
     
-    /// 큐레이션 스크랩 추가
+    //MARK: - 큐레이션 스크랩 추가 !! 얘네 큐레이션에도 쓰임
     public func postScrapCuration(dto: ScrapCurationRequestDto, completion: @escaping (Result<ScrapBoardResponseDto, NetworkError>) -> Void) {
         request(target: .postCurationScrap(curationId: dto.curationId), decodingType: ScrapBoardResponseDto.self, completion: completion)
     }
     
-    /// 큐레이션 스크랩 삭제
+    //MARK: - 큐레이션 스크랩 삭제 !! 얘네 큐레이션에서도 쓰임
     public func deleteScrapCuration(dto: ScrapCurationRequestDto, completion: @escaping (Result<ScrapBoardResponseDto, NetworkError>) -> Void) {
         request(target: .deleteCurationScrap(curationId: dto.curationId), decodingType: ScrapBoardResponseDto.self, completion: completion)
     }

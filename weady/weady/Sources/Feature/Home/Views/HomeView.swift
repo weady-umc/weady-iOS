@@ -10,29 +10,27 @@ import SwiftUI
 struct HomeView: View {
     var body: some View {
         
-        Spacer().frame(height: 105)
+//        Spacer().frame(height: 105)
+//        
+//        TopView
+//        
+//        Button{
+//            
+//        } label: {
+//            WeatherView
+//        }
+//        
+//        Button{
+//            
+//        } label: {
+//            ClothesView
+//        }
+//        
+//        Spacer().frame(height: 29)
         
-        TopView
-        
-        Button{
-            
-        } label: {
-            WeatherView
-        }
-        
-        Button{
-            
-        } label: {
-            ClothesView
-        }
-        
-        Spacer().frame(height: 29)
-        
-        Button{
-            
-        } label: {
-            PlaceView
-        }
+       
+            CurationView()
+
         
         
     }
