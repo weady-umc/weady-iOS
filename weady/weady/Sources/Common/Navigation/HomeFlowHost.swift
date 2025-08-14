@@ -16,9 +16,8 @@ enum HomeRoute: Hashable {
     case weathersearch
     case weatherlocation
 
-    case weatherhome(WeatherData)
-    //case clothes
-    //case place
+    case weatherhome
+    case clothes
 
     case curationdetail(curationId: Int64)
     case curation
@@ -55,7 +54,7 @@ struct HomeFlowHost: View {
                     switch route {
                     case .home:
                         HomeView()
-                    case .weatherhome(let weather):
+                    case .weatherhome:
                         WeatherHomeView()
                     case .weatheradd(let place, let weather):
                         WeatherLocationAddView(
@@ -73,10 +72,8 @@ struct HomeFlowHost: View {
                     case .weatherlocation:
                         WeatherLocationView()
 
-                    //case .place:
-                        //CurationView()
-                    //case .clothes:
-                        //ClothingRecommendationView()
+                    case .clothes:
+                        ClothingRecommendationView()
 
                     case .curationdetail(let curationId):
                         DetailCurationView(curationId: curationId)

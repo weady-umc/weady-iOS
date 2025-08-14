@@ -11,7 +11,6 @@ struct WeatherHomeView: View {
     @Bindable var viewModel: WeatherHomeViewModel = .init()
     private let shortData = ShortWeatherData.example
     @Environment(HomeRouter.self) var router
-    @State private var path = NavigationPath()
     @State private var fetchedShort: ShortWeatherData? = nil
 
     
@@ -19,24 +18,27 @@ struct WeatherHomeView: View {
     
     var body: some View {
         
-            VStack{
+        VStack(spacing:0){
                 SegmentView
                 
                 let base = fetchedShort ?? shortData
                 let addData = WeatherLocationAddViewModel().convertToWeatherAddData(from: base)
                 
-                weatherView(weather: addData)
-                
-                
-            }
-            .navigationDestination(for: HomeRoute.self) { route in
-                switch route {
-                case .weatherlocation:
-                    WeatherLocationView()
-                default:
-                    HomeView()
+                Group {
+                    switch viewModel.selectedSegment {
+                    case .first:   // 날씨
+                        weatherView(weather: addData)
+
+                    case .second:  // 옷차림
+                        ClothingRecommendationView()
+
+                    case .third:   // 장소
+                        CurationView()
+                    }
                 }
+                
             }
+            
             .task {
                 WeatherServices.shared.fetchShortWeather { result in
                     switch result {
@@ -57,6 +59,8 @@ struct WeatherHomeView: View {
     
     
     private func weatherView(weather: WeatherAddData) -> some View {
+        
+        
         ZStack {
             Image(weather.weatherBackground)
                 .resizable()
@@ -135,33 +139,24 @@ struct WeatherHomeView: View {
     }
     
     func sheetSegment(segment: WeatherHomeModel) -> some View {
-        VStack(spacing: 8) {
-            Text(segment.title)
-                .foregroundStyle(viewModel.selectedSegment == segment ? Color.gray100 : Color.gray800)
-                .fontName(.headingSemibold20)
-                /*.onTapGesture {
-                    if let r = segment.route {
-                        router.push(r)
-                    } else {
-                        withAnimation {
-                            viewModel.selectedSegment = segment
-                        }
-                    }
-                }*/
-                    if viewModel.selectedSegment == segment {
-                        Rectangle()
-                            .fill(Color.gray100)
-                            .frame(width: 59, height: 2)
-                            .presentationCornerRadius(1)
-                        
-                    } else {
-                        Rectangle()
-                            .fill(Color.gray800)
-                            .frame(width: 59, height: 2)
-                    }
+        Button {
+            withAnimation { viewModel.selectedSegment = segment }
+        } label: {
+            VStack(spacing: 8) {
+                Text(segment.title)
+                    .foregroundStyle(viewModel.selectedSegment == segment ? Color.gray100 : Color.gray800)
+                    .fontName(.headingSemibold20)
+                if viewModel.selectedSegment == segment {
+                    Rectangle().fill(Color.gray100).frame(width: 59, height: 2)
+                } else {
+                    Rectangle().fill(Color.gray800).frame(width: 59, height: 2)
                 }
-        
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
+
     
     struct bigRainWind :View {
         let weather: WeatherAddData
@@ -327,6 +322,11 @@ struct WeatherHomeView: View {
     }
 
     
+}
+
+#Preview {
+    WeatherHomeView()
+        .environment(HomeRouter())
 }
 
 

@@ -159,7 +159,7 @@ struct WeatherLocationView: View {
                 .allowsHitTesting(editMode?.wrappedValue != .active)
                 .contentShape(Rectangle()) // 클릭 영역 확장
                 .onTapGesture {
-                    router.push(.weatherhome(weather))
+                    router.push(.weatherhome)
                     
                 }
 

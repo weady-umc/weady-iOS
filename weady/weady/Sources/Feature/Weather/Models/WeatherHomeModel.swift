@@ -29,18 +29,18 @@ enum WeatherHomeModel: Int, CaseIterable, Identifiable {
         }
     }
     
- /*   var route: HomeRoute? {
+   var route: HomeRoute? {
         switch self {
         case .first:
             return nil
         case .second:
             return .clothes
         case .third:
-            return .place
+            return .curation
         
         }
     }
-  */
+  
 }
 
 struct WeatherData: Identifiable, Equatable, Hashable {

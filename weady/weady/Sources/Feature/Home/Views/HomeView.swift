@@ -34,7 +34,7 @@ struct HomeView: View {
             
             /// 날씨 카드 (동적 데이터 적용)
             Button {
-                router.push(.weatherlocation)
+                router.push(.weatherhome)
             } label: {
                 if let data = addData {
                     WeatherHeaderCard(data: data)
@@ -62,10 +62,10 @@ struct HomeView: View {
             
             /// 옷차림/장소 카드(그대로)
             Button {
-                
+                router.push(.clothes)
             } label: {
                 ClothesView
-                    .frame(width: 380, height: 100)
+                    .frame(width: 380, height: 120)
                     .background(RoundedRectangle(cornerRadius: 12).fill(Color.white200))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .contentShape(RoundedRectangle(cornerRadius: 12))
@@ -73,8 +73,12 @@ struct HomeView: View {
             
             Spacer().frame(height: 35)
             
-            Button { } label: { PlaceView }
+            Button {
+                router.push(.curation)
+            } label: { PlaceView }
         }
+        .padding(.bottom, 70)
+        
         .onAppear {
             locationService.requestCurrentLocation()
         }
@@ -149,6 +153,8 @@ struct HomeView: View {
                     }
                     Spacer()
                     Image("rightArrow")
+                        .padding(.trailing, 20)
+                        
                 }
                 .redacted(reason: .placeholder)
                 .background(RoundedRectangle(cornerRadius: 12).fill(Color.white200))
@@ -196,6 +202,7 @@ struct HomeView: View {
                         loadFashionSummary()
                     } label: {
                         Image("rightArrow")
+                            .padding(.trailing, 20)
                     }
                 }
                 
@@ -212,6 +219,7 @@ struct HomeView: View {
                         .padding(.leading, 25)
                     Spacer()
                     Image("rightArrow")
+                        .padding(.trailing, 20)
                 }
                 
             }
@@ -226,10 +234,13 @@ struct HomeView: View {
                     .fontName(.bodySemibold16)
                     .foregroundStyle(Color.black100)
                 
+                Spacer()
+                
                 Image("rightArrow")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 10, height: 15.62)
+                    .padding(.trailing, 20)
             }
             .padding(.leading, 25)
             
@@ -408,3 +419,4 @@ struct HomeView: View {
     HomeFlowHost()
         .environment(HomeRouter())
 }
+

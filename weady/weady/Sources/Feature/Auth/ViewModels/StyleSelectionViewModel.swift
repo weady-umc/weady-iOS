@@ -70,6 +70,7 @@ class StyleSelectionViewModel: ObservableObject {
         didTapNext = true
     }
 }
+/*
 #if DEBUG
 /// Preview／테스트용 목 서비스
 final class MockTagService: TagServiceProtocol {
@@ -101,3 +102,4 @@ final class MockTagService: TagServiceProtocol {
 }
 #endif
 
+*/

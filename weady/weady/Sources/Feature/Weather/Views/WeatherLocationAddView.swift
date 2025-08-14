@@ -25,7 +25,6 @@ struct WeatherLocationAddView: View {
         ZStack{
             if let weather = viewModel.weather {
                 Image(weather.weatherBackground)
-                //Image("weatherAdd_rainy")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 335, height: 694)
@@ -47,7 +46,9 @@ struct WeatherLocationAddView: View {
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 20, height: 20)
                         }
+                        .offset(y:-30)
                     }
+                   
                     
                     HStack{
                         Image("placeIcon")
@@ -61,17 +62,17 @@ struct WeatherLocationAddView: View {
                         
                     }
                     
-                    Spacer().frame(height: 24)
+                    Spacer().frame(height: 35)
                     
                     WeatherMainCardView(weather: weather)
                     
                     
-                    Spacer().frame(height: 45)
+                    Spacer().frame(height: 50)
                     
                     HourlyWeatherScrollView(hourlyWeatherList: weather.hourlyWeather)
-                        .padding(.horizontal,60)
+                        .padding(.horizontal,70)
                     
-                    Spacer().frame(height: 36)
+                    Spacer().frame(height: 45)
                     
                     //강수량
                     
@@ -169,7 +170,7 @@ struct WeatherLocationAddView: View {
         
         var body: some View{
             VStack{
-                Text(weather.time)
+                Text(hourLabel(weather.time))
                     .foregroundStyle(Color.white100)
                     .fontName(.metaSemibold12)
                 
@@ -186,6 +187,15 @@ struct WeatherLocationAddView: View {
                 
             }
         }
+        // MARK: - Hour label formatter
+        private func hourLabel(_ time: String) -> String {
+            // "0", "100", "2300", "23:00" 모두 처리
+            let digits = time.filter(\.isNumber)
+            guard let n = Int(digits) else { return time }
+            let hour = (n >= 100) ? (n / 100) : n   // 2300→23, 100→1, 0→0
+            return "\(hour % 24)시"
+        }
+
         
     }
     struct HourlyWeatherScrollView: View {
