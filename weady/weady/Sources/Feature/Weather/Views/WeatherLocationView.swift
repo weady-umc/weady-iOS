@@ -19,7 +19,7 @@ struct WeatherLocationView: View {
     var body: some View {
         
             ZStack(alignment: .top) {
-                Color.white.ignoresSafeArea()
+                
                 VStack{
                     
                     Spacer().frame(height: 25)
@@ -39,9 +39,8 @@ struct WeatherLocationView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden(true)
                 .onAppear {
-                    UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU0OTMzNDczfQ.F5HHR6gtGlbC0SKbJmu_hC8yRuPIKopEBPjcYRvM5Jx5zXSwA7P-2M4oD3kmflDGPhbt4_W8FIX-Ca8ElpPbkQ", forKey: "accessToken")
-                }
-                .onAppear {
+                    UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MTgzMDczfQ.FA0WXJieO-2cQsi-I8ig-7PSMfubAmn0gUUfZmjo_CQaspP9bvhhAUTEEzrxHvTGTL7mMf5ZJWYKwSxaDlxgUQ", forKey: "accessToken")
+                
                     viewModel.loadFavorites()
                 }
 
@@ -157,6 +156,7 @@ struct WeatherLocationView: View {
                     isCurrentLocation: false,
                     editMode: editMode?.wrappedValue == .active
                 )
+                .allowsHitTesting(editMode?.wrappedValue != .active)
                 .contentShape(Rectangle()) // 클릭 영역 확장
                 .onTapGesture {
                     router.push(.weatherhome(weather))

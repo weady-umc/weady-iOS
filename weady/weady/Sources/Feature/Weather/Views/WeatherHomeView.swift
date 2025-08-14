@@ -12,6 +12,8 @@ struct WeatherHomeView: View {
     private let shortData = ShortWeatherData.example
     @Environment(HomeRouter.self) var router
     @State private var path = NavigationPath()
+    @State private var fetchedShort: ShortWeatherData? = nil
+
     
     
     
@@ -20,8 +22,8 @@ struct WeatherHomeView: View {
             VStack{
                 SegmentView
                 
-                
-                let addData = WeatherLocationAddViewModel().convertToWeatherAddData(from: shortData)
+                let base = fetchedShort ?? shortData
+                let addData = WeatherLocationAddViewModel().convertToWeatherAddData(from: base)
                 
                 weatherView(weather: addData)
                 
@@ -34,6 +36,19 @@ struct WeatherHomeView: View {
                 default:
                     HomeView()
                 }
+            }
+            .task {
+                WeatherServices.shared.fetchShortWeather { result in
+                    switch result {
+                    case .success(let data):
+                        self.fetchedShort = data
+                    case .failure(let err):
+                        print("❌ Short API 실패:", err)
+                    }
+                }
+            }
+            .onAppear {
+                UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MTgzMDczfQ.FA0WXJieO-2cQsi-I8ig-7PSMfubAmn0gUUfZmjo_CQaspP9bvhhAUTEEzrxHvTGTL7mMf5ZJWYKwSxaDlxgUQ", forKey: "accessToken")
             }
             
         }
@@ -85,6 +100,21 @@ struct WeatherHomeView: View {
                 Spacer().frame(height: 40)
                 
                 MidTermSectionView(items: viewModel.midTermForecasts)
+                    .overlay {                               // 로딩/에러 표시
+                        if viewModel.isLoadingMid {
+                            ProgressView()
+                        } else if let msg = viewModel.midError {
+                            Text("중기예보 로드 실패: \(msg)")
+                                .font(.caption).foregroundStyle(.red)
+                        }
+                    }
+                    .task {                                   // 화면 보일 때 로드 보장
+                        if viewModel.midTermForecasts.isEmpty {
+                            viewModel.loadMidTerm()
+                        }
+                    }
+
+
             }
         }
         .onAppear {
@@ -109,7 +139,7 @@ struct WeatherHomeView: View {
             Text(segment.title)
                 .foregroundStyle(viewModel.selectedSegment == segment ? Color.gray100 : Color.gray800)
                 .fontName(.headingSemibold20)
-                .onTapGesture {
+                /*.onTapGesture {
                     if let r = segment.route {
                         router.push(r)
                     } else {
@@ -117,7 +147,7 @@ struct WeatherHomeView: View {
                             viewModel.selectedSegment = segment
                         }
                     }
-                }
+                }*/
                     if viewModel.selectedSegment == segment {
                         Rectangle()
                             .fill(Color.gray100)
@@ -301,7 +331,7 @@ struct WeatherHomeView: View {
 
 
 #Preview {
-    WeatherHomeView()
+    HomeFlowHost()
         .environment(HomeRouter())
 }
 

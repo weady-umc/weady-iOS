@@ -16,8 +16,8 @@ enum HomeRoute: Hashable {
     case weathersearch
     case weatherlocation
     case weatherhome(WeatherData)
-    case clothes
-    case place
+    //case clothes
+    //case place
 }
 
 // MARK: - HomeRouter
@@ -65,9 +65,9 @@ struct HomeFlowHost: View {
                         WeatherSearchView(selectedPlace: .constant(nil))
                     case .weatherlocation:
                         WeatherLocationView()
-                    case .place:
+                    //case .place:
                         //CurationView()
-                    case .clothes:
+                    //case .clothes:
                         //ClothingRecommendationView()
                     }
                 }

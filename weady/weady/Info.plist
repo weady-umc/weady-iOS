@@ -2,7 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -17,40 +16,29 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>None</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kakao245c6d9d009eb8b61911baf64cc9471a</string>
+				<string>com.googleusercontent.apps.159172544578-mlv2svh221fn33n3hj6uthk7jo40840e</string>
+				<string>159172544578-mlv2svh221fn33n3hj6uthk7jo40840e</string>
+			</array>
 		</dict>
 	</array>
 	<key>Config</key>
 	<string></string>
-	<key>KAKAO_REST_API_KEY</key>
-	<string>$(KAKAO_REST_API_KEY)</string>
-
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>kakao245c6d9d009eb8b61911baf64cc9471a</string>
-
-				<string>com.googleusercontent.apps.159172544578-mlv2svh221fn33n3hj6uthk7jo40840e</string>
-				<string>159172544578-mlv2svh221fn33n3hj6uthk7jo40840e</string>
-
-			</array>
-		</dict>
-	</array>
 	<key>GIDClientID</key>
 	<string>159172544578-mlv2svh221fn33n3hj6uthk7jo40840e.apps.googleusercontent.com</string>
 	<key>KAKAO_APP_KEY</key>
 	<string>245c6d9d009eb8b61911baf64cc9471a</string>
 	<key>KAKAO_NATIVE_APP_KEY</key>
 	<string>245c6d9d009eb8b61911baf64cc9471a</string>
+	<key>KAKAO_REST_API_KEY</key>
+	<string>$(KAKAO_REST_API_KEY)</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>kakaokompassauth</string>
 		<string>kakaolink</string>
 	</array>
-
 	<key>UIAppFonts</key>
 	<array>
 		<string>Pretendard-Bold.otf</string>

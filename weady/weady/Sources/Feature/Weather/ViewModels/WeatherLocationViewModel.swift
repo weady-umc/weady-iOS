@@ -20,7 +20,7 @@ class WeatherLocationViewModel: ObservableObject {
         temperature: "17",
         highTemperature: "25",
         lowTemperature: "12",
-        backgroundImage: "weather_cloudy"
+        backgroundImage: "home_cloudy"
     )
     
     @Published var favoriteLocations: [WeatherData] = [
@@ -50,10 +50,10 @@ class WeatherLocationViewModel: ObservableObject {
         /// 날씨 상태 → 배경 이미지 매핑 함수
         private func mapSkyStatusToImage(_ skyStatus: String) -> String {
             switch skyStatus.uppercased() {
-            case "CLEAR": return "weather_sunny"
-            case "CLOUDY": return "weather_cloudy"
-            case "RAINY": return "weather_rainy"
-            default: return "weather_default"
+            case "CLEAR": return "home_sunny"
+            case "CLOUDY", "PARTLY_CLOUDY": return "home_cloudy"
+            case "RAINY": return "home_rainy"
+            default: return "home_default"
             }
         }
 }
@@ -63,11 +63,17 @@ extension WeatherLocationViewModel {
 
     /// 서버에서 즐겨찾기 목록 조회 → 화면용 WeatherData로 매핑
     func loadFavorites() {
+        
         UserFavoriteLocationServices().fetchFavoriteLocations { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let list):
-                self.favoriteLocations = list.map { dto in
+                print("📥 server count:", list.count)
+                let ids = list.compactMap { $0.favoriteId }
+                print("🆔 unique id count:", Set(ids).count)
+                print("🔁 dups:", Dictionary(grouping: ids, by: { $0 }).filter { $1.count > 1 }.keys)
+
+                let mapped = list.map { dto in
                     WeatherData(
                         favoriteId: dto.favoriteId,
                         location: [dto.locationAddress1,
@@ -83,7 +89,19 @@ extension WeatherLocationViewModel {
                         backgroundImage: self.mapSkyStatusToImage("CLOUDY")
                     )
                 }
-            case .failure(let err):
+                // ✅ favoriteId 기준 중복 제거
+                    var seen = Set<Int>()
+                    let deduped = mapped.filter { data in
+                        if let id = data.favoriteId {
+                            return seen.insert(id).inserted
+                        }
+                        return true // id 없는 경우는 그냥 통과
+                    }
+                            
+                            DispatchQueue.main.async {
+                                self.favoriteLocations = deduped
+                            }
+                case .failure(let err):
                 print("⭐️ 즐겨찾기 조회 실패:", err)
             }
         }
@@ -94,7 +112,10 @@ extension WeatherLocationViewModel {
         UserFavoriteLocationServices().addFavoriteLocation(bCode: bCode) { result in
             switch result {
             case .success:
-                completion(true)
+                DispatchQueue.main.async {
+                    self.loadFavorites()   
+                        completion(true)
+                }
             case .failure(let err):
                 print("⭐️ 즐겨찾기 추가 실패:", err)
                 completion(false)

@@ -29,7 +29,7 @@ enum WeatherHomeModel: Int, CaseIterable, Identifiable {
         }
     }
     
-    var route: HomeRoute? {
+ /*   var route: HomeRoute? {
         switch self {
         case .first:
             return nil
@@ -40,6 +40,7 @@ enum WeatherHomeModel: Int, CaseIterable, Identifiable {
         
         }
     }
+  */
 }
 
 struct WeatherData: Identifiable, Equatable, Hashable {
@@ -56,6 +57,7 @@ struct WeatherAddData {
     var id = UUID()
     var favoriteId: Int?
     var weatherBackground: String
+    var homeBackground: String
     var place: String
     var temperature: Int
     var weatherIcon: String
@@ -71,6 +73,7 @@ struct WeatherAddData {
 
 let example = WeatherAddData(
         weatherBackground: "weather_sunny",
+        homeBackground: "home_sunny",
         place: "서울특별시 강남구",
         temperature: 25,
         weatherIcon: "sun.max",

@@ -13,6 +13,7 @@ enum WeatherEndpoints {
     case getShortWeather
     case getMidTermWeather
     case getPreview(bCode: String, x: Double, y: Double)
+    case updateNowLocation(longitude: Double, latitude: Double)
 }
 
 extension WeatherEndpoints: TargetType {
@@ -27,11 +28,13 @@ extension WeatherEndpoints: TargetType {
     var path: String {
         switch self{
         case . getShortWeather:
-            return "/weather/short/"
+            return "/api/v1/weather/short"
         case .getMidTermWeather:
-            return "/weather/mid-term/"
+            return "/api/v1/weather/mid-term"
         case .getPreview:
             return "/api/v1/weather/preview"
+        case .updateNowLocation:
+            return "/api/v1/users/now-location"
         }
     }
     
@@ -39,7 +42,8 @@ extension WeatherEndpoints: TargetType {
         switch self {
         case .getShortWeather, .getMidTermWeather, .getPreview:
             return .get
-
+        case .updateNowLocation:
+            return .patch
         }
     }
     
@@ -54,6 +58,11 @@ extension WeatherEndpoints: TargetType {
                 "y": y
             ]
             return .requestParameters(parameters: query, encoding: URLEncoding.default)
+        case let .updateNowLocation(longitude, latitude):
+            return .requestParameters(
+                parameters: ["longitude": longitude, "latitude": latitude],
+                encoding: JSONEncoding.default
+            )
                 
         }
         
