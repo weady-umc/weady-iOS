@@ -26,6 +26,8 @@ struct HomeView: View {
     @State private var didSendNowLocation = false
     @State private var didPatchNowLocation = false
     
+    @StateObject private var curationVM = CurationViewModel()
+    
     var body: some View {
 
         VStack {
@@ -86,9 +88,11 @@ struct HomeView: View {
             Spacer().frame(height: 35)
             
             // MARK: - [네비 버튼] 큐레이션 카드 (누르면 .curation 로 이동)
-            Button {
+            // [네비] 큐레이션 가로 섹션 (어디 눌러도 .curation 이동)
+            CurationStripView(vm: curationVM)
+            {
                 router.push(.curation)
-            } label: { PlaceView }
+            }
         }
         .padding(.bottom, 70)
         
@@ -96,6 +100,9 @@ struct HomeView: View {
         .onAppear {
             locationService.requestCurrentLocation() // 권한 요청 + 현재 좌표 1회/지속 업데이트 트리거
         }
+        
+        .task { await curationVM.boot() }
+
         
         // MARK: - 위치 좌표 스트림 수신 → 서버 now-location PATCH
 
@@ -423,6 +430,75 @@ struct HomeView: View {
     }
         
 }
+struct CurationStripView: View {
+    @ObservedObject var vm: CurationViewModel
+    var onTapAll: () -> Void      // 전체를 탭했을 때 실행
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("지금 날씨에 어울리는 장소")
+                    .fontName(.bodySemibold16)
+                    .padding(.leading, 10)
+                    .foregroundStyle(Color.black100)
+                Spacer()
+                Image("rightArrow")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 10, height: 16)
+            }
+            .padding(.horizontal, 16)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: 12) {
+                    ForEach(vm.cards) { card in
+                        CardTile(title: card.title, imageURL: card.thumbnailURL)
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+            .frame(height: 128)
+        }
+        //  섹션 전체를 탭하면 이동 (카드에 개별 onTap 없음)
+        .contentShape(Rectangle())
+        .onTapGesture { onTapAll() }
+        
+        .padding(.horizontal, 5)
+    }
+}
+
+// 홈용 타일
+private struct CardTile: View {
+    let title: String
+    let imageURL: URL?
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            AsyncImage(url: imageURL) { phase in
+                switch phase {
+                case .success(let image): image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 270, height: 128, alignment: .leading)
+                        .clipped()
+                default: Color.white200
+                }
+            }
+            .frame(width: 270, height: 128)
+            .clipped()
+
+            LinearGradient(colors: [.clear, .black.opacity(0.55)],
+                           startPoint: .center, endPoint: .bottom)
+                .frame(height: 50)
+                .frame(maxWidth: .infinity, alignment: .bottom)
+
+            
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+
 
 #Preview {
     HomeFlowHost()
