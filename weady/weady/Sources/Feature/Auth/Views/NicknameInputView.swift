@@ -8,7 +8,6 @@
 import SwiftUI
 
 extension View {
-    /// 조건이 true일 때만 앞에 placeholder 보이도록
     func placeholder<Content: View>(
         when shouldShow: Bool,
         alignment: Alignment = .leading,
@@ -22,8 +21,23 @@ extension View {
 }
 
 struct NicknameInputView: View {
-    @StateObject private var vm = NicknameInputViewModel()
+    @StateObject private var vm: NicknameInputViewModel
     @FocusState private var isFocused: Bool
+    
+    private let agreements: [OnboardingAgreement]
+    // 기본값 제공
+    @MainActor
+      init(
+          agreements: [OnboardingAgreement],
+          viewModel: NicknameInputViewModel? = nil
+      ) {
+          self.agreements = agreements
+          if let viewModel {
+              _vm = StateObject(wrappedValue: viewModel)
+          } else {
+              _vm = StateObject(wrappedValue: NicknameInputViewModel())
+          }
+      }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -66,11 +80,11 @@ struct NicknameInputView: View {
                 // 3) 유효성 검사 에러 메시지
                 if vm.shouldShowValidationError {
                     if vm.nickname.isEmpty {
-                        Text("최소 1자 이상 입력해 주세요.")
+                        Text("최소 2자 이상 입력해 주세요.")
                             .font(.caption)
                             .foregroundColor(.red)
                     } else if !vm.isValidNickname {
-                        Text("한글, 영문과 숫자로 15자 이내로 입력해 주세요.")
+                        Text("한글, 영문과 숫자로 2~15자 이내로 입력해 주세요.")
                             .font(.caption)
                             .foregroundColor(.red)
                     }
@@ -94,13 +108,19 @@ struct NicknameInputView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
         }//VStack End
+        .onAppear {
+            // 디버그: View가 보관한 agreements 확인
+            print("DEBUG Nickname →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
+        }
+        // 다음 화면으로 agreements를 "View에서" 전달
         .fullScreenCover(isPresented: $vm.shouldNavigateNext) {
-            PreferenceInputView(nickname: vm.nickname)
+            // agreements 릴레이
+            PreferenceInputView(nickname: vm.nickname, agreements: agreements)
         }
     }
 }
 
-
-#Preview {
+/*#Preview {
     NicknameInputView()
 }
+*/

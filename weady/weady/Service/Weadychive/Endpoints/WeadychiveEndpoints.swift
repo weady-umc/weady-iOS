@@ -82,4 +82,10 @@ extension WeadychiveEndpoints: TargetType {
             "Content-Type": "application/json"
         ]
     }
+//    var headers: [String: String]? {
+//        return [
+//            "Content-Type": "application/json",
+//            "Authorization": "Bearer 테스트용 토큰 여기 넣기"
+//        ]
+//    }
 }

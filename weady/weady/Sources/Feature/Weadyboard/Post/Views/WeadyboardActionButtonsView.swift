@@ -11,6 +11,8 @@ struct WeadyboardActionButtonsView: View {
     let goodStatus: Bool
     let goodCount: Int
     let commentCount: Int
+    let isScraped: Bool
+    
     let onLikeTap: () -> Void
     let onCommentTap: () -> Void
     let onBookmarkTap: () -> Void
@@ -33,8 +35,10 @@ struct WeadyboardActionButtonsView: View {
             
             Spacer()
             
-            Image("bookmark")
-                .padding(.trailing, 15)
+            Button(action: onBookmarkTap) {
+                Image(isScraped ? "bookmark_fill" : "bookmark")
+            }
+            .padding(.trailing, 15)
         }
     }
 }

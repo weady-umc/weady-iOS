@@ -16,15 +16,15 @@ struct WeadyboardPostView: View {
     
     let boardId: Int
     @StateObject private var viewModel: WeadyboardPostViewModel
-    @StateObject private var reportViewModel: WeadyboardReportViewModel
-
+    @StateObject private var reportVM: WeadyboardReportViewModel
+    @EnvironmentObject private var weadychiveVM: WeadychiveViewModel
     @StateObject private var tagVM = TagViewModel()
 
     init(boardId: Int, isTabBarHidden: Binding<Bool>) {
         self.boardId = boardId
         self._isTabBarHidden = isTabBarHidden
         _viewModel = StateObject(wrappedValue: WeadyboardPostViewModel(boardId: boardId))
-        _reportViewModel = StateObject(wrappedValue: WeadyboardReportViewModel())
+        _reportVM = StateObject(wrappedValue: WeadyboardReportViewModel())
     }
 
     var body: some View {
@@ -53,8 +53,8 @@ struct WeadyboardPostView: View {
                         WeadyboardActionButtonsView(
                             goodStatus: viewModel.post?.goodStatus ?? false,
                             goodCount: viewModel.post?.goodCount ?? 0,
-                            commentCount: 0,
-//                            commentCount: viewModel.post?.commentCount ?? 0,
+                            commentCount: viewModel.post?.commentCount ?? 0,
+                            isScraped: weadychiveVM.isScrapped(boardId: boardId),
                             onLikeTap: {
                                 if viewModel.post?.goodStatus == true {
                                     viewModel.unlikeBoard()
@@ -63,7 +63,9 @@ struct WeadyboardPostView: View {
                                 }
                             },
                             onCommentTap: { showCommentSheet = true },
-                            onBookmarkTap: { }
+                            onBookmarkTap: {
+                                weadychiveVM.toggleBoardScrap(boardId: boardId)
+                            }
                         )
                         
                         WeadyboardContentView(
@@ -91,6 +93,7 @@ struct WeadyboardPostView: View {
             isTabBarHidden = true
             viewModel.fetchPostDetail()
             tagVM.loadAll(initialCriteria: .init())
+            weadychiveVM.fetchScrappedBoards()
         }
         .onDisappear {
             isTabBarHidden = false
@@ -104,7 +107,7 @@ struct WeadyboardPostView: View {
             WeadyboardPostMoreActionSheet(
                 showReportSheet: $showReportSheet,
                 boardId: boardId,
-                reportViewModel: reportViewModel
+                reportViewModel: reportVM
             )
             .presentationDetents([.height(255)])
             .presentationDragIndicator(.visible)
@@ -112,7 +115,7 @@ struct WeadyboardPostView: View {
         .sheet(isPresented: $showReportSheet) {
             WeadyboardPostReportNavigationSheet(
                 boardId: boardId,
-                reportViewModel: reportViewModel
+                reportViewModel: reportVM
             )
             .presentationDetents([.height(759)])
             .presentationDragIndicator(.visible)

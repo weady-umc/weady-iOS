@@ -1,9 +1,5 @@
-//
-//  ClothingRecommendationView.swift
-//  weady
-//
-//  Created by 김영택 on 8/8/25.
-//
+
+
 
 import SwiftUI
 import Combine
@@ -258,4 +254,5 @@ struct ClothingRecommendationView_Previews: PreviewProvider {
         NavigationStack {ClothingRecommendationView(vm: .preview)}
     }
 }
+
 

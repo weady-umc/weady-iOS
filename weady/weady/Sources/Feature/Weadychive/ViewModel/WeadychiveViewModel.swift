@@ -20,7 +20,8 @@ final class WeadychiveViewModel: ObservableObject {
     @Published var isWeadyboardFetchFailed: Bool = false
     @Published var isCurationLoaded: Bool = false
     @Published var isWeadyboardLoaded: Bool = false
-    
+    @Published private(set) var scrappedBoardIds: Set<Int> = []
+
     var hasScrappedCurations: Bool {
         scrappedCurationItems.contains { !$0.firstImgUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
     }
@@ -57,7 +58,7 @@ final class WeadychiveViewModel: ObservableObject {
 //                weatherTagId: $0 % 5
 //            )
 //        }
-//        
+//
      
     }
     
@@ -104,6 +105,8 @@ final class WeadychiveViewModel: ObservableObject {
                             weatherTagId: $0.weatherTagId
                         )
                     }
+                    // 스크랩 여부 게시물 화면에서 확인하기 위해 추가
+                    self?.scrappedBoardIds = Set(response.content.map { Int($0.boardId) })
                     self?.isWeadyboardFetchFailed = false
                 case .failure(let error):
                     print("❌ Scrapped Boards API 실패: \(error)")
@@ -114,7 +117,19 @@ final class WeadychiveViewModel: ObservableObject {
         }
     }
     
-  
+    /// 큐레이션 스크랩 추가
+    func postCurationScrap(curationId: Int) {
+        let dto = ScrapCurationRequestDto(curationId: curationId)
+        service.postScrapCuration(dto: dto) { result in
+            switch result {
+            case .success(let response):
+                print("✅ 큐레이션 스크랩 추가 성공: \(response.isScraped)")
+                self.fetchScrappedCurations()
+            case .failure(let error):
+                print("!!!큐레이션 추가됌요!!!")
+            }
+        }
+    }
     
     /// 큐레이션 스크랩 삭제
     func removeCurationScrap(curationId: Int) {
@@ -125,26 +140,60 @@ final class WeadychiveViewModel: ObservableObject {
                 print("✅ 큐레이션 스크랩 삭제 성공: \(response.isScraped)")
                 self.fetchScrappedCurations()
             case .failure(let error):
-                print("❌ 큐레이션 스크랩 삭제 실패: \(error)")
+                print("!!!큐레이션 삭제됌요!!!")
             }
         }
+    }
+    
+    // MARK: - 웨디보드 스크랩 연결
+    /// 현재 스크랩 여부 조회
+    func isScrapped(boardId: Int) -> Bool {
+        return scrappedBoardIds.contains(boardId)
     }
     
     /// 게시물 스크랩 추가
     func addBoardScrap(boardId: Int) {
         let dto = ScrapBoardRequestDto(boardId: boardId)
-        service.postScrapBoard(dto: dto) { result in
-            switch result {
-            case .success(let response):
-                print("✅ 웨디보드 스크랩 성공: \(response.isScraped)")
-                self.fetchScrappedBoards()
-            case .failure(let error):
-                print("❌ 웨디보드 스크랩 실패: \(error)")
+        service.postScrapBoard(dto: dto) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    print("✅ 웨디보드 스크랩 성공: \(response.isScraped)")
+                    if response.isScraped {
+                        self?.scrappedBoardIds.insert(boardId)
+                    }
+                    self?.fetchScrappedBoards()
+                case .failure(let error):
+                    print("❌ 웨디보드 스크랩 실패: \(error)")
+                }
             }
         }
     }
     
- 
+    /// 게시물 스크랩 삭제 ( 웨디보드 게시물 화면에서 )
+    func removeBoardScrap(boardId: Int) {
+        let dto = ScrapBoardRequestDto(boardId: boardId)
+        service.deleteScrapBoard(dto: dto) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self?.scrappedBoardIds.remove(boardId)
+                    self?.fetchScrappedBoards()
+                case .failure(let error):
+                    print("❌ 웨디보드 스크랩 삭제 실패: \(error)")
+                }
+            }
+        }
+    }
+    
+    /// 게시물 스크랩 토글
+    func toggleBoardScrap(boardId: Int) {
+        if isScrapped(boardId: boardId) {
+            removeBoardScrap(boardId: boardId)
+        } else {
+            addBoardScrap(boardId: boardId)
+        }
+    }
     
     // MARK: - 큐레이션 스크랩 삭제
     func deleteCurationItems(with ids: [Int64]) {
