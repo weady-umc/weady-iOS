@@ -1,5 +1,3 @@
-
-
 import Foundation
 import Combine
 import SwiftUI
@@ -9,29 +7,45 @@ import KeychainSwift
 @MainActor
 final class CurationViewModel: ObservableObject {
 
-    // MARK: - UI Output
+    // MARK: - Published  프로퍼티들!!
+    // 헤더에 표시되는 날씨 및 위치 관련 문구
     @Published private(set) var headerText: WeatherHeaderText = .placeholder
+    // 위치 태그 목록 (예: 내 주변, 카테고리 등)
     @Published private(set) var tags: [LocationTag] = []
+    // 현재 선택된 위치 태그
     @Published private(set) var selectedTag: LocationTag = .nearby
+    // 큐레이션 카드 목록 (피드)
     @Published private(set) var cards: [CurationCard] = []
+    // 선택된 큐레이션의 상세 정보
     @Published private(set) var detail: CurationDetail? = nil
-    /// 날씨 문구) & 장소 칩(원) 테두리에 공용으로 사용하는 색상
+    // 날씨 문구 및 장소 칩(원) 테두리에 공용으로 사용하는 색상
     @Published private(set) var accentColor: Color = .primary
 
+    // 사용자에게 보여줄 공지 문구
     @Published var noticeText: String? = nil
+    // 마지막 에러 발생 시 HTTP 상태 코드 저장
     @Published private(set) var lastErrorStatusCode: Int? = nil
+    // 현재 선택된 큐레이션이 스크랩되었는지 여부
     @Published var isScrapped : Bool = false
+    // 토스트 메시지 표시용 문자열
     @Published var toastMessage: String? = nil
 
-    // MARK: - States
+    
+    // 로딩 상태를 나타내는 열거형 (대기, 로딩중, 성공, 실패)
     enum LoadState: Equatable { case idle, loading, success, failure(String) }
+    // 피드 리스트 로딩 상태
     @Published private(set) var listState: LoadState = .idle
+    // 큐레이션 상세 로딩 상태
     @Published private(set) var detailState: LoadState = .idle
 
-    // MARK: - Dependencies
+    // MARK: - 서비스파일 연결
+  
     private let service = CurationServices.shared
 
-    // MARK: - Error Mapping Helpers
+    // MARK: - 에러 매핑 !!
+    // 에러 객체에서 HTTP 상태 코드를 안전하게 추출하는 함수
+    // - Parameter error: 발생한 에러 객체
+    // - Returns: HTTP 상태 코드(Int) 또는 nil
     private func extractStatusCode(from error: Error) -> Int? {
         // 최대한 안전하게 statusCode 유추 (APIError 구현에 의존하지 않도록 리플렉션 사용)
         let mirror = Mirror(reflecting: error)
@@ -41,7 +55,7 @@ final class CurationViewModel: ObservableObject {
                 if label == "code", let code = child.value as? Int { return code }
             }
         }
-        // nested associated values까지 한 번 더 훑기
+      
         for child in mirror.children {
             let subMirror = Mirror(reflecting: child.value)
             for sub in subMirror.children {
@@ -54,6 +68,8 @@ final class CurationViewModel: ObservableObject {
         return nil
     }
 
+    // 에러 상태에 따라 사용자에게 보여줄 공지 메시지를 설정하는 함수
+   
     private func setNotice(for error: Error) {
         let code = extractStatusCode(from: error)
         lastErrorStatusCode = code
@@ -68,21 +84,24 @@ final class CurationViewModel: ObservableObject {
         }
     }
 
+    // 공지 메시지 및 에러 상태 초기화 함수!
     private func clearNotice() {
         noticeText = nil
         lastErrorStatusCode = nil
     }
 
-    // MARK: - Boot: 최초 진입
+    // MARK: : 최초 진입
+    // 뷰모델 초기화 시 호출하여 기본 태그 목록 구성 및 내 주변 큐레이션 피드 로드
     func boot() async {
-        // 칩 목록 구성 (고정 + 필요 시 서버 카테고리로 대체 가능)
+        // 칩 목록 구성 (고정) (id만 부여함!)
         tags = Self.fixedTags()
         selectedTag = .nearby
 
         await loadNearbyFeed() // 기본: 내주변
     }
 
-    // MARK: - User Intents
+    // MARK: - 사용자가 장소 칩 선택했을때 호출 하는 함수들
+    
     func select(tag: LocationTag) async {
         guard tag.id != selectedTag.id || tag.kind != selectedTag.kind else { return }
         selectedTag = tag
@@ -94,10 +113,13 @@ final class CurationViewModel: ObservableObject {
         }
     }
 
+    // 큐레이션 상세 화면을 열기 위해 상세 데이터를 로드하는 함수
+   
     func openDetail(curationId: Int64) async {
         await loadDetail(curationId: curationId)
     }
 
+    // 큐레이션 상세 화면을 닫고 상태를 초기화하는 함수
     func closeDetail() {
         detail = nil
         detailState = .idle
@@ -105,7 +127,8 @@ final class CurationViewModel: ObservableObject {
     
     
 
-    // MARK: - Networking (Feed)
+   
+    // 내 주변 위치 기반 큐레이션 피드를 비동기적으로 로드하는 함수
     private func loadNearbyFeed() async {
         listState = .loading
         do {
@@ -113,7 +136,7 @@ final class CurationViewModel: ObservableObject {
             let defaultLoc = try await requestAsync { cont in
                 self.service.getUserDefaultLocation(completion: cont)
             }
-            // 2) 위치 기반 피드
+            // 2) 위치 기반으로 한 큐레이션 피드 덩어리 조회 후 매핑
             let feedDTO = try await requestAsync { cont in
                 self.service.getCurationsByLocation(locationId: defaultLoc.data.defaultLocationId, completion: cont)
             }
@@ -127,6 +150,8 @@ final class CurationViewModel: ObservableObject {
         }
     }
 
+    // 특정 카테고리 기반 큐레이션 피드를 비동기적으로 로드하는 함수
+   
     private func loadCategoryFeed(categoryId: Int64) async {
         listState = .loading
         do {
@@ -144,13 +169,17 @@ final class CurationViewModel: ObservableObject {
         }
     }
 
+    // API에서 받아온 큐레이션 피드 데이터를 뷰모델의 UI 출력 변수에 적용하는 함수
+   
     private func apply(feed: CurationFeed) {
         headerText = feed.header
         cards = feed.cards
         accentColor = feed.tone.color   // SemanticColor → Color("assetName")
     }
 
-    // MARK: - Networking (Detail)
+   
+    // 큐레이션 상세 데이터를 비동기적으로 로드하는 함수
+   
     private func loadDetail(curationId: Int64) async {
         detailState = .loading
         do {
@@ -166,7 +195,9 @@ final class CurationViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Helpers
+ 
+    // 고정된 위치 태그 목록을 반환하는 함수 (내 주변 + 7개 카테고리)
+   
     private static func fixedTags() -> [LocationTag] {
         // 고정 칩: 내주변 + 1~7 카테고리
         var result: [LocationTag] = [.nearby]
@@ -186,7 +217,8 @@ final class CurationViewModel: ObservableObject {
         return result
     }
 
-    // Callback 기반 -> async/await 변환
+    // 콜백 기반 API 요청을 async/await 패턴으로 변환하는 헬퍼 함수
+   
     private func requestAsync<T>(_ work: (@escaping (Result<T, CurationServices.APIError>) -> Void) -> Void) async throws -> T {
         try await withCheckedThrowingContinuation { cont in
             work { res in
@@ -199,10 +231,3 @@ final class CurationViewModel: ObservableObject {
     }
 }
 
-
-
-//// MARK: - View-facing derived properties
-//extension CurationViewModel {
-//    /// (계절+날씨) 기반 컬러칩 최종 색상. View는 이 값을 그대로 사용합니다.
-//    var accentColor: Color { feed.tone.color }
-//}

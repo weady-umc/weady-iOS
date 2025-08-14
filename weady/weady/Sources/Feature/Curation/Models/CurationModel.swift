@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 
 // MARK: - 계절태그,날씨태그 -> 날씨 문구 + 컬러칩 달라짐
+//계절
 enum Season: String, CaseIterable, Codable {
     case spring = "봄"
     case summer = "여름"
@@ -21,6 +22,7 @@ enum Season: String, CaseIterable, Codable {
     }
 }
 
+//날씨
 enum SkyWeather: String, CaseIterable, Codable {
     case clear = "맑은날"
     case mostlyCloudy = "구름 많은 날"
@@ -36,6 +38,7 @@ enum SkyWeather: String, CaseIterable, Codable {
 }
 
 // MARK: - 컬러칩(날씨 문구 + 장소 칩 테두리 색상)
+//(날씨 + 계절) 에 따라서 추천문구 & 장소칩 컬러칩이 변경
 
 enum SemanticColor: String, Codable, CaseIterable {
     case springClear
@@ -81,7 +84,7 @@ enum WeatherTone {
             return .springRainy
         case (.summer, .clear):
             return .summerClear
-//TODO: - 데모데이용으로 색상 대조 크게 하기위해서, 여름 구름낀 날을 봄 구름낀 날의 색상으로 바꿈
+//TODO: - 데모데이용으로 색상 대조 크게 하기위해서, 여름 구름낀 날을 봄 구름낀 날의 색상으로 바꿈. 데모데이 이후 다시 여름 색상으로 변경
         case (.summer, .mostlyCloudy), (.summer, .cloudy):
             return .springCloudy
         case (.summer, .rainy):
@@ -106,7 +109,7 @@ enum WeatherTone {
     }
 }
 
-// MARK: - Header Phrase
+// MARK: - 상단 날씨 헤더 문구
 /// 상단 문구: [가변] + [고정] 구조
 struct WeatherHeaderText: Equatable {
     /// ex) "맑고 따듯한 봄날"
@@ -114,6 +117,7 @@ struct WeatherHeaderText: Equatable {
     /// 고정 텍스트
     let trailing: String = "이런 코스들을 추천해드려요"
 }
+
 
 enum WeatherPhrase {
     /// 서버에서 받은 시즌/날씨 조합 → 상단 가변 문구
@@ -160,7 +164,7 @@ struct LocationTag: Identifiable, Hashable {
     static let nearby = LocationTag(id: -1, name: "내주변", kind: .nearby)
 }
 
-// MARK: - Cards & Detail
+// MARK: - 큐레이션 카드 구조체
 struct CurationCard: Identifiable, Equatable {
     let id: Int64
     let title: String
@@ -170,7 +174,7 @@ struct CurationCard: Identifiable, Equatable {
 struct CurationDetailImage: Identifiable, Equatable {
     let id: Int // imgOrder
     let url: URL?
-    //TODO: - 추후 수정
+    //TODO: - 추후 수정 ( 네이버 지도 연동 )
     //let address: String?
 }
 
@@ -179,11 +183,11 @@ struct CurationDetail: Equatable {
     let title: String
     let images: [CurationDetailImage]
 
-    /// 편의: URL 배열만 필요할 때 사용
+    /// URL 배열 필요할 때 사용
     var imageURLs: [URL] { images.compactMap { $0.url } }
 }
 
-// MARK: - Composite models (첫 화면 구성을 한 번에 보유)
+// MARK: - (첫 화면 구성을 한 번에 보유하는 구조체!)
 struct CurationFeed: Equatable {
     let locationId: Int64
     let locationName: String
@@ -194,7 +198,7 @@ struct CurationFeed: Equatable {
 
 // MARK: - 매핑 (DTO → Domain)
 enum CurationMapper {
-    // 공통: season/weather → 헤더 문구
+    // 공통: season/weather → 헤더 문구에 쓰인다.
     private static func makeHeader(seasonString: String, weatherString: String) -> WeatherHeaderText {
         let season = Season(server: seasonString)
         let weather = SkyWeather(server: weatherString)
@@ -204,6 +208,7 @@ enum CurationMapper {
 
     /// /curation/location/{locationId} 또는 /curation/curationCategory/{id}
     /// 두 API 모두 동일 스키마를 사용하므로 동일 변환 사용
+    /// //내주변 큐레이션 추천  & 장소별 큐레이션 추천
     static func toFeed(from dto: ApiResponseCurationByLocationResponseDto) -> CurationFeed {
         let season = Season(server: dto.data.season)
         let weather = SkyWeather(server: dto.data.weather)
@@ -230,7 +235,7 @@ enum CurationMapper {
     }
 
     /// /curation/{curationId} 상세
-    //TODO: - 추후에 수
+
     static func toDetail(from dto: ApiResponseCurationByCurationIdResponseDto) -> CurationDetail {
         let images: [CurationDetailImage] = dto.data.imgs
             .sorted { $0.imgOrder < $1.imgOrder }
@@ -239,7 +244,7 @@ enum CurationMapper {
     }
 }
 
-// MARK: - View seeds (초기값/플레이스홀더)
+// MARK: - 뷰 초기값
 extension WeatherHeaderText {
     static let placeholder = WeatherHeaderText(leading: "오늘같이 덥고 습한 여름날")
 }

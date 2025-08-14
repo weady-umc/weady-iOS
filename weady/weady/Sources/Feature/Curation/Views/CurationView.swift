@@ -3,10 +3,14 @@ import KeychainSwift
 
 /// Curation 첫 화면 (PlaceView 레이아웃을 유지하면서 MVVM 바인딩)
 struct CurationView: View {
+//MARK: - 프로퍼티
     @StateObject private var vm = CurationViewModel()
+    @Environment(HomeRouter.self) private var router
+  
     
     
-
+    
+//MARK: -뷰 바디
     var body: some View {
 
         ScrollView {
@@ -20,7 +24,8 @@ struct CurationView: View {
                 // 상태/에러 안내 배너 (404, 500 등)
                 if let msg = vm.noticeText, !msg.isEmpty {
                     Text(msg)
-                        .font(.system(size: 14, weight: .semibold))
+                       
+                        .fontName(.captionSemibold14)
                         .foregroundStyle(.secondary)
                 }
 
@@ -46,17 +51,21 @@ struct CurationView: View {
                         Text(vm.noticeText?.isEmpty == false ? (vm.noticeText ?? "") : "")
                             .font(.system(size: 15, weight: .regular))
                             .foregroundStyle(.secondary)
-                        // noticeText가 비어있다면 공간만 유지 (필요 시 스켈레톤 등 교체 가능)
+                      
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
+                    // 카드 리스트가 있는 경우 CardRow를 순서대로 나열.!
                     VStack(spacing: 10) {
                         ForEach(vm.cards) { card in
-                            // NavigationLink(value: HomeRoute.curationdetail(curationId: Int64(card.id))) {
-                                CardRow(title: card.title, imageURL: card.thumbnailURL)
-                            // }
-                            // .buttonStyle(.plain)
-                            .padding(.horizontal, 16)
+                            CardRow(title: card.title, imageURL: card.thumbnailURL)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    router.push(.curationdetail(curationId: Int64(card.id)))
+                                }
+                                .padding(.horizontal, 16)
+                            
+                            
                         }
                     }
                     .padding(.top, 8)
@@ -69,7 +78,7 @@ struct CurationView: View {
     }
 }
 
-// MARK: - Header
+// MARK: - 날씨 안내 문구
 private struct HeaderView: View {
     let leading: String
     let trailing: String
@@ -80,7 +89,7 @@ private struct HeaderView: View {
             HStack(spacing: 0) {
                 Text(leading)
                     .fontName(.headingBold20)
-                    .foregroundColor(accent) // Figma의 포인트색 유사
+                    .foregroundColor(accent) // 계절별 컬러칩 적용
                 Text("에는")
                     .fontName(.headingBold20)
                     .foregroundColor(.primary)
@@ -91,7 +100,7 @@ private struct HeaderView: View {
     }
 }
 
-// MARK: - TagChip (원형, 띄어쓰기 줄바꿈, 선택 시 테두리 강조)
+// MARK: - 장소 칩 (원형, 띄어쓰기 줄바꿈, 선택 시 테두리 색상 변경)
 private struct TagChip: View {
     let tag: LocationTag
     let isSelected: Bool
@@ -124,7 +133,7 @@ private struct TagChip: View {
     }
 }
 
-// MARK: - 썸네일
+// MARK: - 큐레이션 썸네일(backgroundImgUrl)
 private struct CardRow: View {
     let title: String
     let imageURL: URL?
@@ -145,9 +154,60 @@ private struct CardRow: View {
         .clipped()
         .frame(maxWidth: .infinity, alignment: .center)
         .clipShape(RoundedRectangle(cornerRadius: 10))
+       
+    }
+}
+
+
+// MARK: - 프리뷰용
+private struct CurationView_NavPreview: View {
+    @State private var router = HomeRouter()
+
+    var body: some View {
+        @Bindable var router = router
+        return NavigationStack(path: $router.path) {
+            CurationView()
+                .environment(router)
+                .navigationDestination(for: HomeRoute.self) { route in
+                    switch route {
+                    case .home:
+                        HomeView()
+                    case .weatheraddlocation:
+                        WeatherLocationAddView(
+                            viewModel: WeatherLocationAddViewModel(),
+                            locationViewModel: WeatherLocationViewModel(),
+                            selectedPlace: .constant(nil),
+                            weather: ShortWeatherData.example
+                        )
+                    case .weathersearch:
+                        WeatherSearchView(selectedPlace: .constant(nil))
+                    case .weatherlocation:
+                        WeatherLocationView()
+                    case .curationdetail(let curationId):
+                        DetailCurationView(curationId: curationId)
+                    case .curation:
+                        CurationView()
+                    }
+                }
+        }
+        .onAppear {
+            // 미리 Detail 화면으로 진입한 상태를 미리보기로 확인
+            if router.path.isEmpty {
+                router.push(.curationdetail(curationId: 5))
+            }
+        }
     }
 }
 
 #Preview("CurationView") {
     CurationView()
+        .environment(HomeRouter()) //  Observation 스타일 프리뷰 주입
+}
+
+#Preview("CurationView → Detail (Nav Preview)") {
+    CurationView_NavPreview()
+}
+
+#Preview("DetailCurationView") {
+    DetailCurationView(curationId: 5)
 }

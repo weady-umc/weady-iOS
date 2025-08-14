@@ -9,7 +9,7 @@ import Foundation
 import Moya
 import KeychainSwift
 
-//스크랩하기,스크랩취소하기 -> Weadychive Service 파일에 정의되어 있음. 
+//스크랩하기,스크랩취소하기 -> Weadychive Service 파일에 있음. 여기에 할 필요 X
 enum CurationEndpoints {
     //큐레이션 상세조회
     case getCurationDetailForCuration(curationId: Int)
@@ -64,24 +64,24 @@ extension CurationEndpoints: TargetType {
         return .requestPlain
     }
 
-//    var headers: [String: String]? {
-//        let keychain = KeychainSwift()
-//        if let token = keychain.get("serverAccessToken") {
-//            return [
-//                "Authorization": "Bearer \(token)",
-//                "Content-Type": "application/json"
-//            ]
-//        } else {
-//            return [
-//                "Content-Type": "application/json"
-//            ]
-//        }
-//    }
     var headers: [String: String]? {
-        return [
-            "Content-Type": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTE1MDc3OH0.vId7OLfCIqxw45z3W8ow3XKgSSa3znV58rc5l171zNhdXjlhUSrXogSBIEGDkjWi92xPJbM-_Galh2Wyrcp5YQ"
-        ]
+        let keychain = KeychainSwift()
+        if let token = keychain.get("serverAccessToken") {
+            return [
+                "Authorization": "Bearer \(token)",
+                "Content-Type": "application/json"
+            ]
+        } else {
+            return [
+                "Content-Type": "application/json"
+            ]
+        }
     }
+//    var headers: [String: String]? {
+//        return [
+//            "Content-Type": "application/json",
+//            "Authorization": "Bearer 테스트용 토큰 넣기"
+//        ]
+//    }
     
 }

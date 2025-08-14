@@ -8,8 +8,8 @@
 import Foundation
 import Moya
 
-/// Curation 전용 API Service
-/// WeadychiveServices와 동일한 구성으로 작성
+// Curation 전용 API Service
+
 final class CurationServices {
     static let shared = CurationServices()
     private init() {}
@@ -24,7 +24,7 @@ final class CurationServices {
         #endif
     }()
 
-    // MARK: - 에러
+    // MARK: - 에러 처리
     enum APIError: Error {
         case decoding
         case status(Int)
@@ -38,7 +38,7 @@ final class CurationServices {
         provider.request(target) { result in
             switch result {
             case .success(let response):
-                // 상태 코드 체크 (2xx만 통과)
+                // 상태 코드 체크 (2xx만 통과!)
                 guard (200..<300).contains(response.statusCode) else {
                     completion(.failure(.status(response.statusCode)))
                     return

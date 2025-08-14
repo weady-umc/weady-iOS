@@ -41,8 +41,10 @@ struct HomeFlowHost: View {
 
     // MARK: Body
     var body: some View {
+        @Bindable var router = router
         NavigationStack(path: $router.path) {
             HomeView()
+            
                 .navigationDestination(for: HomeRoute.self) { route in
                     switch route {
                     case .home:

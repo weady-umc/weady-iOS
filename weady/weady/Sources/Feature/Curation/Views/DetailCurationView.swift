@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-/// 서버 연동 버전의 상세뷰
-/// - 진입 파라미터: curationId (카드 탭 시 전달)
+
 struct DetailCurationView: View {
     @Environment(\.dismiss) private var dismiss
+    
 
     let curationId: Int64
 
@@ -22,12 +22,7 @@ struct DetailCurationView: View {
     var body: some View {
         ZStack(alignment: .top) {
             VStack(spacing: 25) {
-                //시연
-//                Button(action: { toggleScrap() }) {
-//                    Image(isScrapped ? "scrapfilled" : "scrap")
-//                        .padding(.top, 50)
-//                }
-                //시연
+
                 DetailCurationImageCarousel(currentIndex: $currentIndex,
                                             imageURLs: vm.detail?.imageURLs ?? [])
 
@@ -53,7 +48,7 @@ struct DetailCurationView: View {
                 }
             }
 
-            // NOTE: 요구 사항에 따라 line 49, 51의 Text를 모두 curationTitle로 표시
+           
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 0) {
                     Text(titleTwoLinesAuto(vm.detail?.title ?? ""))
@@ -107,7 +102,7 @@ final class DetailCurationViewModel: ObservableObject {
     }
 }
 
-// MARK: - 이미지 캐러셀 (서버 URL 기반)
+// MARK: - 이미지 캐러셀ㅂ
 private struct DetailCurationImageCarousel: View {
     @Binding var currentIndex: Int
     let imageURLs: [URL]
@@ -152,7 +147,7 @@ private struct DetailCurationImageCarousel: View {
     }
 }
 
-// MARK: - 네이버 지도 연결 버튼(기존 UI 유지)
+// MARK: - 네이버 지도 연결 버튼
 private struct DetailCurationMapButton: View {
     var body: some View {
         Button(action: { /* TODO: - 네이버 지도로 연결 */ }) {
@@ -164,7 +159,7 @@ private struct DetailCurationMapButton: View {
     }
 }
 
-// MARK: - 페이지 인디케이터 (기존 UI 유지)
+// MARK: - 이미지 인디케이터
 private struct IndicatorBarView: View {
     let currentIndex: Int
     let count: Int
@@ -192,27 +187,14 @@ extension DetailCurationView {
         let id = Int(curationId)
         if isScrapped {
             scrapVm.removeCurationScrap(curationId: id)
-            // 성공 콜백에서 토글하는 구조가 아니라면, optimistic 업데이트 후 실패 시 롤백
-            isScrapped = true // keep current until result
-            // 실제 구현에서 removeCurationScrap에 completion이 있다면 그 안에서 isScrapped = false 로 변경하세요.
-            // 예시(완전한 형태):
-            // scrapVm.removeCurationScrap(curationId: id) { result in
-            //     switch result {
-            //     case .success: self.isScrapped = false
-            //     case .failure:  break // 필요 시 에러 토스트
-            //     }
-            // }
+           
+            isScrapped = true
+           
             self.isScrapped = false
         } else {
             scrapVm.postCurationScrap(curationId: id)
-            // 동일하게 optimistic 처리 후 성공 시 유지, 실패 시 롤백
-            isScrapped = false // keep current until result
-            // scrapVm.postCurationScrap(curationId: id) { result in
-            //     switch result {
-            //     case .success: self.isScrapped = true
-            //     case .failure:  break
-            //     }
-            // }
+           
+            isScrapped = false
             self.isScrapped = true
         }
     }
@@ -254,15 +236,14 @@ extension DetailCurationView {
         let trimmed = s.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return s }
 
-        // Define the font used (matching .captionMedium14)
-        let font = UIFont.systemFont(ofSize: 14, weight: .medium)
+    
         let attributes: [NSAttributedString.Key: Any] = [.font: font]
 
-        // Measure full width
+     
         let fullWidth = (trimmed as NSString).size(withAttributes: attributes).width
         let halfWidth = fullWidth / 2
 
-        // Find the break point so that first line width <= halfWidth
+       
         var breakIndex: String.Index? = nil
         var lastSpaceBeforeHalf: String.Index? = nil
         var currentLine = ""
@@ -272,11 +253,11 @@ extension DetailCurationView {
             currentLine.append(char)
             let currentWidth = (currentLine as NSString).size(withAttributes: attributes).width
             if currentWidth > halfWidth {
-                // If we found a space before exceeding halfWidth, break there
+             
                 if let spaceIndex = lastSpaceBeforeHalf {
                     breakIndex = spaceIndex
                 } else {
-                    // No space found, break at current character
+                  
                     breakIndex = index
                 }
                 break
@@ -286,7 +267,7 @@ extension DetailCurationView {
             }
         }
 
-        // If we never exceeded halfWidth, no break needed
+
         if breakIndex == nil {
             return trimmed
         }
@@ -302,36 +283,36 @@ extension DetailCurationView {
         let text = s.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return s }
 
-        // Font used for measuring (match .captionMedium14)
+        
         let font = UIFont.systemFont(ofSize: 14, weight: .medium)
         let attrs: [NSAttributedString.Key: Any] = [.font: font]
 
-        // Expected available width for the toolbar title (keep in sync with Text frame)
+        
         let maxWidth = UIScreen.main.bounds.width * 0.68
 
-        // Helper to measure a line's rendered width
+      
         func lineWidth(_ str: String) -> CGFloat {
             (str as NSString).size(withAttributes: attrs).width
         }
 
-        // If there are no spaces at all, hard-break at the middle character boundary
+       
         let spaces = text.indices.filter { text[$0] == " " }
         if spaces.isEmpty {
             let mid = text.index(text.startIndex, offsetBy: text.count/2)
             return String(text[..<mid]) + "\n" + String(text[mid...])
         }
 
-        // 1) Prefer a punctuation break (comma-like) near the middle
+     
         let punctuation: Set<Character> = [",", "，", "、"]
         let mid = text.index(text.startIndex, offsetBy: text.count/2)
 
-        // Gather punctuation indices
+    
         let punctIndices: [String.Index] = text.indices.filter { punctuation.contains(text[$0]) }
 
         struct Candidate { let idx: String.Index; let overflow: CGFloat; let balance: CGFloat; let distToMid: Int }
 
         func evaluateCandidate(_ at: String.Index, consumePunctuation: Bool) -> Candidate {
-            // If we break at punctuation, include it in the left line and trim spaces from the right line
+           
             let left = String(text[..<text.index(after: at)])
             let rightRaw = String(text[text.index(after: at)...])
             let right = rightRaw.trimmingCharacters(in: .whitespaces)
@@ -343,7 +324,7 @@ extension DetailCurationView {
             return Candidate(idx: at, overflow: overflow, balance: balance, distToMid: dist)
         }
 
-        // Rank punctuation candidates: minimize overflow, then distance to mid, then balance
+      
         var bestPunct: Candidate? = nil
         for idx in punctIndices {
             let cand = evaluateCandidate(idx, consumePunctuation: true)
@@ -358,14 +339,14 @@ extension DetailCurationView {
             }
         }
 
-        // If a punctuation-based break yields no overflow, use it
+       
         if let p = bestPunct, p.overflow == 0 {
             let left = String(text[..<text.index(after: p.idx)])
             let right = String(text[text.index(after: p.idx)...]).trimmingCharacters(in: .whitespaces)
             return left + "\n" + right
         }
 
-        // 2) Fallback to balanced space-based split (previous algorithm)
+       
         struct SpaceCandidate { let idx: String.Index; let overflow: CGFloat; let balance: CGFloat }
         var best: SpaceCandidate? = nil
         for idx in spaces {
@@ -391,7 +372,7 @@ extension DetailCurationView {
             return left + "\n" + right
         }
 
-        // Last resort: hard-break at mid
+      
         let hard = text.index(text.startIndex, offsetBy: text.count/2)
         return String(text[..<hard]) + "\n" + String(text[hard...])
     }
