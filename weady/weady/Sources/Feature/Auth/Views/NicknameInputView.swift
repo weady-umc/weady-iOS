@@ -8,7 +8,6 @@
 import SwiftUI
 
 extension View {
-    /// 조건이 true일 때만 앞에 placeholder 보이도록
     func placeholder<Content: View>(
         when shouldShow: Bool,
         alignment: Alignment = .leading,
@@ -22,13 +21,23 @@ extension View {
 }
 
 struct NicknameInputView: View {
-    @StateObject private var vm = NicknameInputViewModel()
+    @StateObject private var vm: NicknameInputViewModel
     @FocusState private var isFocused: Bool
-    private let agreements: [OnboardingAgreement]?
     
-    init(agreements: [OnboardingAgreement]? = nil) {
-        self.agreements = agreements
-    }
+    private let agreements: [OnboardingAgreement]
+    // 기본값 제공
+    @MainActor
+      init(
+          agreements: [OnboardingAgreement],
+          viewModel: NicknameInputViewModel? = nil
+      ) {
+          self.agreements = agreements
+          if let viewModel {
+              _vm = StateObject(wrappedValue: viewModel)
+          } else {
+              _vm = StateObject(wrappedValue: NicknameInputViewModel())
+          }
+      }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -100,15 +109,18 @@ struct NicknameInputView: View {
             .padding(.bottom, 22)
         }//VStack End
         .onAppear {
-            print("DEBUG Nickname →", agreements?.map { "\($0.termsType)=\($0.isAgreed)" } ?? [])
+            // 디버그: View가 보관한 agreements 확인
+            print("DEBUG Nickname →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
         }
+        // 다음 화면으로 agreements를 "View에서" 전달
         .fullScreenCover(isPresented: $vm.shouldNavigateNext) {
+            // agreements 릴레이
             PreferenceInputView(nickname: vm.nickname, agreements: agreements)
         }
     }
 }
 
-
-#Preview {
+/*#Preview {
     NicknameInputView()
 }
+*/

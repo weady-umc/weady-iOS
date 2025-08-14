@@ -81,7 +81,7 @@ struct AppRootView: View {
                 }
         }
         .environment(router)
-        .environmentObject(router)
+       // .environmentObject(router)
 //        .environmentObject(weadyboardBridge)
         .environmentObject(toastCenter)
     }

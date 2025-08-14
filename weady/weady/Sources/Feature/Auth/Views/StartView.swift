@@ -7,30 +7,39 @@
 
 import SwiftUI
 
+extension StartView {
+    static func onboarding(
+        nickname: String,
+        gender: GenderCode?,
+        styleIds: [Int64]?,
+        agreements: [OnboardingAgreement]?
+    ) -> StartView {
+        StartView(nickname: nickname, gender: gender, styleIds: styleIds, agreements: agreements)
+    }
+}
+
 struct StartView: View {
     @StateObject private var vm: StartViewModel
     @State private var showHome = false
-    @State private var showTerms = false
-    @Environment(NavigationRouter.self) private var router
-    @Environment(\.dismiss) private var dismiss
     
-    init(nickname: String) {
-        _vm = StateObject(wrappedValue: StartViewModel(nickname: nickname))
-    }
-    
-    // 신규 init (옵셔널 파라미터)
-    init(nickname: String,
-         gender: GenderCode? = nil,
-         styleIds: [Int64]? = nil,
-         agreements: [OnboardingAgreement]? = nil) {
-        _vm = StateObject(wrappedValue: StartViewModel(
-            nickname: nickname,
-            gender: gender,
-            styleIds: styleIds,
-            agreements: agreements
-        ))
-    }
-    
+
+    // 전체 데이터 전달용 (POST에 쓰일 값)
+    init(
+          nickname: String,
+          gender: GenderCode? = nil,
+          styleIds: [Int64]? = nil,
+          agreements: [OnboardingAgreement]? = nil
+      ) {
+          _vm = StateObject(
+              wrappedValue: StartViewModel(
+                  nickname: nickname,
+                  gender: gender,
+                  styleIds: styleIds,
+                  agreements: agreements
+              )
+          )
+      }
+        
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // 1) 프로그레스 인디케이터 (5번째 스텝)
@@ -82,9 +91,7 @@ struct StartView: View {
             // 4) 다음 버튼
             
             Button{
-                print("VM.route =", String(describing: vm.route))
-                 print("Router path count(before) =", router.path.count)
-                Task { await vm.handleStart() }
+                vm.startTapped() // 여기서만 POST
             } label: {
                 Text("웨디 시작하기")
                     .fontName(.bodyMedium16)
@@ -94,46 +101,22 @@ struct StartView: View {
                     .foregroundStyle(Color.white100)
                     .cornerRadius(10)
             }
+            .disabled(vm.isSubmitting)
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
         }
-        
-        // 전역 라우터로 라우팅
-        .onReceive(vm.$route.removeDuplicates()) { route in
-            print("Route recv:", String(describing: route),
-                  "| path count(before) =", router.path.count)
-
-            switch route {
-            case .home?:
-                router.reset()
-                router.push(.basetab)
-                dismiss()
-                print("→ pushed .basetab | path count(after) =", router.path.count)
-             
-            case .terms?:
-                router.reset()
-                router.push(.onboarding)
-                dismiss()
-                print("→ pushed .onboarding | path count(after) =", router.path.count)
-        
-            case nil:
-                break
-            }
+        // 실패 시 경고
+        .alert(item: $vm.alert) { a in
+            Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
         }
-        // 서버 에러 메시지 얼럿
-        .alert("알림",
-               isPresented: Binding(
-                get: { vm.alertMessage != nil },
-                set: { if !$0 { vm.alertMessage = nil } }
-               ),
-               actions: { Button("확인") { vm.alertMessage = nil } },
-               message: { Text(vm.alertMessage ?? "") }
-        )
+        // 성공 시 Home 
+        .fullScreenCover(isPresented: $vm.navigateHome) {
+            BaseTabContainerView()
+        }
     }
 }
 
 #Preview {
-    StartView(nickname: "테스트").environment(NavigationRouter())
+    StartView(nickname: "테스트")
+        .environment(NavigationRouter())
 }
-
-

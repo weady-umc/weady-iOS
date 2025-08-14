@@ -13,13 +13,20 @@ private struct WebLink: Identifiable {
     let url: URL
 }
 
-
+@MainActor
 struct TermsAgreementView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var router: NavigationRouter
     @StateObject private var viewModel = TermsAgreementViewModel()
+
+    // 약관 payload를 시트와 1:1로 연결하기 위한 식별 가능한 래퍼
+      private struct AgreementsBox: Identifiable {
+          let id = UUID()
+          let value: [OnboardingAgreement]
+      }
     
-    @State private var showNicknameInput = false
+    // isPresented 플래그 대신 item을 사용해 레이스 조건 제거
+    @State private var nextAgreements: AgreementsBox? = nil
+    
     @State private var activeLink: WebLink? // 현재 선택된 약관 URL
     
     var body: some View {
@@ -95,7 +102,11 @@ struct TermsAgreementView: View {
             
             // 다음
             Button {
-                showNicknameInput = true
+                let payload = viewModel.makeAgreementsPayload()
+                // 디버그 & 안전 가드
+                assert(!payload.isEmpty, "Agreements payload should NOT be empty at TermsAgreementView")
+                print("DEBUG Terms →", payload.map { "\($0.termsType)=\($0.isAgreed)" })
+                nextAgreements = AgreementsBox(value: payload)
             } label: {
                 Text("다음")
                     .font(.system(size: 16, weight: .bold))
@@ -113,12 +124,7 @@ struct TermsAgreementView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
-                    //
-                    if !router.path.isEmpty {
-                        router.pop()
-                    } else {
-                        dismiss()
-                    }
+                    dismiss()
                 } label: {
                     Image("authBackIcon")
                         .resizable()
@@ -130,15 +136,9 @@ struct TermsAgreementView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-        
-        .fullScreenCover(isPresented: $showNicknameInput) {
-            NicknameInputView(agreements: viewModel.makeAgreementsPayload())
-                .onAppear {
-                    let p = viewModel.makeAgreementsPayload()
-                    print("DEBUG Sheet Payload →", p.map { "\($0.termsType)=\($0.isAgreed)" })
-                }
+        .fullScreenCover(item: $nextAgreements) { box in
+            NicknameInputView(agreements: box.value)
         }
-        
         // URL 시트 표시
         .sheet(item: $activeLink) { link in
             SafariSheet(url: link.url)
