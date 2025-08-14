@@ -14,7 +14,7 @@ enum AppTextStyle {
     case captionSemibold14, captionMedium14, captionRegular14, captionLight14
     case metaSemibold12, metaMedium12, metaRegular12
     case metaMedium10, metaRegular10, metaMedium8, metaRegular8, metaSemibold21
-    case homeRegular30, homeSemibold12, homeMedium11, homeRegular11
+    case homeRegular30, homeSemibold12, homeMedium11, homeRegular11,homeSemibold30
 
 
     var font: Font {
@@ -53,6 +53,7 @@ enum AppTextStyle {
         case .homeSemibold12: return .custom("Pretendard-SemiBold", size: 12)
         case .homeMedium11: return .custom("Pretendard-Medium", size: 11)
         case .homeRegular11: return .custom("Pretendard-Regular", size: 11)
+        case .homeSemibold30: return .custom("Pretendard-SemiBold", size: 30)
         }
     }
 
@@ -66,7 +67,7 @@ enum AppTextStyle {
         case .metaSemibold12, .metaMedium12, .metaRegular12, .homeSemibold12: return 12
         case .metaMedium10, .metaRegular10: return 10
         case .metaMedium8, .metaRegular8: return 8
-        case .homeRegular30: return 30
+        case .homeRegular30, .homeSemibold30: return 30
         case .homeMedium11, .homeRegular11: return 11
         }
     }
@@ -81,7 +82,7 @@ enum AppTextStyle {
         case .metaSemibold12, .metaMedium12, .metaRegular12,
              .metaMedium10, .metaRegular10,
              .metaMedium8, .metaRegular8: return 16
-        case .homeRegular30: return 30
+        case .homeRegular30, .homeSemibold30: return 30
         case .homeMedium11, .homeRegular11: return 11
         case .homeSemibold12: return 14
 
