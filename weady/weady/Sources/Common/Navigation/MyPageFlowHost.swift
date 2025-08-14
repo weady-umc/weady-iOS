@@ -12,6 +12,7 @@ import Observation
 /// Mypage 플로우에서 사용하는 라우트 정의
 enum MyPageRoute: Hashable {
     case mypage
+    case setting
 }
 
 // MARK: - MyPageRouter
@@ -42,6 +43,8 @@ struct MyPageFlowHost: View {
                     switch route {
                     case .mypage:
                         MyPageView()
+                    case .setting:
+                        SettingView()
                     }
                 }
         }

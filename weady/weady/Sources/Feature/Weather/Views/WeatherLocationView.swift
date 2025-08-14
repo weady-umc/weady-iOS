@@ -1,5 +1,5 @@
 //
-//  WeatherLocationAddView.swift
+//  WeatherLocationView.swift
 //  weady
 //
 //  Created by Yoonseo on 7/18/25.
@@ -41,6 +41,13 @@ struct WeatherLocationView: View {
                 .navigationTitle("위치")
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden(true)
+                .onAppear {
+                    UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU0NzQ0NTMyfQ.QvipLyoLNcIYzj7qTuBsbEWO8cPDkbl1XJxe9cR-MZoh2lPP0yIcaCIXp8FkpkxZVipoJBEcuC0eaGTlVvOGnw", forKey: "accessToken")
+                }
+                .onAppear {
+                    viewModel.loadFavorites()
+                }
+
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
@@ -190,11 +197,35 @@ struct WeatherLocationView: View {
         
 
     }
+
+
     func deleteItem(_ weather: WeatherData) {
-        if let index = viewModel.favoriteLocations.firstIndex(of: weather) {
-            viewModel.favoriteLocations.remove(at: index)
+        guard let favId = weather.favoriteId else {
+            // 서버 ID 없으면 로컬만 제거
+            if let idx = viewModel.favoriteLocations.firstIndex(of: weather) {
+                viewModel.favoriteLocations.remove(at: idx)
+            }
+            return
+        }
+
+        if let idx = viewModel.favoriteLocations.firstIndex(of: weather) {
+            let removed = weather
+            viewModel.favoriteLocations.remove(at: idx) // 낙관적 제거
+
+            viewModel.deleteFavoriteFromServer(favoriteId: favId) { ok in
+                if ok {
+                    print("✅ 즐겨찾기 삭제 성공: \(favId)")
+                } else {
+                    print("❌ 즐겨찾기 삭제 실패, 복구")
+                    DispatchQueue.main.async {
+                        viewModel.favoriteLocations.insert(removed, at: idx)
+                    }
+                }
+            }
         }
     }
+
+
 
 }
 

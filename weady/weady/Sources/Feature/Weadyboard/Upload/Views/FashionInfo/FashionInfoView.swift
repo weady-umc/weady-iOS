@@ -4,6 +4,8 @@ struct FashionInfoView: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var viewModel: FashionViewModel
     
+    var onComplete: (() -> Void)? = nil
+    
     @State private var showAddSheet = false
     @State private var brandName: String = ""
     @State private var productName: String = ""
@@ -17,7 +19,7 @@ struct FashionInfoView: View {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 1), count: 5), spacing: 15) {
                         ForEach(viewModel.allStyles, id: \.self) { style in
                             FilterLineBtn(
-                                title: style,
+                                title: style.displayName,
                                 isSelected: viewModel.fashion.selectedStyles.contains(style)
                             ) {
                                 viewModel.toggleStyle(style)
@@ -74,8 +76,9 @@ struct FashionInfoView: View {
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("완료") {
-                    print("- 스타일: \(viewModel.fashion.selectedStyles)")
+                    print("- 스타일: \(viewModel.fashion.selectedStyles.map { $0.displayName })")
                     print("- 태그: \(viewModel.fashion.selectedTags)")
+                    onComplete?()
                     dismiss()
                 }
                 .fontName(.captionMedium14)

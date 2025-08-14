@@ -12,8 +12,10 @@ struct WeadyboardPostReportDetailView: View {
     let selectedReasonIndex: Int
     let boardId: Int
     @State private var customText: String = ""
+    @State private var isSubmitting = false
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var reportViewModel: WeadyboardReportViewModel
+    @EnvironmentObject private var toast: ToastCenter
     
     var body: some View {
         VStack(spacing: 0) {
@@ -75,11 +77,9 @@ struct WeadyboardPostReportDetailView: View {
             Spacer()
             
             Button {
-                let reportType = ReportTag.reportTypeEnglish(for: selectedReasonIndex)
-                let content = reason.isCustomInput ? customText : reason.detailTitle
-                reportViewModel.report(boardId: boardId, reportType: reportType, content: content)
+                submitReport()
             } label: {
-                Text("신고하기")
+                Text(isSubmitting ? "신고 중..." : "신고하기")
                     .fontName(.bodySemibold16)
                     .foregroundColor(.white100)
                     .frame(maxWidth: .infinity)
@@ -89,10 +89,46 @@ struct WeadyboardPostReportDetailView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 20)
             }
+            .disabled(isSubmitDisabled)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.white100)
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
+    }
+    
+    private var isSubmitDisabled: Bool {
+        if isSubmitting { return true }
+        if reason.isCustomInput {
+            return customText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        return false
+    }
+    
+    private var buttonBackgroundColor: Color {
+        isSubmitDisabled ? Color.gray300 : Color.black100
+    }
+    
+    private func submitReport() {
+        guard !isSubmitDisabled else { return }
+        isSubmitting = true
+        
+        let reportType = ReportTag.reportTypeEnglish(for: selectedReasonIndex)
+        let content = reason.isCustomInput
+        ? customText.trimmingCharacters(in: .whitespacesAndNewlines)
+        : reason.detailTitle
+        
+        reportViewModel.report(boardId: boardId, reportType: reportType, content: content) { result in
+            isSubmitting = false
+            switch result {
+            case .success:
+                toast.showSuccess("신고가 접수되었습니다.")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    dismiss()
+                }
+            case .failure:
+                toast.showError("신고에 실패했습니다. 잠시 후 다시 시도해주세요.")
+            }
+        }
     }
 }

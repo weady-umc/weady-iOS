@@ -9,10 +9,7 @@ import Foundation
 import Combine
 
 struct WeatherResponse: Codable {
-    struct HourlyEntry: Codable {
-        let dt: TimeInterval
-        let temp: Double
-    }
+    struct HourlyEntry: Codable { let dt: TimeInterval; let temp: Double }
     let hourly: [HourlyEntry]
 }
 

@@ -14,5 +14,11 @@ public struct ApiResponse<T: Decodable>: Decodable {
     public let data: T?
 }
 
-// 응답 데이터가 아예 없는 경우 
+// 응답 데이터 없는 경우 (data 키 자체가 없음)
+public struct ApiResponseNoData: Decodable {
+    public let code: Int
+    public let message: String
+}
+
+// 응답 데이터 없는 경우 (data 키 있지만 그 안이 비어있음)
 public struct EmptyResponse: Decodable {}
