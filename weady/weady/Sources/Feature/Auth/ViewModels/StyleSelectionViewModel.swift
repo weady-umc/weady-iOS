@@ -82,4 +82,3 @@ final class StyleSelectionViewModel: ObservableObject {
         didTapNext = true
     }
 }
-
