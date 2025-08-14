@@ -20,6 +20,10 @@ struct ClothingRecommendationView: View {
     @State private var helpStep: HelpStep = .intro //HelpGuideCardView 1,2
     
     let same = Date()
+    // 기본 init: 내부에서 VM 생성
+    init() {
+        _vm = StateObject(wrappedValue: ClothingRecommendationViewModel())
+    }
     
     // 실제 앱에서 토큰으로 초기화
     init(token: String) {
@@ -88,7 +92,7 @@ struct ClothingRecommendationView: View {
                                 .fontName(.titleMedium24)
                             Text(vm.clothingName)
                                 .fontName(.titleBold24)
-                            Text(vm.subjectParticle)       
+                            Text(vm.subjectParticle)
                                 .fontName(.titleMedium24)
                         }
                         Text("딱 좋은 날이에요.")
