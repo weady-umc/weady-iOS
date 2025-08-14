@@ -12,8 +12,8 @@ struct AgreementItem: Identifiable {
     let title: String
     let isRequired: Bool
     var isOn: Bool
+    var url: URL? //약관 상세 URL
     
-    /// “만 14세 이상입니다. (필수)” 같은 레이블
     var label: String {
         title + (isRequired ? " (필수)" : " (선택)")
     }

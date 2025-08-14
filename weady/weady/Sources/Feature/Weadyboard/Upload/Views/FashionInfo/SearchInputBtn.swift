@@ -13,7 +13,7 @@ struct SearchInputBtn: View {
                 showSearchSheet.toggle()
             } label: {
                 HStack {
-                    Image(.searchIcon)
+                    Image(.uploadSearchIcon)
                         .scaledToFit()
                         .frame(width: 17, height: 17)
                     Text("브랜드명, 제품명을 입력하세요")

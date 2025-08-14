@@ -4,6 +4,8 @@ struct PlaceInfoView: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var viewModel: PlaceViewModel
     
+    var onComplete: (() -> Void)? = nil
+    
     @State private var isSearching = false
 
     var body: some View {
@@ -70,6 +72,7 @@ struct PlaceInfoView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("완료") {
                     print("- 장소명 : \(viewModel.selectedPlaces)")
+                    onComplete?()
                     dismiss()
                 }
                 .fontName(.captionMedium14)

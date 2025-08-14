@@ -8,11 +8,19 @@
 import Foundation
 
 struct TempChartModel: Identifiable {
-    let id = UUID()
+    let id: UUID
     let date: Date
     let temp: Int
+    let iconName: String?
 
-    /// 체감온도에 맞는 구간(min…max)을 Int 타입으로 반환
+    init(id: UUID = UUID(), date: Date, temp: Int, iconName: String? = nil) {
+        self.id = id
+        self.date = date
+        self.temp = temp
+        self.iconName = iconName
+    }
+
+    /// 체감온도를 5개 밴드 범위로 표현 (참고용)
     var range: (min: Int, max: Int) {
         switch temp {
         case 15...16: return (15, 16)
@@ -22,10 +30,5 @@ struct TempChartModel: Identifiable {
         case 31...35: return (31, 35)
         default:      return (temp, temp)
         }
-    }
-
-    /// 막대의 오른쪽 x값 (1시간 뒤)
-    var endDate: Date {
-        Calendar.current.date(byAdding: .hour, value: 1, to: date)!
     }
 }

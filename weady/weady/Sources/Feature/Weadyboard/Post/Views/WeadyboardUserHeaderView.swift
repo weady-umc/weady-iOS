@@ -9,21 +9,21 @@ import SwiftUI
 
 struct WeadyboardUserHeaderView: View {
     let userName: String
-    let userProfileImageUrl: String
+    let userProfileImageUrl: String?
     let onMoreTap: () -> Void
     
     var body: some View {
         HStack(spacing: 12) {
-            AsyncImage(url: URL(string: userProfileImageUrl)) { img in
+            AsyncImage(url: URL(string: userProfileImageUrl ?? "")) { img in
                 img.resizable()
             } placeholder: {
-                Image("profile")
+                Image("profile") // 기본 프로필 이미지
+                    .resizable()
             }
-            .frame(width: 36, height: 36)
+            .frame(width: 30, height: 30)
             .clipShape(Circle())
             
-//            Text(username)
-            Text("nickname")
+            Text(userName)
                 .fontName(.metaSemibold12)
             
             Spacer()
