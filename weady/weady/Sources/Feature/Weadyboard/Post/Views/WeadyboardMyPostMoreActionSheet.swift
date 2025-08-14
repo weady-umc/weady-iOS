@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct WeadyboardMyPostMoreActionSheet: View {
-    @Binding var showReportSheet: Bool
     let boardId: Int
-    @ObservedObject var reportViewModel: WeadyboardReportViewModel
-    @EnvironmentObject private var toast: ToastCenter
+    let onEdit: () -> Void
+    let onDeleteSuccess: () -> Void
 
-   
-    
+    @EnvironmentObject private var toast: ToastCenter
+    @State private var showDeleteAlert = false
+    private let service = BoardService()
+
     var body: some View {
         VStack(spacing: 0) {
             
@@ -30,17 +31,14 @@ struct WeadyboardMyPostMoreActionSheet: View {
                 MyMoreActionButton(
                     iconName: "updateicon",
                     title: "게시물 수정하기",
-                    action: {
-                        
-                    }
+                    action: { onEdit() }
                 )
 
                 MyMoreActionButton(
                     iconName: "deleteicon",
                     title: "게시물 삭제하기",
                     titleColor: Color(UIColor.systemRed),
-                    action: {
-                    }
+                    action: { showDeleteAlert = true }
                 )
             }
             .padding(.top, 24)
@@ -51,6 +49,21 @@ struct WeadyboardMyPostMoreActionSheet: View {
                 .fill(Color.white100)
                 .cornerRadius(10, corners: [.topLeft, .topRight])
         )
+        .alert("게시물을 삭제하시겠어요?", isPresented: $showDeleteAlert) {
+            Button("취소", role: .cancel) {}
+            Button("삭제", role: .destructive) {
+                service.deleteBoard(boardId: boardId) { result in
+                    switch result {
+                    case .success:
+                        onDeleteSuccess()
+                    case .failure:
+                        toast.showError("삭제에 실패했습니다. 잠시 후 다시 시도해주세요.")
+                    }
+                }
+            }
+        } message: {
+            Text("삭제하면 되돌릴 수 없습니다.")
+        }
     }
 }
 
@@ -90,4 +103,3 @@ struct MyMoreActionButton: View {
         }
     }
 }
-
