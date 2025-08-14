@@ -48,6 +48,7 @@ struct WeatherHomeView: View {
                     print("Short API 실패:", err)
                 }
             }
+
         }
         // MARK: - 토큰 사전 세팅 (Moya Plugin/헤더에서 참조한다고 가정)
         .onAppear {
