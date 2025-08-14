@@ -31,7 +31,7 @@ class WeatherLocationAddViewModel: ObservableObject {
     private func mapSkyStatusToBackground(_ status: String) -> String {
         switch status {
         case "CLEAR": return "weatherAdd_sunny"
-        case "CLOUDY": return "weatherAdd_cloudy"
+        case "CLOUDY", "PARTLY_CLOUDY": return "weatherAdd_cloudy"
         case "RAIN", "RAINY": return "weatherAdd_rainy"
         default: return "weatherAdd_default"
         }
@@ -40,7 +40,7 @@ class WeatherLocationAddViewModel: ObservableObject {
     static func mapSkyStatusToIcon(_ status: String) -> String {
         switch status {
         case "CLEAR": return "sunnyIcon"
-        case "CLOUDY": return "cloudyIcon"
+        case "CLOUDY", "PARTLY_CLOUDY": return "cloudyIcon"
         case "RAIN", "RAINY": return "rainyIcon"
         case "WINDY": return "windyIcon"
         default: return "defaultIcon"
@@ -50,7 +50,7 @@ class WeatherLocationAddViewModel: ObservableObject {
     private func mapSkyStatusToBigIcon(_ status: String) -> String {
         switch status {
         case "CLEAR": return "bigSunnyIcon"
-        case "CLOUDY": return "bigCloudyIcon"
+        case "CLOUDY", "PARTLY_CLOUDY": return "bigCloudyIcon"
         case "RAIN", "RAINY": return "bigRainyIcon"
         case "WINDY": return "bigWindyIcon"
         default: return "bigDefaultIcon"
@@ -60,6 +60,7 @@ class WeatherLocationAddViewModel: ObservableObject {
     func convertToWeatherAddData(from data: ShortWeatherData) -> WeatherAddData {
         return WeatherAddData(
             weatherBackground: mapSkyStatusToBackground(data.skyStatus),
+            homeBackground: mapSkyStatusToHomeBackground(data.skyStatus),
             place: "\(data.address1) \(data.address2) \(data.address3)",
             temperature: Int(data.currentTmp),
             weatherIcon: mapSkyStatusToBigIcon(data.skyStatus), // 상단에는 big 아이콘 사용
@@ -81,19 +82,30 @@ class WeatherLocationAddViewModel: ObservableObject {
     private func mapSkyStatusToKorean(_ status: String) -> String {
         switch status {
         case "CLEAR": return "맑음"
-        case "CLOUDY": return "흐림"
+        case "CLOUDY", "PARTLY_CLOUDY": return "흐림"
         case "RAIN", "RAINY": return "비"
         case "WINDY": return "바람"
         default: return "날씨 정보 없음"
         }
     }
 
+    private func mapSkyStatusToHomeBackground(_ status: String) -> String {
+        // 홈 카드 전용 배경
+        switch status {
+        case "CLEAR": return "home_sunny"
+        case "CLOUDY", "PARTLY_CLOUDY": return "home_cloudy"
+        case "RAIN", "RAINY": return "home_rainy"
+        case "WINDY": return "home_windy"
+        default: return "home_default"
+        }
+    }
 
     
 }
 
 
-extension ShortWeatherData {
+extension ShortWeatherData{
+        
     static let example = ShortWeatherData(
         address1: "서울특별시",
         address2: "강남구",

@@ -1,5 +1,19 @@
 
-
+//
+//  ClothingRecommendationView.swift
+//  weady
+//
+//  Created by 김영택 on 8/8/25.
+//
+import SwiftUI
+struct ClothingRecommendationView : View {
+    var body: some View {
+        VStack{
+            Text("이거 네비연결하려고한거니 이거 나중에 지우셈")
+        }
+    }
+}
+/*
 
 import SwiftUI
 import Combine
@@ -251,4 +265,6 @@ struct ClothingRecommendationView_Previews: PreviewProvider {
     }
 }
 
+
+*/
 

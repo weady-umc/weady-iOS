@@ -15,7 +15,7 @@ struct ShortWeatherResponse: Decodable {
 }
 
 //단기예보 모델
-struct ShortWeatherData: Decodable, Identifiable {
+struct ShortWeatherData: Decodable, Identifiable, Hashable {
     var id: UUID { UUID() }
     let address1: String
     let address2: String
@@ -30,20 +30,20 @@ struct ShortWeatherData: Decodable, Identifiable {
 }
 
 //시간별 예보
-struct HourlyForecast: Decodable {
+struct HourlyForecast: Decodable, Hashable {
     let time: Int
     let skyStatus: String
     let tmp: Double
 }
 
 //시간별 강수 확률
-struct HourlyPrecipitation: Decodable {
+struct HourlyPrecipitation: Decodable, Hashable {
     let time: Int
     let probability: Double
 }
 
 //시간별 풍속, 풍향
-struct HourlyWind: Decodable {
+struct HourlyWind: Decodable, Hashable {
     let time: Int
     let direction: String
     let speed: Double

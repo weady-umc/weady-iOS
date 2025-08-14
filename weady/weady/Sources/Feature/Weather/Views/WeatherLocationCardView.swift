@@ -79,7 +79,7 @@ struct WeatherLocationCardView: View {
 
 #Preview {
     let example = WeatherData(
-        id: UUID(),
+        
         location: "서초구 양재1동",
         temperature: "17",
         highTemperature: "25",

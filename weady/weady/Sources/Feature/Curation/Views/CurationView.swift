@@ -158,7 +158,7 @@ private struct CardRow: View {
     }
 }
 
-
+/*
 // MARK: - 프리뷰용
 private struct CurationView_NavPreview: View {
     @State private var router = HomeRouter()
@@ -172,7 +172,7 @@ private struct CurationView_NavPreview: View {
                     switch route {
                     case .home:
                         HomeView()
-                    case .weatheraddlocation:
+                    case .weatheradd:
                         WeatherLocationAddView(
                             viewModel: WeatherLocationAddViewModel(),
                             locationViewModel: WeatherLocationViewModel(),
@@ -187,6 +187,8 @@ private struct CurationView_NavPreview: View {
                         DetailCurationView(curationId: curationId)
                     case .curation:
                         CurationView()
+                    case .weatherhome(_):
+                        <#code#>
                     }
                 }
         }
@@ -210,4 +212,9 @@ private struct CurationView_NavPreview: View {
 
 #Preview("DetailCurationView") {
     DetailCurationView(curationId: 5)
+}
+*/
+#Preview("CurationView") {
+    CurationView()
+        .environment(HomeRouter()) //  Observation 스타일 프리뷰 주입
 }

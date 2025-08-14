@@ -17,6 +17,7 @@ struct WeatherSearchView: View {
     @State private var previewWeatherData: ShortWeatherData? = nil
     @StateObject private var locationViewModel = WeatherLocationViewModel()
     @StateObject private var addViewModel = WeatherLocationAddViewModel()
+    @State private var shouldGoToWeatherLocation = false
 
     
     var body: some View {
@@ -50,23 +51,11 @@ struct WeatherSearchView: View {
                 }
             }
         }
-        .sheet(isPresented: $showWeatherPreview) {
-            if let weather = previewWeatherData {
-                WeatherLocationAddView(
-                    viewModel: addViewModel,
-                    locationViewModel: locationViewModel,
-                    selectedPlace: $selectedPlace,
-                    onComplete: {
-                        router.push(.weatherlocation)
-                    }, weather: weather
-                )
-                .environment(router)
-            }
-        }
+       
 
 
         .onAppear {
-            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU0NzM3NTU1fQ.foppETPx0LDKmBVgj-ogeflTfReGxsMDXpy88TRocNBKiHkGNlfsr12aoYI8jct4GShYuxaJJA_21AjkJikZjw", forKey: "accessToken")
+            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MTgzMDczfQ.FA0WXJieO-2cQsi-I8ig-7PSMfubAmn0gUUfZmjo_CQaspP9bvhhAUTEEzrxHvTGTL7mMf5ZJWYKwSxaDlxgUQ", forKey: "accessToken")
         }
     }
     
@@ -100,9 +89,14 @@ struct WeatherSearchView: View {
         VStack {
 
             if viewModel.searchResults.isEmpty {
+                
+                Spacer().frame(height: 40)
+                
                 Text("🔍 검색 결과가 없습니다.")
-                    .foregroundColor(.gray)
-                    .padding(.top, 20)
+                    .foregroundColor(.gray300)
+                
+                    
+                    
             } else {
                 List(viewModel.filteredResults, id: \.id) { place in
                     Button(action: {
@@ -111,11 +105,10 @@ struct WeatherSearchView: View {
                         viewModel.select(place: place) { weather in
                             if let weather = weather {
                                 print("✅ 날씨 데이터 수신 완료: \(weather)")
+                                
                                 self.previewWeatherData = weather
                                 self.showWeatherPreview = true
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    self.showWeatherPreview = true
-                                }
+                                router.push(.weatheradd(place, weather))
                                 
                             } else {
                                 print("❌ 날씨 데이터를 가져오지 못함")
@@ -144,6 +137,8 @@ struct WeatherSearchView: View {
 struct WeatherSearchView_Previews: PreviewProvider {
     static var previews: some View {
         WeatherSearchView(selectedPlace: .constant(nil))
-//            .environmentObject(NavigationRouter())
+
+            .environment(HomeRouter())
+
     }
 }

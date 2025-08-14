@@ -45,7 +45,7 @@ extension UploadModel {
             styleIds: self.styleIds,
             boardBrandRequestDtoList: self.brandDtoList.map {
                 BrandDTO(brand: $0.brand, product: $0.product)
-            },
+            }
 //            imageDtoList: self.imageDtoList.map {
 //                ImageDTO(imgUrl: $0.imgUrl, imgOrder: $0.imgOrder)
 //            },

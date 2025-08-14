@@ -31,4 +31,14 @@ final class FashionService: NetworkManager {
     public func getFashionDetail(completion: @escaping (Result<FashionDetailResponseDTO, NetworkError>) -> Void) {
         request(target: .getDetail, decodingType: FashionDetailResponseDTO.self, completion: completion)
     }
+    
+    /// GET /api/v1/fashion/summary
+    /// 홈 화면 요약(추천 문구/이미지)
+    public func getFashionSummary(
+        completion: @escaping (Result<FashionSummaryResponseDTO, NetworkError>) -> Void
+    ) {
+        request(target: .getSummary,
+                decodingType: FashionSummaryResponseDTO.self,
+                completion: completion)
+    }
 }
