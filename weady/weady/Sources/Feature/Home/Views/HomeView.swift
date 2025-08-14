@@ -8,37 +8,49 @@ import SwiftUI
 import Moya
 
 struct HomeView: View {
-    @Environment(HomeRouter.self) var router
-    @StateObject private var locationService = LocationService()
     
-    // 동적 날씨 데이터 상태
-    @State private var addData: WeatherAddData?
-    @State private var isLoading = false
-    @State private var errorMessage: String?
+    // MARK: - Router / Location 환경 주입
+    @Environment(HomeRouter.self) var router                         // 화면 전환용 커스텀 라우터
+    @StateObject private var locationService = LocationService()     // 현재 위치 획득용 서비스 (CLLocationManager 래핑 가정)
     
-    @State private var fashion: FashionSummary?
-    @State private var isLoadingFashion = false
-    @State private var fashionError: String?
+    // MARK: - 날씨 카드 상태 (Home 상단 카드)
+    @State private var addData: WeatherAddData?                      // 상단 날씨 카드에 뿌릴 변환된 도메인 데이터
+    @State private var isLoading = false                             // 상단 날씨 로딩 상태
+    @State private var errorMessage: String?                         // 상단 날씨 오류 메시지
+    
+    // MARK: - 옷차림 추천 상태
+    @State private var fashion: FashionSummary?                      // 옷차림 추천 결과(도메인)
+    @State private var isLoadingFashion = false                      // 옷차림 로딩 상태
+    @State private var fashionError: String?                         // 옷차림 오류 메시지
+    
+    @State private var didSendNowLocation = false
+    @State private var didPatchNowLocation = false
     
     var body: some View {
 
         VStack {
             
-            
+            // MARK: - 상단 여백 (디자인 스펙)
             Spacer().frame(height: 105)
             
+            // MARK: - 인사/타이틀
             TopView
                 .padding(.horizontal, 13)
             
+            
             Spacer().frame(height: 25)
             
-            /// 날씨 카드 (동적 데이터 적용)
+            // MARK: - [네비 버튼] 날씨 카드 (누르면 .weatherhome 로 이동)
             Button {
                 router.push(.weatherhome)
             } label: {
+                
+                // MARK: - 상단 날씨 카드 3단계 상태 렌더링
                 if let data = addData {
+                    // ✅ 정상 데이터 있을 때: 실 카드
                     WeatherHeaderCard(data: data)
                 } else if isLoading {
+                    // ⏳ 로딩 중일 때: 스켈레톤/프로그레스
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(Color.white200)
@@ -46,7 +58,7 @@ struct HomeView: View {
                         ProgressView().padding()
                     }
                 } else {
-                    // 최초 진입 또는 오류 시 대체 뷰
+                    // ❌ 초기 진입 또는 오류 시 대체 뷰
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(Color.white200)
@@ -60,7 +72,7 @@ struct HomeView: View {
             
             Spacer().frame(height: 28)
             
-            /// 옷차림/장소 카드(그대로)
+            // MARK: - [네비 버튼] 옷차림/장소 카드 (누르면 .clothes 로 이동)
             Button {
                 router.push(.clothes)
             } label: {
@@ -73,25 +85,48 @@ struct HomeView: View {
             
             Spacer().frame(height: 35)
             
+            // MARK: - [네비 버튼] 큐레이션 카드 (누르면 .curation 로 이동)
             Button {
                 router.push(.curation)
             } label: { PlaceView }
         }
         .padding(.bottom, 70)
         
+        // MARK: - 라이프사이클: 화면 진입 시 위치 요청
         .onAppear {
+            locationService.requestCurrentLocation() // 권한 요청 + 현재 좌표 1회/지속 업데이트 트리거
+        }
+        
+        // MARK: - 위치 좌표 스트림 수신 → 서버 now-location PATCH
+
+        // onAppear: 토큰 세팅 + 플래그 초기화 + 위치 요청
+        .onAppear {
+            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MjA5OTY2fQ.RoRcKwT1e1Iq7btHyKcq67LwipFwq8vCJbrpQ57jW0mxF45JUDwtmAT8j3XT9EIN-7Ep6OqZqORH1W0iHgwq4A", forKey: "accessToken")
+            didSendNowLocation = false            // 매 진입마다 다시 보내도록 초기화
+            didPatchNowLocation = false
             locationService.requestCurrentLocation()
         }
+
+        // 3) 좌표 수신부: 그대로 (guard !didSendNowLocation 유지)
         .onReceive(locationService.$coordinate.compactMap { $0 }) { coord in
-            // 좌표 갱신되면 서버에 now-location 전송
+            print(String(format: "📍 [Location] lat=%.6f, lon=%.6f", coord.latitude, coord.longitude))
+            guard !didSendNowLocation else { return }
+            didSendNowLocation = true
+
             WeatherServices.shared.updateNowLocation(
                 longitude: coord.longitude,
                 latitude: coord.latitude
-            ) { result in
+            ) { (result: Result<NowLocationResponse, Error>) in   
                 switch result {
-                case .success:
-                    print("✅ now-location PATCH 성공")
+                case .success(let res):
+                    print("✅ now-location PATCH 성공, id=\(res.nowLocationId)")
+                    didPatchNowLocation = true
+                    self.loadHomeWeather()
+                    self.loadFashionSummary()
+                    
                 case .failure(let error):
+                    didPatchNowLocation = false
+                    self.loadHomeWeather() // fallback
                     if case let MoyaError.underlying(_, response) = error, let res = response {
                         print("❌ status=\(res.statusCode)")
                         print("❌ body=\(String(data: res.data, encoding: .utf8) ?? "nil")")
@@ -102,46 +137,29 @@ struct HomeView: View {
                         print("❌ \(error)")
                     }
                 }
-                
             }
-            print("lat: \(coord.latitude), lon: \(coord.longitude)")
-            
-            
         }
-        
-        .onAppear {
-            // 토큰 세팅
-            UserDefaults.standard.set(
-                "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MTgzMDczfQ.FA0WXJieO-2cQsi-I8ig-7PSMfubAmn0gUUfZmjo_CQaspP9bvhhAUTEEzrxHvTGTL7mMf5ZJWYKwSxaDlxgUQ",
-                forKey: "accessToken"
-                
-                
-            )
-            
-            // 날씨 데이터 로드
-            loadHomeWeather()
-            //self.addData = WeatherLocationAddViewModel().convertToWeatherAddData(from: ShortWeatherData.example)
-            loadHomeWeather()
-            
-            
-            
-        }
+
 
     }
     
-    
-    
+    // MARK: - 상단 타이틀 뷰
     private var TopView: some View {
         Text("키코님, \n오늘은 이런 하루 어때요?")
             .foregroundStyle(Color.black100)
             .fontName(.titleSemibold24)
+            .lineLimit(2)                 // 줄바꿈 방지
+            .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.leading, 24)
     }
     
+    
+    // MARK: - 옷차림 카드 뷰 (상태별 분기)
     private var ClothesView: some View {
         Group {
             if isLoadingFashion {
+                // ⏳ 로딩 스켈레톤
                 
                 HStack {
                     RoundedRectangle(cornerRadius: 8).fill(Color.white300)
@@ -161,35 +179,30 @@ struct HomeView: View {
                 .frame(width: 375, height: 170)
 
             } else if let s = fashion {
-                // 정상(또는 실패 대체) 데이터
+                //  정상 또는 실패 대체(더미) 데이터가 있는 경우
                 HStack {
-                    
-                    
-                    
-                    RemoteThumb(urlString: s.imageURL)
-                        .frame(width: 60, height: 60)
+                    RemoteThumb(urlString: s.imageUrl)
+                        .frame(width: 70, height: 70)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                         .padding(.leading, 25)
                         
-
-                    Text(s.recommendation)
+                    Text("오늘은 \(s.recommendation)가 \n딱 좋은 날이에요")
                         .fontName(.bodyLight16)
                         .foregroundStyle(Color.black100)
                         .multilineTextAlignment(.leading)
                         .lineLimit(2)
                         .padding(.leading, 25)
                         
-
                     Spacer()
                     Image("rightArrow")
+                        .padding(.trailing, 20)
                 }
-                
 
             } else if let _ = fashionError {
-                // 에러인데 더미 대체도 못했을 때
+                //  에러 + 더미도 없는 경우: 재시도 버튼 노출
                 HStack {
                     Image("clothesIcon").resizable().aspectRatio(contentMode: .fit)
-                        .frame(width: 60, height: 60)
+                        .frame(width: 70, height: 70)
                         .padding(.leading, 25)
                     
                     Text("옷차림 정보를 불러오지 못했어요. 다시 시도해 주세요.")
@@ -207,10 +220,10 @@ struct HomeView: View {
                 }
                 
             } else {
-                // 초기/빈 상태
+                //  초기/빈 상태
                 HStack {
                     Image("clothesIcon").resizable()
-                        .frame(width: 60, height: 60)
+                        .frame(width: 70, height: 70)
                         .padding(.leading, 25)
                     
                     Text("오늘의 옷차림을 불러오는 중…")
@@ -221,12 +234,11 @@ struct HomeView: View {
                     Image("rightArrow")
                         .padding(.trailing, 20)
                 }
-                
             }
         }
     }
 
-    
+    // MARK: - 장소 큐레이션 카드 (수평 스크롤 이미지 리스트)
     private var PlaceView: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -244,10 +256,9 @@ struct HomeView: View {
             }
             .padding(.leading, 25)
             
-            
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 16) {
-                    
+                    // NOTE: 현재는 정적 이미지 사용. 서버 연동 시 모델 리스트로 교체 예정 가정
                     Image("homeplacedata1")
                         .resizable()
                         .frame(width: 259, height: 128)
@@ -275,23 +286,24 @@ struct HomeView: View {
         .frame(width: 390, height: 185)
     }
     
-    // 서버에서 단기예보 불러와 WeatherAddData로 변환
+    // MARK: - API: 단기예보 → WeatherAddData 변환 후 상단 카드에 반영
     private func loadHomeWeather() {
         isLoading = true
         errorMessage = nil
-        addData = nil
+        addData = nil // NOTE: 기존 데이터 제거 → 로딩 시 카드가 사라져 '깜빡임' 발생 가능 (코드 변경 금지로 유지)
         
         WeatherServices.shared.fetchShortWeather { result in
             DispatchQueue.main.async {
                 isLoading = false
                 switch result {
                 case .success(let short):
+                    print("✅ [ShortWeather] OK | \(short.address1) \(short.address2) \(short.address3) | now=\(short.currentTmp)°C | min=\(short.minTmp)°C / max=\(short.maxTmp)°C")
                     let converter = WeatherLocationAddViewModel()
-                    self.addData = converter.convertToWeatherAddData(from: short)
+                    self.addData = converter.convertToWeatherAddData(from: short) // 성공 → 변환 반영
                     
                 case .failure(let error):
                     print("❌ 날씨 API 호출 실패: \(error.localizedDescription)")
-                    // 실패 시 더미 데이터로 대체
+                    // 실패 시 더미 데이터로 대체 (앱 체감 무너짐 방지)
                     let converter = WeatherLocationAddViewModel()
                     self.addData = converter.convertToWeatherAddData(from: ShortWeatherData.example)
                 }
@@ -299,22 +311,20 @@ struct HomeView: View {
         }
     }
     
-    
-    
-    //  홈 상단 날씨 카드 (배경/온도/장소/최저·최고 + 시간별)
+    // MARK: - 컴포넌트: 홈 상단 날씨 카드 UI
     private struct WeatherHeaderCard: View {
         let data: WeatherAddData
         
         var body: some View {
             ZStack {
-                Image(data.homeBackground)
+                Image(data.homeBackground)                 // 날씨 상태에 따른 배경 이미지
                     .resizable()
                     .frame(width: 375, height: 170)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                 
                 VStack {
                     HStack {
-                        Text("\(data.temperature)º")
+                        Text("\(data.temperature)º")       // 현재 기온
                             .foregroundStyle(Color.white100)
                             .fontName(.homeRegular30)
                             .padding(.leading, 40)
@@ -328,21 +338,21 @@ struct HomeView: View {
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 8, height: 11.43)
                                 
-                                Text(data.place)
+                                Text(data.place)            // 현재 위치명
                                     .foregroundStyle(Color.white100)
                                     .fontName(.homeMedium11)
                                     .lineLimit(1)
                                     .truncationMode(.tail)
                             }
                             
-                            Text("최저 \(data.lowTemperature)º | 최고 \(data.highTemperature)º")
+                            Text("최저 \(data.lowTemperature)º | 최고 \(data.highTemperature)º") // 최저/최고
                                 .foregroundStyle(Color.white100)
                                 .fontName(.metaRegular10)
                         }
                         .padding(.trailing, 35)
                     }
                     
-                    //  시간별 스크롤 (재사용 컴포넌트)
+                    // 시간대별 날씨 요약 (가로 스크롤)
                     HourlyWeatherScrollView(hourlyWeatherList: data.hourlyWeather)
                         .padding(.horizontal, 40)
                 }
@@ -352,71 +362,69 @@ struct HomeView: View {
         
     }
         
-        // MARK: - Fashion summary
-        
-        private func loadFashionSummary() {
-            isLoadingFashion = true
-            fashionError = nil
-            fashion = nil
-            
-            FashionService().getFashionSummary { result in
-                DispatchQueue.main.async {
-                    isLoadingFashion = false
-                    switch result {
-                    case .success(let dto):
-                        self.fashion = dto.data.toDomain()
-                        
-                    case .failure(let e):
-                        // 서버 500 등 실패 시: 에러 저장 + 온도 기반 더미로 대체
-                        self.fashionError = e.localizedDescription
-                        let rec = makeFallbackRecommendation(from: self.addData?.temperature)
-                        self.fashion = FashionSummary(locationId: 0,
-                                                      recommendation: rec,
-                                                      imageURL: "")
-                    }
+    // MARK: - API: 옷차림 요약 불러오기
+    private func loadFashionSummary() {
+        isLoadingFashion = true
+        fashionError = nil
+        fashion = nil
+
+        FashionService().getFashionSummary { result in
+            DispatchQueue.main.async {
+                isLoadingFashion = false
+                switch result {
+                case .success(let dto):
+                    let model = dto.data.toDomain()
+                    self.fashion = model
+                    print("✅ [Fashion] id=\(model.locationId) | \(model.recommendation) | img=\(model.imageUrl)")
+                case .failure(let e):
+                    self.fashionError = e.localizedDescription
+                    // 폴백 문구(현재 온도 기준)
+                    let rec = makeFallbackRecommendation(from: self.addData?.temperature)
+                    self.fashion = FashionSummary(locationId: 0, recommendation: rec, imageUrl: "")
+                    print("⛔️ [Fashion] \(e)")
                 }
             }
         }
+    }
+
         
-        /// 온도 기준 더미 멘트
-        private func makeFallbackRecommendation(from temp: Int?) -> String {
-            guard let t = temp else { return "가벼운 겉옷을 준비하세요." }
-            switch t {
-            case ..<(-5):     return "오늘은 두꺼운 패딩이 딱 좋은 날이에요."
-            case (-5)..<5:   return "오늘은 패딩이 딱 좋은 날이에요."
-            case 6..<11:  return "오늘은 니트가 딱 좋은 날이에요."
-            case 12..<16:  return "오늘은 얇은 아우터가 딱 좋은 날이에요."
-            case 17..<22:  return "오늘은 긴팔 셔츠가 딱 좋은 날이에요."
-            case 23..<26: return "오늘은 반팔이 딱 좋은 날이에요."
-            case 27..<30: return "오늘은 반팔이 딱 좋은 날이에요."
-            default:       return "오늘은 반팔이 딱 좋은 날이에요."
-            }
+    /// MARK: - 더미 추천 문구 생성 (온도 기준)
+    private func makeFallbackRecommendation(from temp: Int?) -> String {
+        guard let t = temp else { return "가벼운 겉옷을 준비하세요." }
+        switch t {
+        case ..<(-5):     return "오늘은 두꺼운 패딩이 딱 좋은 날이에요."
+        case (-5)..<5:   return "오늘은 패딩이 딱 좋은 날이에요."
+        case 6..<11:  return "오늘은 니트가 딱 좋은 날이에요."
+        case 12..<16:  return "오늘은 얇은 아우터가 딱 좋은 날이에요."
+        case 17..<22:  return "오늘은 긴팔 셔츠가 딱 좋은 날이에요."
+        case 23..<26: return "오늘은 반팔이 딱 좋은 날이에요."
+        case 27..<30: return "오늘은 반팔이 딱 좋은 날이에요."
+        default:       return "오늘은 반팔이 딱 좋은 날이에요."
         }
+    }
         
-        /// 원격 이미지 썸네일(실패 시 기본 아이콘)
-        private struct RemoteThumb: View {
-            let urlString: String
-            var body: some View {
-                if let url = URL(string: urlString), !urlString.isEmpty {
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image.resizable().aspectRatio(contentMode: .fit)
-                        default:
-                            Image("clothesIcon").resizable().aspectRatio(contentMode: .fit)
-                        }
+    // MARK: - 원격 이미지 썸네일 (실패 시 기본 아이콘)
+    private struct RemoteThumb: View {
+        let urlString: String
+        var body: some View {
+            if let url = URL(string: urlString), !urlString.isEmpty {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image.resizable().aspectRatio(contentMode: .fit) // 성공 시 썸네일
+                    default:
+                        Image("clothesIcon").resizable().aspectRatio(contentMode: .fit) // 로딩/실패 시 대체
                     }
-                } else {
-                    Image("clothesIcon").resizable().aspectRatio(contentMode: .fit)
                 }
+            } else {
+                Image("clothesIcon").resizable().aspectRatio(contentMode: .fit) // 빈 URL 대체
             }
         }
+    }
         
-    
 }
 
 #Preview {
     HomeFlowHost()
-        .environment(HomeRouter())
+        .environment(HomeRouter()) // 미리보기에서 라우터 주입
 }
-
