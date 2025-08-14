@@ -45,6 +45,7 @@ extension FashionEndpoints: TargetType {
 
     var headers: [String : String]? {
         var header: [String: String] = [
+            "Accept": "application/json",
             "Content-Type": "application/json" // Auth와 동일 포맷 유지
         ]
         // AuthEndpoints와 동일: AuthManager에서 AccessToken 읽어 Authorization 구성
