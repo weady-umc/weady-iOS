@@ -12,15 +12,18 @@ struct WeadyboardView: View {
     @Environment(WeadyboardRouter.self) private var router
     @State private var isFilterPresented = false
     @StateObject private var viewModel = WeadyboardViewModel()
-    
+
+    @State private var currentCriteria: BoardFilterCriteria = .init()
+
+    private let cardWidth: CGFloat = 177
+
     private var leftColumn: [BoardPreviewDTO] {
         viewModel.posts.enumerated().compactMap { $0.offset % 2 == 0 ? $0.element : nil }
     }
-    
     private var rightColumn: [BoardPreviewDTO] {
         viewModel.posts.enumerated().compactMap { $0.offset % 2 == 1 ? $0.element : nil }
     }
-    
+
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
@@ -30,7 +33,7 @@ struct WeadyboardView: View {
                     showAlarmButton: true,
                     showBottomDivider: false
                 )
-                
+
                 HStack {
                     Spacer()
                     Button {
@@ -46,10 +49,11 @@ struct WeadyboardView: View {
                             )
                     }
                     .frame(width: 30, height: 30)
-                    .padding(.trailing, 20)
-                    .padding(.bottom, 6)
+                    .padding(.trailing, 8)
                 }
-                
+                .padding(.trailing, 8)
+                .padding(.bottom, 6)
+
                 ScrollView {
                     HStack(alignment: .top, spacing: 8) {
                         VStack(spacing: 8) {
@@ -57,7 +61,6 @@ struct WeadyboardView: View {
                                 boardImageCard(item: item)
                             }
                         }
-                        
                         VStack(spacing: 8) {
                             ForEach(rightColumn, id: \.boardId) { item in
                                 boardImageCard(item: item)
@@ -87,44 +90,65 @@ struct WeadyboardView: View {
                         .background(Color.black70)
                         .clipShape(RoundedRectangle(cornerRadius: 30))
                     }
-                    .padding(.bottom, 86)
+                    .padding(.bottom, 56)
                     .padding(.trailing, 24)
                 }
             }
         }
         .background(Color.white100)
         .sheet(isPresented: $isFilterPresented) {
-            WeadyboardFilterSheet()
+            WeadyboardFilterSheet(
+                onApply: { criteria in
+                    currentCriteria = criteria
+                    viewModel.applyFilter(criteria)
+                },
+                initialCriteria: currentCriteria
+            )
         }
-                .task {
-                    viewModel.fetchBoards()
-                }
+        .task {
+            viewModel.fetchBoards()
+        }
     }
-    
+
     @ViewBuilder
     private func boardImageCard(item: BoardPreviewDTO) -> some View {
+        let url = URL(string: item.imgUrl ?? "")
+        let height = viewModel.heightFor(boardId: item.boardId, defaultHeight: 240)
+
         Button {
-            router.push(.weadyboardPost(boardId: item.boardId))  
+            router.push(.weadyboardPost(boardId: item.boardId))
         } label: {
             ZStack(alignment: .topTrailing) {
-
-                KFImage(URL(string: item.imgUrl ?? ""))
+                KFImage(url)
                     .placeholder {
                         Color.gray100
+                            .frame(width: cardWidth, height: height)
+                            .cornerRadius(8)
+                    }
+                    .onSuccess { result in
+                        viewModel.setHeight(
+                            for: item.boardId,
+                            imageSize: result.image.size,
+                            targetWidth: cardWidth
+                        )
                     }
                     .resizable()
                     .scaledToFill()
-                    .frame(width: 177, height: 240)
+                    .frame(width: cardWidth, height: height)
                     .clipped()
                     .cornerRadius(8)
-                
+                    .contentTransition(.opacity)
+                    .transaction { tx in tx.animation = nil }
+
                 Image(WeatherTag.imageName(for: item.weatherTagId))
                     .resizable()
                     .scaledToFit()
                     .frame(width: 20, height: 20)
                     .frame(width: 40, height: 40)
                     .background(Color.clear)
+                    .padding(6)
             }
         }
+        .buttonStyle(.plain)
     }
 }

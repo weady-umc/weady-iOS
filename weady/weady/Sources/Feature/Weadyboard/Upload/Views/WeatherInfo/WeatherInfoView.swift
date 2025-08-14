@@ -4,6 +4,8 @@ import Observation
 struct WeatherInfoView: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var viewModel: WeatherViewModel
+    
+    var onComplete: (() -> Void)? = nil
 
     var body: some View {
         VStack(spacing: 20) {
@@ -59,7 +61,6 @@ struct WeatherInfoView: View {
             // MARK: - 완료 버튼
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("완료") {
-                    viewModel.applyWeatherToUploadModel(useCurrentLocation: viewModel.isUsingCurrentLocation)
 
                     let selectedWeather = viewModel.isUsingCurrentLocation ? viewModel.currentWeather : viewModel.toWeatherModel()
 
@@ -67,6 +68,7 @@ struct WeatherInfoView: View {
                     print("- 기온 : \(selectedWeather?.temperature?.tempRangeText ?? "nil")")
                     print("- 날씨: \(selectedWeather?.weather.map { $0.rawValue } ?? [])")
                     print("- 현재위치/직접추가: \(selectedWeather?.isManual ?? false)")
+                    onComplete?()
                     dismiss()
                 }
                 .fontName(.captionMedium14)

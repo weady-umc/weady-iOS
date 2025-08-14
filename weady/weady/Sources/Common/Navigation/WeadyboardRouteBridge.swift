@@ -11,7 +11,7 @@ import Observation
 // MARK: - WeadyboardRouteBridge
 /// 다른 탭에서 보드 플로우로 연결
 @Observable
-final class WeadyboardRouteBridge: ObservableObject {
+final class WeadyboardRouteBridge {
     // MARK: Properties
     var handler: ((WeadyboardRoute) -> Void)?
     // MARK: Methods

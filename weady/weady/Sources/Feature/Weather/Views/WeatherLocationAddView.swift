@@ -259,5 +259,5 @@ struct rainWind :View {
         selectedPlace: .constant(dummyPlace),
         weather: ShortWeatherData.example
     )
-    .environmentObject(NavigationRouter())
+//    .environmentObject(NavigationRouter())
 }

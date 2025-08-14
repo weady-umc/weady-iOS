@@ -50,6 +50,35 @@ extension NetworkManager {
         }
     }
     
+    // 2.5. 래퍼 없이 바디를 T로 직접 디코딩 (DELETE처럼 data가 없는 응답 처리에 사용)
+    func requestRaw<T: Decodable>(
+        target: Endpoint,
+        decodingType: T.Type,
+        completion: @escaping (Result<T, NetworkError>) -> Void
+    ) {
+        provider.request(target) { result in
+            switch result {
+            case .success(let response):
+                do {
+                    guard (200...299).contains(response.statusCode) else {
+                        let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: response.data)
+                        let message = errorResponse?.message ?? "상태 코드 오류: \(response.statusCode)"
+                        completion(.failure(.serverError(statusCode: response.statusCode, message: message)))
+                        return
+                    }
+                    let decoded = try JSONDecoder().decode(T.self, from: response.data)
+                    completion(.success(decoded))
+                } catch {
+                    let body = String(data: response.data, encoding: .utf8) ?? "nil"
+                    print("❌ DECODE ERROR [RAW \(type(of: target)) \(target.path) \(response.statusCode)] → \(T.self): \(error)\n↳ Body: \(body)")
+                    completion(.failure(.decodingError))
+                }
+            case .failure(let error):
+                completion(.failure(self.handleNetworkError(error)))
+            }
+        }
+    }
+    
     // 3. 상태 코드만 확인
     func requestStatusCode(
         target: Endpoint,

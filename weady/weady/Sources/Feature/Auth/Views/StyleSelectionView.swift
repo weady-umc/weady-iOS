@@ -151,12 +151,8 @@ struct CategoryButton: View {
     }
 }
 
-
 struct StyleSelectionView_Previews: PreviewProvider {
     static var previews: some View {
-        StyleSelectionView(
-            nickname: "테스트",
-            service: MockTagService()
-            )
+        StyleSelectionView(nickname: "테스트")
     }
 }
