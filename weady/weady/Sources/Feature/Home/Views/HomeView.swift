@@ -8,28 +8,33 @@
 import SwiftUI
 
 struct HomeView: View {
+    @Environment(HomeRouter.self) private var router
     var body: some View {
         
-//        Spacer().frame(height: 105)
-//        
-//        TopView
-//        
-//        Button{
-//            
-//        } label: {
-//            WeatherView
-//        }
-//        
-//        Button{
-//            
-//        } label: {
-//            ClothesView
-//        }
-//        
-//        Spacer().frame(height: 29)
+        Spacer().frame(height: 105)
+        
+        TopView
+        
+        Button{
+            
+        } label: {
+            WeatherView
+        }
+        
+        Button{
+            
+        } label: {
+            ClothesView
+        }
+        
+        Spacer().frame(height: 29)
         
        
-            CurationView()
+        Button{
+            
+        } label: {
+            PlaceView
+        }
 
         
         
@@ -128,6 +133,10 @@ struct HomeView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 10, height: 15.62)
+                    .onTapGesture {
+                        router.push(.curation)
+                    }
+                        
             }
             
             ScrollView(.horizontal, content: {
