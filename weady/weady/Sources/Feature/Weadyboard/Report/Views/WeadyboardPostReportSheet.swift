@@ -8,42 +8,57 @@
 import SwiftUI
 
 struct WeadyboardPostReportSheet: View {
-    @Environment(\.dismiss) private var dismiss
+    let boardId: Int
     @ObservedObject var reportViewModel: WeadyboardReportViewModel
-    @Binding var navigationPath: NavigationPath
-
+    
+    var onBack: () -> Void
+    var onClose: () -> Void
+    var onNextDetail: (ReportReason) -> Void
+    var onSelect: (Int) -> Void
+    
+    private let reasons: [ReportReason] = reportReasons
+    
     var body: some View {
         VStack(spacing: 0) {
-            
-            WeadyboardPostReportTopBar()
-            
-            ForEach(reportReasons.indices, id: \.self) { index in
-                let reason = reportReasons[index]
-                Button {
-                    reportViewModel.selectedReasonIndex = index
-                    navigationPath.append(reason)
-                } label: {
-                    HStack {
-                        Text(reason.listTitle)
-                            .fontName(.captionSemibold14)
-                            .foregroundColor(.black100)
-                        Spacer()
-                        Image("arrow_right")
-                            .resizable()
-                            .frame(width: 6, height: 10)
-                    }
-                    .padding(.horizontal, 20)
-                    .frame(height: 50)
-                }
-                Rectangle()
-                    .fill(Color.gray600)
-                    .frame(height: 1)
-                    .padding(.horizontal, 20)
+            WeadyboardPostReportTopBar(showBackButton: true) {
+                onClose()
             }
-
+            
+            Spacer().frame(height: 24)
+            
+            // 사유 리스트
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    ForEach(Array(reasons.enumerated()), id: \.offset) { idx, reason in
+                        Button {
+                            onSelect(idx)
+                            onNextDetail(reason)
+                        } label: {
+                            HStack(spacing: 0) {
+                                Text(reason.listTitle)
+                                    .fontName(.captionSemibold14)
+                                    .foregroundStyle(.black)
+                                Spacer()
+                                Image("arrow_right")
+                                    .resizable()
+                                    .frame(width: 6, height: 10)
+                            }
+                            .padding(.horizontal, 20)
+                            .frame(height: 50)
+                        }
+                        
+                        // 구분선
+                        Rectangle()
+                            .fill(Color.gray600)
+                            .frame(height: 1)
+                            .padding(.horizontal, 20)
+                    }
+                }
+            }
+            .padding(.top, 8)
             Spacer()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(width: 375, height: 759)
         .background(Color.white100)
     }
 }

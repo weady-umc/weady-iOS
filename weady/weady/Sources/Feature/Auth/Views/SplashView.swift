@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct SplashView: View {
-    @Environment(NavigationRouter.self) var router
-    
+    @Environment(\.router) private var router
+    @State private var didNavigate = false
+    @State private var splashTask: Task<Void, Never>?
+
     var body: some View {
         ZStack {
             Color(hex: "000000").ignoresSafeArea()
@@ -26,9 +28,21 @@ struct SplashView: View {
                 Spacer()
             }
         }
-        .task {
-            try? await Task.sleep(nanoseconds: 3_000_000_000)
-            router.push(.login)
+        .onAppear {
+            guard !didNavigate else { return }
+            splashTask?.cancel()
+            splashTask = Task {
+                try? await Task.sleep(nanoseconds: 1_200_000_000)
+                if Task.isCancelled { return }
+                await MainActor.run {
+                    guard !didNavigate else { return }
+                    didNavigate = true
+                    router.push(.login)
+                }
+            }
+        }
+        .onDisappear {
+            splashTask?.cancel()
         }
     }
 }

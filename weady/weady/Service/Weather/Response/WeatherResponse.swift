@@ -7,68 +7,80 @@
 
 import Foundation
 
-// MARK: - 단기예보 날씨
+// MARK: - 단기예보 응답 루트
+// 서버의 단기예보 API 응답 포맷 (code/message/data)
 struct ShortWeatherResponse: Decodable {
     let code: Int
     let message: String
     let data: ShortWeatherData
 }
 
-//단기예보 모델
-struct ShortWeatherData: Decodable, Identifiable {
-    var id: UUID { UUID() }
-    let address1: String
-    let address2: String
-    let address3: String
-    let currentTmp: Double
-    let skyStatus: String
-    let maxTmp: Double
-    let minTmp: Double
-    let hourlyForecasts: [HourlyForecast]
-    let hourlyPrecipitations: [HourlyPrecipitation]
-    let hourlyWinds: [HourlyWind]
+// MARK: - 단기예보 데이터 모델
+// 한 위치에 대한 현재/시간별 예보를 포함
+struct ShortWeatherData: Decodable, Identifiable, Hashable {
+    var id: UUID { UUID() }                // 식별자(로컬 생성)
+    let address1: String                   // 시/도
+    let address2: String                   // 시/군/구
+    let address3: String                   // 읍/면/동
+    let currentTmp: Double                 // 현재 기온
+    let skyStatus: String                  // 하늘 상태(서버 코드값: CLEAR/CLOUDY/RAIN 등)
+    let maxTmp: Double                     // 금일 최고 기온
+    let minTmp: Double                     // 금일 최저 기온
+    let hourlyForecasts: [HourlyForecast]  // 시간별 예보(하늘/온도)
+    let hourlyPrecipitations: [HourlyPrecipitation] // 시간별 강수 확률
+    let hourlyWinds: [HourlyWind]          // 시간별 풍속/풍향
 }
 
-//시간별 예보
-struct HourlyForecast: Decodable {
-    let time: Int
-    let skyStatus: String
-    let tmp: Double
+// MARK: - 시간별 예보(하늘/온도)
+struct HourlyForecast: Decodable, Hashable {
+    let time: Int          // 시각(예: 900, 1300 등)
+    let skyStatus: String  // 하늘 상태 코드
+    let tmp: Double        // 기온
 }
 
-//시간별 강수 확률
-struct HourlyPrecipitation: Decodable {
-    let time: Int
-    let probability: Double
+// MARK: - 시간별 강수 확률
+struct HourlyPrecipitation: Decodable, Hashable {
+    let time: Int          // 시각
+    let probability: Double // 강수 확률(%)
 }
 
-//시간별 풍속, 풍향
-struct HourlyWind: Decodable {
-    let time: Int
-    let direction: String
-    let speed: Double
+// MARK: - 시간별 풍속/풍향
+struct HourlyWind: Decodable, Hashable {
+    let time: Int          // 시각
+    let direction: String  // 풍향(문자열: N/NE/북동 등)
+    let speed: Double      // 풍속(m/s 등 단위는 UI에서 표기)
 }
 
-// MARK: - 중기예보 날씨
+// MARK: - 중기예보 응답 루트
 struct MidTermWeatherResponse: Decodable {
     let code: Int
     let message: String
     let data: [MidTermForecast]
 }
 
-//중기예보 날씨 모델
+// MARK: - 중기예보(일 단위) 모델
+// 요일별 오전/오후 하늘 상태와 최저/최고 기온
 struct MidTermForecast: Decodable {
-    let dayOfWeek: String
-    let amSkyStatus: String
-    let pmSkyStatus: String
-    let minTemp: Double
-    let maxTemp: Double
+    let dayOfWeek: String   // 요일(월/화/…)
+    let amSkyStatus: String // 오전 하늘 상태
+    let pmSkyStatus: String // 오후 하늘 상태
+    let minTemp: Double     // 최저 기온
+    let maxTemp: Double     // 최고 기온
 }
 
-// MARK: - 지역 날씨 미리보기 API
-//단기예보 날씨와 구조 동일
+// MARK: - 지역 날씨 미리보기 응답
+// 단기예보와 동일한 데이터 구조를 data에 담아 반환
 struct WeatherPreviewResponse: Decodable {
     let code: Int
     let message: String
-    let data: ShortWeatherData?
+    let data: ShortWeatherData? // 일부 케이스에서 없을 수 있어 Optional
+}
+
+//  현재 위치 업데이트 응답
+struct NowLocationResponse: Decodable {
+    let nowLocationId: Int64
+    let address1: String
+    let address2: String
+    let address3: String
+    let address4: String?   // 일부 환경에서 없을 수 있으니 옵셔널
 }

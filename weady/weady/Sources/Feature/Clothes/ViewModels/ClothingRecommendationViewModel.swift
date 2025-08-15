@@ -58,6 +58,7 @@ final class ClothingRecommendationViewModel: ObservableObject {
                         .joined(separator: " ")
                     self?.feelTemp = Int(d.recommendation.feelTmp)
                     self?.clothingName = d.recommendation.clothing.name
+                    self?.subjectParticle = self?.subjectParticle(for: d.recommendation.clothing.name) ?? "이"
                     self?.clothingImageUrl = URL(string: d.recommendation.clothing.imageUrl)
                     self?.chartItems = d.chart
                     self?.tags = d.tags
@@ -65,9 +66,8 @@ final class ClothingRecommendationViewModel: ObservableObject {
 
                 case .failure(let error):
                     print("패션 디테일 로드 실패:", error)
+                    self?.addressText = "위치 정보를 확인할 수 없어요"
                 }
-
-
             }
         }
     }

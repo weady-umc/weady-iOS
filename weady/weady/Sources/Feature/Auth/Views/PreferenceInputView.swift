@@ -10,15 +10,26 @@ import SwiftUI
 struct PreferenceInputView: View {
     @StateObject private var vm: PreferenceInputViewModel
 
-    init(nickname: String) {
-        _vm = StateObject(wrappedValue: PreferenceInputViewModel(nickname: nickname))
+    private let agreements: [OnboardingAgreement]
+    // 기본값 제공
+    init(
+          nickname: String,
+          agreements: [OnboardingAgreement],
+          viewModel: PreferenceInputViewModel? = nil
+    ) {
+        self.agreements = agreements
+        if let viewModel {
+            _vm = StateObject(wrappedValue: viewModel)
+        } else {
+            _vm = StateObject(wrappedValue: PreferenceInputViewModel(nickname: nickname))
+        }
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // 1) 프로그레스 인디케이터 (2번째 스텝)
             ProgressIndicator(currentStep: 1, totalSteps: 5)
-
+            
             // 2) 타이틀: 언더라인된 닉네임 + 나머지 텍스트
             VStack(alignment: .leading, spacing: 18) {
                 HStack(spacing: 0) {
@@ -38,22 +49,11 @@ struct PreferenceInputView: View {
             }
             .padding(.horizontal, 32)
             .padding(.top, 39)
-
+            
             Spacer()
 
-            // 3) 중앙 일러스트 버튼
-            ZStack {
-                Circle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(width: 200, height: 200)
-                Text("웨디 일러스트")
-                    .font(.system(size: 16))
-                    .foregroundColor(.black)
-            }
-            .frame(maxWidth: .infinity)
-
             Spacer().frame(height: 146)
-
+            
             // 4) 하단 버튼들
             VStack(spacing: 20) {
                 Button(action: vm.skip) {
@@ -67,7 +67,7 @@ struct PreferenceInputView: View {
                                 .stroke(Color.gray800, lineWidth: 1)
                         )
                 }
-
+                
                 Button(action: vm.next) {
                     Text("다음")
                         .fontName(.bodyMedium16)
@@ -81,18 +81,27 @@ struct PreferenceInputView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
         }
-        //
-        .fullScreenCover(isPresented: $vm.didTapSkip) {
-            // 건너뛸 때 이동할 뷰
-            StartView(nickname: vm.nickname)
+        .onAppear {
+            // 디버그: View가 들고 있는 약관을 확인
+            print("DEBUG Preference →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
         }
+        // 스킵 → StartView (agreements 그대로 전달)
+        .fullScreenCover(isPresented: $vm.didTapSkip) {
+            StartView(
+                nickname: vm.nickname,
+                gender: nil,                 // 아직 성별 없음
+                styleIds: [],                // 스킵이므로 빈 배열
+                agreements: agreements       // 약관 릴레이
+            )
+        }
+        // 다음 → GenderSelection (agreements 그대로 전달)
         .fullScreenCover(isPresented: $vm.didTapNext) {
-            // 다음에 이동할 뷰
-            GenderSelectionView(nickname: vm.nickname)
+            GenderSelectionView(nickname: vm.nickname, agreements: agreements)
         }
     }
 }
 
-#Preview {
+/*#Preview {
     PreferenceInputView(nickname: "테스트")
 }
+*/

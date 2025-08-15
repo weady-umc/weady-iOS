@@ -15,6 +15,7 @@ struct BoardDetailResponseDTO: Decodable {
     let isPublic: Bool
     let goodStatus: Bool
     let goodCount: Int
+    let commentCount: Int
     let imgCount: Int?
     let imageDtoList: [BoardImageDTO]
     let content: String
@@ -29,13 +30,8 @@ struct BoardDetailResponseDTO: Decodable {
 }
 
 struct BoardImageDTO: Decodable {
-    let imgUrl: String
     let imgOrder: Int
-}
-
-struct BrandDTO: Decodable, Hashable {
-    let brand: String
-    let product: String
+    let imgUrl: String
 }
 
 struct BoardLikeResponseDTO: Decodable {

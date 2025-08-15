@@ -10,6 +10,7 @@ import Foundation
 @MainActor
 final class WeadyboardPostViewModel: ObservableObject {
     @Published var post: BoardDetailResponseDTO?
+    @Published var commentCount: Int = 0
     @Published var likeCount: Int = 0
     @Published var isLiked: Bool = false
     @Published var isLoading: Bool = false
@@ -34,6 +35,7 @@ final class WeadyboardPostViewModel: ObservableObject {
                     self.post = dto
                     self.isLiked = dto.goodStatus
                     self.likeCount = dto.goodCount
+                    self.commentCount = dto.commentCount
                 case .failure(let err):
                     self.errorMessage = err.localizedDescription
                 }

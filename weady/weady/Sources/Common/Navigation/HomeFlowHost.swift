@@ -12,9 +12,19 @@ import Observation
 /// Home 플로우에서 사용하는 라우트 정의
 enum HomeRoute: Hashable {
     case home
-    case weatheraddlocation
+    case weatheradd(AddressDocument, ShortWeatherData)
     case weathersearch
     case weatherlocation
+
+    case weatherhome
+    case clothes
+
+    case curationdetail(curationId: Int64)
+    case curation
+    
+    case alarm
+    case weadyboard
+
 }
 
 // MARK: - HomeRouter
@@ -39,27 +49,48 @@ struct HomeFlowHost: View {
 
     // MARK: Body
     var body: some View {
+        @Bindable var router = router
         NavigationStack(path: $router.path) {
             HomeView()
+            
                 .navigationDestination(for: HomeRoute.self) { route in
                     switch route {
                     case .home:
                         HomeView()
-                    case .weatheraddlocation:
+                    case .weatherhome:
+                        WeatherHomeView()
+                    case .weatheradd(let place, let weather):
                         WeatherLocationAddView(
                             viewModel: WeatherLocationAddViewModel(),
                             locationViewModel: WeatherLocationViewModel(),
-                            selectedPlace: .constant(nil),
-                            weather: ShortWeatherData.example
+                            selectedPlace: .constant(place),
+                            onComplete: {
+                                router.reset()
+                                router.push(.weatherlocation)
+                            },
+                            weather: weather
                         )
                     case .weathersearch:
                         WeatherSearchView(selectedPlace: .constant(nil))
                     case .weatherlocation:
                         WeatherLocationView()
+
+                    case .clothes:
+                        ClothingRecommendationView()
+
+                    case .curationdetail(let curationId):
+                        DetailCurationView(curationId: curationId)
+                    case .curation:
+                        CurationView()
+                    case .alarm:
+                        NotificationView()
+                    case .weadyboard:
+                        WeadyboardView()
+
                     }
                 }
         }
-        // 필요 시 하위 뷰에서 @Environment(HomeRouter.self)로 직접 push/pop 가능
+//         필요 시 하위 뷰에서 @Environment(HomeRouter.self)로 직접 push/pop 가능
         .environment(router)
     }
 }

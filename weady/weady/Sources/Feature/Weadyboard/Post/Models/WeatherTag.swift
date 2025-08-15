@@ -6,43 +6,36 @@
 //
 
 enum WeatherTag: Int {
-    case sunny = 0, cloudy, rainy, snowy, partlyCloudy, windy
+    case sunny        = 1  // 맑은 날
+    case cloudy       = 2  // 구름 많은 날
+    case rainy        = 3  // 비 오는 날
+    case partlycloudy = 4  // 흐린 날
+    case snowy        = 5  // 눈 오는 날
+    case windy        = 6  // 바람 많은 날
 
-    static func iconName(for id: Int) -> String {
-        switch id {
-        case 0: return "filter_sunny"
-        case 1: return "filter_cloudy"
-        case 2: return "filter_rainy"
-        case 3: return "filter_snowy"
-        case 4: return "filter_partlycloudy"
-        case 5: return "filter_windy"
-        default: return ""
+    static func imageName(for id: Int) -> String {
+        switch WeatherTag(rawValue: id) {
+        case .sunny:        return "filter_sunny"
+        case .cloudy:       return "filter_cloudy"
+        case .rainy:        return "filter_rainy"
+        case .partlycloudy: return "filter_partlycloudy"
+        case .snowy:        return "filter_snowy"
+        case .windy:        return "filter_windy"
+        case .none:         return "filter_sunny"
         }
     }
 
     static func label(for id: Int) -> String {
-        switch id {
-        case 0: return "맑음"
-        case 1: return "구름 많음"
-        case 2: return "비 오는 날"
-        case 3: return "눈 오는 날"
-        case 4: return "흐린 날"
-        case 5: return "바람 많은 날"
-        default: return "알 수 없음"
+        switch WeatherTag(rawValue: id) {
+        case .sunny:        return "맑은 날"
+        case .cloudy:       return "구름 많은 날"
+        case .rainy:        return "비 오는 날"
+        case .partlycloudy: return "흐린 날"
+        case .snowy:        return "눈 오는 날"
+        case .windy:        return "바람 많은 날"
+        case .none:         return "알 수 없음"
         }
     }
-    
-    static func imageName(for id: Int) -> String {
-            switch id {
-            case 0: return "filter_sunny"
-            case 1: return "filter_cloudy"
-            case 2: return "filter_rainy"
-            case 3: return "filter_snowy"
-            case 4: return "filter_partlycloudy"
-            case 5: return "filter_windy"
-            default: return ""
-            }
-        }
 }
 
 enum StyleTag: Int, CaseIterable {

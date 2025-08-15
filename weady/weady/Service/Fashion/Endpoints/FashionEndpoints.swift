@@ -11,6 +11,7 @@ import Moya
 enum FashionEndpoints {
     /// GET /fashion/detail — 파라미터 없음, Bearer 필요
     case getDetail
+    case getSummary
 }
 
 extension FashionEndpoints: TargetType {
@@ -23,25 +24,28 @@ extension FashionEndpoints: TargetType {
         switch self {
         case .getDetail:
             return "/api/v1/fashion/detail"
+        case .getSummary:
+            return "/api/v1/fashion/summary"
         }
     }
 
     var method: Moya.Method {
         switch self {
-        case .getDetail:
+        case .getDetail, .getSummary:
             return .get
         }
     }
 
     var task: Task {
         switch self {
-        case .getDetail:
+        case .getDetail, .getSummary:
             return .requestPlain
         }
     }
 
     var headers: [String : String]? {
         var header: [String: String] = [
+            "Accept": "application/json",
             "Content-Type": "application/json" // Auth와 동일 포맷 유지
         ]
         // AuthEndpoints와 동일: AuthManager에서 AccessToken 읽어 Authorization 구성

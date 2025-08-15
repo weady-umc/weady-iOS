@@ -1,3 +1,4 @@
+
 //
 //  ClothingRecommendationView.swift
 //  weady
@@ -13,13 +14,18 @@ import Charts
 struct ClothingRecommendationView: View {
     @StateObject private var vm: ClothingRecommendationViewModel
     @State private var showLocationPicker = false
-    private enum Route: Hashable { case weadyboard }
+    //private enum Route: Hashable { case weadyboard }
+    @Environment(HomeRouter.self) private var router
     
     private enum HelpStep: Hashable { case intro, details }
     @State private var showHelp = false //HelpGuideCardView
     @State private var helpStep: HelpStep = .intro //HelpGuideCardView 1,2
     
     let same = Date()
+    // 기본 init: 내부에서 VM 생성
+    init() {
+        _vm = StateObject(wrappedValue: ClothingRecommendationViewModel())
+    }
     
     // 실제 앱에서 토큰으로 초기화
     init(token: String) {
@@ -32,7 +38,7 @@ struct ClothingRecommendationView: View {
     }
     
     var body: some View {
-        NavigationStack {
+
             ZStack{
                 Image("backgroundImage")
                     .resizable()
@@ -88,7 +94,7 @@ struct ClothingRecommendationView: View {
                                 .fontName(.titleMedium24)
                             Text(vm.clothingName)
                                 .fontName(.titleBold24)
-                            Text(vm.subjectParticle)       
+                            Text(vm.subjectParticle)
                                 .fontName(.titleMedium24)
                         }
                         Text("딱 좋은 날이에요.")
@@ -137,15 +143,15 @@ struct ClothingRecommendationView: View {
                     .padding(.leading, 312)
                     .padding(.top, 13)
                     
-                    NavigationLink {
-                        WeadyboardView()
-                    } label: {
-                        NavigationRowLabel(
-                            title: "다른 사람들은 어떻게 입었는지 보러가기",
-                            images: ["howPic1","howPic2","howPic3"]
-                        )
-                        .contentShape(RoundedRectangle(cornerRadius: 10))
-                    }
+                    Button {
+                            router.push(.weadyboard)
+                                   } label: {
+                                       NavigationRowLabel(
+                                           title: "다른 사람들은 어떻게 입었는지 보러가기",
+                                           images: ["howPic1","howPic2","howPic3"]
+                                      )
+                                       .contentShape(RoundedRectangle(cornerRadius: 10))
+                                   }
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top, 13)
                     .padding(.bottom, 19)
@@ -175,7 +181,7 @@ struct ClothingRecommendationView: View {
             }
         }
     }
-}
+
 
 struct NavigationRowLabel: View {
     let title: String

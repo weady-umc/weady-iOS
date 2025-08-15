@@ -17,7 +17,7 @@ struct CustomTagBtn: View {
                         .foregroundStyle(Color.gray200)
                 }
                 Spacer()
-                Image(.rightIcon)
+                Image(.uploadRightIcon)
                     .resizable()
                     .frame(width: 8, height: 14)
             }
