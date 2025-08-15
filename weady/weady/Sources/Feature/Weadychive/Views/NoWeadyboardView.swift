@@ -4,40 +4,42 @@
 ////
 ////  Created by 고석현 on 7/28/25.
 ////
-//
-//import SwiftUI
-//
-//// MARK: - NoWeadyboardView (스크랩된 웨디보드 없는 경우)
-//struct NoWeadyboardView: View {
-//    var body: some View {
-//        VStack {
-//            VStack(spacing: 20) {
-//                Text("웨디보드에서는 다른 사람의 하루도 아카이빙할 수 있어요!")
-//                    .fontName(.metaMedium12)
-//                    .multilineTextAlignment(.center)
-//                    .padding(.horizontal)
-//
-//                Button(action: {
-//                    // TODO: - 웨디보드 탐색 화면으로 이동
-//                    //WeadyboardView()
-//                }) {
-//                    Text("웨디보드 보러가기")
-//                        .fontName(.captionSemibold14)
-//                        .foregroundStyle(.white)
-//                        .padding(.vertical, 10)
-//                        .padding(.horizontal, 20)
-//                        .background(Color.gray900)
-//                        .cornerRadius(8)
-//                }
-//            }
-//            .padding(.top, 141)
-//            Spacer()
-//        }
-//        .frame(maxWidth: .infinity, maxHeight: .infinity)
-//        .padding()
-//    }
-//}
-//
-//#Preview {
-//    NoWeadyboardView()
-//}
+
+import SwiftUI
+
+// MARK: - NoWeadyboardView (스크랩된 웨디보드 없는 경우)
+struct NoWeadyboardView: View {
+    @Environment(WeadychiveRouter.self) private var router
+    // 일단 이런식으로 추가하면 연결되도록 해놨습니다 !
+    @Environment(AppTabController.self) private var tab
+    @Environment(WeadyboardRouteBridge.self) private var weadyboardBridge
+    
+    var body: some View {
+        VStack {
+            VStack(spacing: 20) {
+                Text("웨디보드에서는 다른 사람의 하루도 아카이빙할 수 있어요!")
+                    .fontName(.metaMedium12)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+
+                Button(action: {
+//                    router?.push(.weadyboard) // 웨디보드 탐색 화면으로 이동
+                    // 이런식으로 웨디보드로 연결될 듯합니다
+                    tab.switchTo(.weadyboard)
+                }) {
+                    Text("웨디보드 보러가기")
+                        .fontName(.captionSemibold14)
+                        .foregroundStyle(.white)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 20)
+                        .background(Color.gray900)
+                        .cornerRadius(8)
+                }
+            }
+            .padding(.top, 141)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
+    }
+}

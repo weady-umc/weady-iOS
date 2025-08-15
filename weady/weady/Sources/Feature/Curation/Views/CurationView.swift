@@ -158,62 +158,7 @@ private struct CardRow: View {
     }
 }
 
-/*
-// MARK: - 프리뷰용
-private struct CurationView_NavPreview: View {
-    @State private var router = HomeRouter()
 
-    var body: some View {
-        @Bindable var router = router
-        return NavigationStack(path: $router.path) {
-            CurationView()
-                .environment(router)
-                .navigationDestination(for: HomeRoute.self) { route in
-                    switch route {
-                    case .home:
-                        HomeView()
-                    case .weatheradd:
-                        WeatherLocationAddView(
-                            viewModel: WeatherLocationAddViewModel(),
-                            locationViewModel: WeatherLocationViewModel(),
-                            selectedPlace: .constant(nil),
-                            weather: ShortWeatherData.example
-                        )
-                    case .weathersearch:
-                        WeatherSearchView(selectedPlace: .constant(nil))
-                    case .weatherlocation:
-                        WeatherLocationView()
-                    case .curationdetail(let curationId):
-                        DetailCurationView(curationId: curationId)
-                    case .curation:
-                        CurationView()
-                    case .weatherhome(_):
-                        <#code#>
-                    }
-                }
-        }
-        .onAppear {
-            // 미리 Detail 화면으로 진입한 상태를 미리보기로 확인
-            if router.path.isEmpty {
-                router.push(.curationdetail(curationId: 5))
-            }
-        }
-    }
-}
-
-#Preview("CurationView") {
-    CurationView()
-        .environment(HomeRouter()) //  Observation 스타일 프리뷰 주입
-}
-
-#Preview("CurationView → Detail (Nav Preview)") {
-    CurationView_NavPreview()
-}
-
-#Preview("DetailCurationView") {
-    DetailCurationView(curationId: 5)
-}
-*/
 #Preview("CurationView") {
     CurationView()
         .environment(HomeRouter()) //  Observation 스타일 프리뷰 주입
