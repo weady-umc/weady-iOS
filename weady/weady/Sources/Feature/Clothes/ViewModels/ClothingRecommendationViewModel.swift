@@ -42,7 +42,7 @@ final class ClothingRecommendationViewModel: ObservableObject {
         if let id = locationId {
             components.queryItems = [URLQueryItem(name: "locationId", value: String(id))]
         }
-        guard let url = components.url else { return }
+        guard components.url != nil else { return } 
     }
 
 
