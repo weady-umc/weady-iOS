@@ -30,25 +30,25 @@ struct DetailCurationView: View {
                 Spacer()
             }
             .padding(.horizontal, 16)
-            .padding(.top, 100)
+            .padding(.top, 60)
 
             if vm.isLoading {
                 ProgressView().controlSize(.large)
             }
         }
         .navigationBarBackButtonHidden(true)
-        .toolbarBackground(Color.white)
+        .toolbarBackground(Color.white, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+       
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { dismiss() }) {
                     Image("backicon")
-                        .padding(.top, 50)
                         .padding(10)
                         .frame(width: 44, height: 44, alignment: .center)
                 }
             }
 
-           
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 0) {
                     Text(titleTwoLinesAuto(vm.detail?.title ?? ""))
@@ -59,15 +59,12 @@ struct DetailCurationView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .fontName(.captionMedium14)
                         .frame(maxWidth: UIScreen.main.bounds.width * 0.68)
-                   
                 }
-                .padding(.top, 50)
             }
 
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { toggleScrap() }) {
                     Image(isScrapped ? "scrapfilled" : "scrap")
-                        .padding(.top, 50)
                 }
             }
         }
@@ -115,21 +112,21 @@ private struct DetailCurationImageCarousel: View {
                         switch phase {
                         case .empty:
                             Color.gray.opacity(0.15)
-                                .frame(width: UIScreen.main.bounds.width, height: 600)
+                                .frame(width: UIScreen.main.bounds.width, height: 520)
                                 .clipped()
                         case .success(let image):
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
-                                .frame(width: UIScreen.main.bounds.width, height: 600)
+                                .frame(width: UIScreen.main.bounds.width, height: 520)
                                 .clipped()
                         case .failure:
                             Color.gray.opacity(0.25)
-                                .frame(width: UIScreen.main.bounds.width, height: 600)
+                                .frame(width: UIScreen.main.bounds.width, height: 520)
                                 .clipped()
                         @unknown default:
                             Color.gray.opacity(0.2)
-                                .frame(width: UIScreen.main.bounds.width, height: 600)
+                                .frame(width: UIScreen.main.bounds.width, height: 520)
                                 .clipped()
                         }
                     }
@@ -137,7 +134,7 @@ private struct DetailCurationImageCarousel: View {
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .frame(width: 350, height: 556)
+            .frame(width: 350, height: 520)
             .cornerRadius(10)
             .ignoresSafeArea(.all, edges: .horizontal)
 
@@ -312,7 +309,6 @@ extension DetailCurationView {
         struct Candidate { let idx: String.Index; let overflow: CGFloat; let balance: CGFloat; let distToMid: Int }
 
         func evaluateCandidate(_ at: String.Index, consumePunctuation: Bool) -> Candidate {
-           
             let left = String(text[..<text.index(after: at)])
             let rightRaw = String(text[text.index(after: at)...])
             let right = rightRaw.trimmingCharacters(in: .whitespaces)
@@ -391,10 +387,10 @@ private struct DetailCurationToolbarPreviewHarness: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            // Dummy root; we immediately push to show a back button in the toolbar
+           
             Color.clear
                 .onAppear {
-                    // Push once so DetailCurationView is not the root
+                 
                     if path.isEmpty { path.append(1) }
                 }
                 .navigationDestination(for: Int.self) { _ in
