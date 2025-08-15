@@ -14,8 +14,8 @@ import KeychainSwift
 enum UserFavoriteLocationEndpoints {
     case getUserFavoriteLocation                                  // 즐겨찾기 목록 조회
     case postUserFavoriteLocation(bCode: String)                   // 즐겨찾기 추가
-    case patchDefaultFavoriteLocation(locationID: Int)             // 대표 즐겨찾기 설정
-    case deleteFavoriteLocation(favoriteID: Int)                   // 즐겨찾기 삭제
+    case patchDefaultFavoriteLocation(favoriteId: Int)             // 대표 즐겨찾기 설정
+    case deleteFavoriteLocation(favoriteId: Int)                   // 즐겨찾기 삭제
 }
 
 extension UserFavoriteLocationEndpoints: TargetType {
@@ -70,9 +70,9 @@ extension UserFavoriteLocationEndpoints: TargetType {
                 parameters: ["bCode": bCode],
                 encoding: JSONEncoding.default
             )
-        case .patchDefaultFavoriteLocation(let locationID):
+        case .patchDefaultFavoriteLocation(let favoriteId):
             // 대표 즐겨찾기 설정: JSONEncodable 바디
-            let body = PatchDefaultFavoriteLocationRequest(userFavoriteLocationId: locationID)
+            let body = PatchDefaultFavoriteLocationRequest(userFavoriteLocationId: favoriteId)
             return .requestJSONEncodable(body)
         case .deleteFavoriteLocation:
             // 삭제는 바디 없이 경로 파라미터로 처리

@@ -10,12 +10,16 @@ import SwiftUI
 struct CustomNavBar: View {
     let viewTitle: String
     var showBackButton: Bool = false
+    var showLogoButton: Bool = false
     var showAlarmButton: Bool = false
     var showSubmitButton: Bool = false
     var showBottomDivider: Bool = true
     var backAction: (() -> Void)? = nil
+    var logoAction: (() -> Void)? = nil
     var alarmAction: (() -> Void)? = nil
     var submitAction: (() -> Void)? = nil
+    
+    var logoImageName: String = "navbar_logo"
 
     var body: some View {
         VStack(spacing: 0) {
@@ -29,6 +33,15 @@ struct CustomNavBar: View {
                             .frame(width: 9.5, height: 17)
                             .frame(width: 44, height: 44)
                     }
+                } else if showLogoButton {
+                    Button(action: { logoAction?() }) {
+                        Image(logoImageName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 20)
+                            .frame(width: 44, height: 44) // 탭 영역 44 유지
+                    }
+                        
                 } else {
                     Spacer().frame(width: 44, height: 44)
                 }

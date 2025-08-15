@@ -21,6 +21,8 @@ enum HomeRoute: Hashable {
 
     case curationdetail(curationId: Int64)
     case curation
+    
+    case alarm
 
 }
 
@@ -79,6 +81,8 @@ struct HomeFlowHost: View {
                         DetailCurationView(curationId: curationId)
                     case .curation:
                         CurationView()
+                    case .alarm:
+                        NotificationView()
 
                     }
                 }

@@ -23,6 +23,7 @@ extension View {
 struct NicknameInputView: View {
     @StateObject private var vm: NicknameInputViewModel
     @FocusState private var isFocused: Bool
+    @AppStorage("nickname") private var storedNickname: String = ""
     
     private let agreements: [OnboardingAgreement]
     // 기본값 제공
@@ -96,7 +97,11 @@ struct NicknameInputView: View {
             Spacer()
             
             // 다음버튼
-            Button { vm.next() } label: {
+            Button {
+                let name = vm.nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+                storedNickname = name
+                vm.next()
+            } label: {
                 Text("다음")
                     .fontName(.bodyMedium16)
                     .frame(maxWidth: .infinity)
