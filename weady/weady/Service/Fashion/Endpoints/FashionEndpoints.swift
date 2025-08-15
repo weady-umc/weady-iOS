@@ -15,17 +15,20 @@ enum FashionEndpoints {
 }
 
 extension FashionEndpoints: TargetType {
-    var baseURL: URL {
-        // AuthEndpoints와 동일하게 루트만, path에 /api/v1 포함
-        return URL(string: "https://weadyapi.pro")!
+    public var baseURL: URL {
+        guard let url = URL(string: Domain.fashionURL)
+        else {
+            fatalError("잘못된 URL")
+        }
+        return url
     }
 
     var path: String {
         switch self {
         case .getDetail:
-            return "/api/v1/fashion/detail"
+            return "/detail"
         case .getSummary:
-            return "/api/v1/fashion/summary"
+            return "/summary"
         }
     }
 

@@ -13,7 +13,7 @@ struct WeadyboardMyPostMoreActionSheet: View {
     let onDeleteSuccess: () -> Void
 
     @EnvironmentObject private var toast: ToastCenter
-    @State private var showDeleteAlert = false
+    @State private var showDeleteModal = false
     private let service = BoardService()
 
     var body: some View {
@@ -38,7 +38,7 @@ struct WeadyboardMyPostMoreActionSheet: View {
                     iconName: "post_deleteicon",
                     title: "게시물 삭제하기",
                     titleColor: Color(UIColor.systemRed),
-                    action: { showDeleteAlert = true }
+                    action: { withAnimation(.spring(response: 0.25, dampingFraction: 0.95)) { showDeleteModal = true } }
                 )
             }
             .padding(.top, 24)
@@ -49,21 +49,99 @@ struct WeadyboardMyPostMoreActionSheet: View {
                 .fill(Color.white100)
                 .cornerRadius(10, corners: [.topLeft, .topRight])
         )
-        .alert("게시물을 삭제하시겠어요?", isPresented: $showDeleteAlert) {
-            Button("취소", role: .cancel) {}
-            Button("삭제", role: .destructive) {
-                service.deleteBoard(boardId: boardId) { result in
-                    switch result {
-                    case .success:
-                        onDeleteSuccess()
-                    case .failure:
-                        toast.showError("삭제에 실패했습니다. 잠시 후 다시 시도해주세요.")
-                    }
+        // 오버레이: 삭제 확인 모달
+        if showDeleteModal {
+            // 반투명 딤머
+            Color.black.opacity(0.45)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation(.easeOut(duration: 0.18)) { showDeleteModal = false }
                 }
-            }
-        } message: {
-            Text("삭제하면 되돌릴 수 없습니다.")
+            
+            DeleteConfirmModal(
+                title: "게시물을 삭제하시겠어요?",
+                message: "삭제하시면 해당 기록은 완전히 사라지며, 이후에는 다시 확인하거나 복구할 수 없습니다.\n한 번 더 신중히 결정해 주세요.",
+                confirmTitle: "삭제",
+                cancelTitle: "취소",
+                onConfirm: {
+                    // 실제 삭제 요청
+                    service.deleteBoard(boardId: boardId) { result in
+                        switch result {
+                        case .success:
+                            withAnimation(.easeOut(duration: 0.18)) { showDeleteModal = false }
+                            onDeleteSuccess()
+                        case .failure:
+                            withAnimation(.easeOut(duration: 0.18)) { showDeleteModal = false }
+                            toast.showError("삭제에 실패했습니다. 잠시 후 다시 시도해주세요.")
+                        }
+                    }
+                },
+                onCancel: {
+                    withAnimation(.easeOut(duration: 0.18)) { showDeleteModal = false }
+                }
+            )
+            .transition(.scale.combined(with: .opacity))
+            .zIndex(1)
         }
+    }
+}
+
+// MARK: - 커스텀 삭제 확인 모달
+private struct DeleteConfirmModal: View {
+    let title: String
+    let message: String
+    let confirmTitle: String
+    let cancelTitle: String
+    let onConfirm: () -> Void
+    let onCancel: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // 본문
+            VStack(spacing: 12) {
+                Text(title)
+                    .fontName(.bodySemibold16)
+                    .foregroundColor(.black100)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 20)
+
+                Text(message)
+                    .fontName(.captionRegular14)
+                    .foregroundColor(.gray600)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 12)
+            }
+
+            Divider().foregroundColor(.gray200)
+
+            Button {
+                onConfirm()
+            } label: {
+                Text(confirmTitle)
+                    .fontName(.bodySemibold16)
+                    .foregroundColor(Color(UIColor.systemRed))
+                    .frame(maxWidth: .infinity, minHeight: 56)
+            }
+
+            Divider().foregroundColor(.gray200)
+
+            Button {
+                onCancel()
+            } label: {
+                Text(cancelTitle)
+                    .fontName(.bodySemibold16)
+                    .foregroundColor(.black100)
+                    .frame(maxWidth: .infinity, minHeight: 56)
+            }
+        }
+        .frame(width: 311)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white100)
+                .shadow(color: .black.opacity(0.1), radius: 16, x: 0, y: 8)
+        )
+        .padding(.horizontal, 32)
     }
 }
 

@@ -15,18 +15,22 @@ enum AuthEndpoints {
 }
 
 extension AuthEndpoints: TargetType {
-    var baseURL: URL {
-        return URL(string: "https://weadyapi.pro")!
+    public var baseURL: URL {
+        guard let url = URL(string: Domain.authURL)
+        else {
+            fatalError("잘못된 URL")
+        }
+        return url
     }
 
     var path: String {
         switch self {
         case .postReissue:
-            return "/api/v1/auth/reissue"
+            return "/reissue"
         case .postLogin(_, let provider):
-            return "/api/v1/auth/\(provider)"
+            return "/\(provider)"
         case .deleteLogout:
-            return "/api/v1/auth/logout"
+            return "/logout"
         }
     }
 

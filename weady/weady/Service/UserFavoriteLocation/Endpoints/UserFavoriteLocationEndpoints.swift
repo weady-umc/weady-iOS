@@ -21,9 +21,9 @@ enum UserFavoriteLocationEndpoints {
 extension UserFavoriteLocationEndpoints: TargetType {
     
     // MARK: Base URL
-    // 공통 베이스 경로: https://weadyapi.pro/api/v1
     public var baseURL: URL {
-        guard let url = URL(string: "https://weadyapi.pro/api/v1") else {
+        guard let url = URL(string: Domain.userfavoriteURL)
+        else {
             fatalError("잘못된 URL")
         }
         return url
@@ -34,11 +34,11 @@ extension UserFavoriteLocationEndpoints: TargetType {
     var path: String {
         switch self{
         case .getUserFavoriteLocation, .postUserFavoriteLocation:
-            return "/users/favorites"
+            return ""
         case .patchDefaultFavoriteLocation:
-            return "/users/favorites/default"
+            return "/default"
         case .deleteFavoriteLocation(let favoriteId):
-            return "/users/favorites/\(favoriteId)"
+            return "/\(favoriteId)"
         }
     }
     
