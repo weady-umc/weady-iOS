@@ -1,7 +1,7 @@
 import SwiftUI
 import KeychainSwift
 
-/// Curation 첫 화면 (PlaceView 레이아웃을 유지하면서 MVVM 바인딩)
+/// Curation 첫 화면
 struct CurationView: View {
 //MARK: - 프로퍼티
     @StateObject private var vm = CurationViewModel()
@@ -13,6 +13,7 @@ struct CurationView: View {
 //MARK: -뷰 바디
     var body: some View {
 
+        
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 // 1) 상단 텍스트: [가변] + [고정]

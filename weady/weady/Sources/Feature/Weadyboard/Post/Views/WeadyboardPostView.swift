@@ -7,18 +7,28 @@
 
 import SwiftUI
 
+// MARK: - 바텀시트 단계 상태
+enum WeadyboardPostSheetState: Equatable {
+    case none
+    case more
+    case reportList
+    case reportDetail(ReportReason)
+}
+
 struct WeadyboardPostView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var isTabBarHidden: Bool
     @State private var showCommentSheet = false
-    @State private var showMoreSheet = false
-    @State private var showReportSheet = false
-    
+
     let boardId: Int
     @StateObject private var viewModel: WeadyboardPostViewModel
     @StateObject private var reportVM: WeadyboardReportViewModel
     @EnvironmentObject private var weadychiveVM: WeadychiveViewModel
     @StateObject private var tagVM = TagViewModel()
+
+    // 단일 바텀시트 컨테이너 상태
+    @State private var sheetState: WeadyboardPostSheetState = .none
+    @State private var showDim: Bool = false
 
     init(boardId: Int, isTabBarHidden: Binding<Bool>) {
         self.boardId = boardId
@@ -28,65 +38,83 @@ struct WeadyboardPostView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            CustomNavBar(
-                viewTitle: "",
-                showBackButton: true,
-                backAction: {
-                    isTabBarHidden = false
-                    dismiss()
-                }
-            )
-            
-            if let post = viewModel.post {
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 16) {
-                        Spacer()
-                        WeadyboardUserHeaderView(
-                            userName: post.userName,
-                            userProfileImageUrl: post.userProfileImageUrl,
-                            onMoreTap: { showMoreSheet = true }
-                        )
-                        
-                        WeadyboardPostImageView(images: post.imageDtoList.map { $0.imgUrl })
-                        
-                        WeadyboardActionButtonsView(
-                            goodStatus: viewModel.post?.goodStatus ?? false,
-                            goodCount: viewModel.post?.goodCount ?? 0,
-                            commentCount: viewModel.post?.commentCount ?? 0,
-                            isScraped: weadychiveVM.isScrapped(boardId: boardId),
-                            onLikeTap: {
-                                if viewModel.post?.goodStatus == true {
-                                    viewModel.unlikeBoard()
-                                } else {
-                                    viewModel.likeBoard()
-                                }
-                            },
-                            onCommentTap: { showCommentSheet = true },
-                            onBookmarkTap: {
-                                weadychiveVM.toggleBoardScrap(boardId: boardId)
-                            }
-                        )
-                        
-                        WeadyboardContentView(
-                            createdAt: post.createdAt,
-                            content: post.content
-                        )
-                        
-                        WeadyboardPostCardView(
-                            userName: post.userName,
-                            weatherText: weatherName(for: post.weatherTagId),
-                            temperatureText: temperatureName(for: post.temperatureTagId),
-                            placeDtoList: post.placeDtoList,
-                            styleNames: post.styleIdList.compactMap { StyleTag(rawValue: $0)?.name }
-                        )
-                        .padding(.horizontal, 20)
+        ZStack {
+            VStack(spacing: 0) {
+                CustomNavBar(
+                    viewTitle: "",
+                    showBackButton: true,
+                    backAction: {
+                        isTabBarHidden = false
+                        dismiss()
                     }
+                )
+                
+                if let post = viewModel.post {
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 16) {
+                            Spacer()
+                            
+                            WeadyboardUserHeaderView(
+                                userName: post.userName,
+                                userProfileImageUrl: post.userProfileImageUrl,
+                                onMoreTap: { present(.more) }
+                            )
+                            
+                            WeadyboardPostImageView(images: post.imageDtoList.map { $0.imgUrl })
+                            
+                            WeadyboardActionButtonsView(
+                                goodStatus: viewModel.post?.goodStatus ?? false,
+                                goodCount: viewModel.post?.goodCount ?? 0,
+                                commentCount: viewModel.post?.commentCount ?? 0,
+                                isScraped: weadychiveVM.isScrapped(boardId: boardId),
+                                onLikeTap: {
+                                    if viewModel.post?.goodStatus == true {
+                                        viewModel.unlikeBoard()
+                                    } else {
+                                        viewModel.likeBoard()
+                                    }
+                                },
+                                onCommentTap: { showCommentSheet = true },
+                                onBookmarkTap: {
+                                    weadychiveVM.toggleBoardScrap(boardId: boardId)
+                                }
+                            )
+                            
+                            WeadyboardContentView(
+                                createdAt: post.createdAt,
+                                content: post.content
+                            )
+                            
+                            WeadyboardPostCardView(viewModel: viewModel)
+                                .onAppear {
+                                    viewModel.fetchPostDetail()
+                                }
+                            .padding(.horizontal, 20)
+                        }
+                    }
+                } else if viewModel.isLoading {
+                    ProgressView().padding(.top, 100)
+                } else if let error = viewModel.errorMessage {
+                    Text(error).foregroundColor(.red)
                 }
-            } else if viewModel.isLoading {
-                ProgressView().padding(.top, 100)
-            } else if let error = viewModel.errorMessage {
-                Text(error).foregroundColor(.red)
+            }
+            
+            // 단일 컨테이너 오버레이
+            if sheetState != .none {
+                Color.black.opacity(showDim ? 0.4 : 0.0)
+                    .ignoresSafeArea()
+                    .animation(.easeInOut(duration: 0.2), value: showDim)
+                    .onTapGesture { dismissSheet() }
+                
+                WeadyboardPostSheetContainer(
+                    state: $sheetState,
+                    boardId: boardId,
+                    reportViewModel: reportVM,
+                    onClose: { dismissSheet() }
+                )
+                .ignoresSafeArea(edges: .bottom)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .zIndex(2)
             }
         }
         .onAppear {
@@ -103,25 +131,20 @@ struct WeadyboardPostView: View {
                 .presentationDetents([.height(624)])
                 .presentationDragIndicator(.visible)
         }
-        .sheet(isPresented: $showMoreSheet) {
-            WeadyboardPostMoreActionSheet(
-                showReportSheet: $showReportSheet,
-                boardId: boardId,
-                reportViewModel: reportVM
-            )
-            .presentationDetents([.height(255)])
-            .presentationDragIndicator(.visible)
-        }
-        .sheet(isPresented: $showReportSheet) {
-            WeadyboardPostReportNavigationSheet(
-                boardId: boardId,
-                reportViewModel: reportVM
-            )
-            .presentationDetents([.height(759)])
-            .presentationDragIndicator(.visible)
-        }
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
+    }
+
+    private func present(_ newState: WeadyboardPostSheetState) {
+        sheetState = newState
+        withAnimation(.easeInOut(duration: 0.2)) { showDim = true }
+    }
+
+    private func dismissSheet() {
+        withAnimation(.easeInOut(duration: 0.2)) { showDim = false }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            sheetState = .none
+        }
     }
 
     // MARK: - TagViewModel 사용
@@ -134,8 +157,8 @@ struct WeadyboardPostView: View {
         case 1: return "맑은 날"
         case 2: return "구름 많은 날"
         case 3: return "비 오는 날"
-        case 4: return "눈 오는 날"
-        case 5: return "흐린 날"
+        case 4: return "흐린 날"
+        case 5: return "눈 오는 날"
         case 6: return "바람 많은 날"
         default: return ""
         }

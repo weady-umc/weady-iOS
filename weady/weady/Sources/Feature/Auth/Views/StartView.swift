@@ -22,6 +22,8 @@ struct StartView: View {
     @StateObject private var vm: StartViewModel
     @State private var showHome = false
     
+    @State private var selectedTab: TabType = .home
+    @State private var isTabBarHidden: Bool = false
 
     // 전체 데이터 전달용 (POST에 쓰일 값)
     init(
@@ -100,12 +102,34 @@ struct StartView: View {
         }
         // 성공 시 Home 
         .fullScreenCover(isPresented: $vm.navigateHome) {
-            BaseTabContainerView()
+            BaseTabHost(
+                selectedTab: $selectedTab,
+                isTabBarHidden: $isTabBarHidden
+            )
         }
     }
 }
 
-#Preview {
-    StartView(nickname: "테스트")
-        .environment(NavigationRouter())
+// MARK: - BaseTabHost
+private struct BaseTabHost: View {
+    @Binding var selectedTab: TabType
+    @Binding var isTabBarHidden: Bool
+    
+    @State private var router = NavigationRouter()
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // 콘텐츠 영역
+            BaseTabScreen(selectedTab: $selectedTab,  isTabBarHidden: $isTabBarHidden)
+                .environment(router)
+            
+            // 탭바
+            if !isTabBarHidden {
+                BaseTabView(
+                    selectedTab: $selectedTab,
+                    isTabBarHidden: $isTabBarHidden
+                )
+            }
+        }
+    }
 }

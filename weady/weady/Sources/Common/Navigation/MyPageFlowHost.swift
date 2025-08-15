@@ -13,6 +13,7 @@ import Observation
 enum MyPageRoute: Hashable {
     case mypage
     case setting
+    case profileEdit
 }
 
 // MARK: - MyPageRouter
@@ -34,17 +35,20 @@ final class MyPageRouter {
 struct MyPageFlowHost: View {
     // MARK: Properties
     @State private var router = MyPageRouter()
+    @State var mypageVM = MypageViewModel()
 
     // MARK: Body
     var body: some View {
         NavigationStack(path: $router.path) {
-            MyPageView()
+            MyPageView(viewModel: mypageVM) 
                 .navigationDestination(for: MyPageRoute.self) { route in
                     switch route {
                     case .mypage:
-                        MyPageView()
+                        MyPageView(viewModel: mypageVM)
                     case .setting:
                         SettingView()
+                    case .profileEdit:
+                        ProfileEditView(viewModel: ProfileEditViewModel(mypageViewModel: mypageVM))
                     }
                 }
         }

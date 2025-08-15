@@ -24,6 +24,7 @@
 /* Begin PBXFileReference section */
 		808ED0FB2E1D9EFF00442DA8 /* weady.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = weady.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDC1AB1F2E4CBC6200F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CDC1B6A42E4E468200F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDE727542E4C94AC005F67E7 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDF98D1B2E29549500446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -89,6 +90,11 @@
 			sourceTree = "<group>";
 		};
 		CDC1AB212E4CBC6200F8629F /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CDC1B6A62E4E468200F8629F /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -183,6 +189,10 @@
 				{
 					ProductGroup = CDF98D1D2E29549500446374 /* Products */;
 					ProjectRef = CDF98D1B2E29549500446374 /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CDC1B6A62E4E468200F8629F /* Products */;
+					ProjectRef = CDC1B6A42E4E468200F8629F /* weady.xcodeproj */;
 				},
 				{
 					ProductGroup = CDC1AB212E4CBC6200F8629F /* Products */;

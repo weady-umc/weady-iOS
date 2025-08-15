@@ -6,7 +6,6 @@
 //  Created by 김영택 on 8/8/25.
 //
 
-
 import SwiftUI
 import Combine
 import Charts
@@ -14,8 +13,9 @@ import Charts
 
 struct ClothingRecommendationView: View {
     @StateObject private var vm: ClothingRecommendationViewModel
-    @State private var showLocationPicker = false
-    private enum Route: Hashable { case weadyboard }
+    //@State private var showLocationPicker = false
+    //private enum Route: Hashable { case weadyboard }
+    @Environment(HomeRouter.self) private var router
     
     private enum HelpStep: Hashable { case intro, details }
     @State private var showHelp = false //HelpGuideCardView
@@ -38,7 +38,7 @@ struct ClothingRecommendationView: View {
     }
     
     var body: some View {
-        NavigationStack {
+
             ZStack{
                 Image("backgroundImage")
                     .resizable()
@@ -56,7 +56,7 @@ struct ClothingRecommendationView: View {
                             .foregroundStyle(.appwhite100)
                         //지역 선택 화면으로 가는 버튼
                         Button {
-                            showLocationPicker = true
+                            router.push(.weatherlocation)
                         } label: {
                             Image("clothesDownIcon")
                                 .resizable()
@@ -143,15 +143,15 @@ struct ClothingRecommendationView: View {
                     .padding(.leading, 312)
                     .padding(.top, 13)
                     
-                    NavigationLink {
-                        WeadyboardView()
-                    } label: {
-                        NavigationRowLabel(
-                            title: "다른 사람들은 어떻게 입었는지 보러가기",
-                            images: ["howPic1","howPic2","howPic3"]
-                        )
-                        .contentShape(RoundedRectangle(cornerRadius: 10))
-                    }
+                    Button {
+                            router.push(.weadyboard)
+                                   } label: {
+                                       NavigationRowLabel(
+                                           title: "다른 사람들은 어떻게 입었는지 보러가기",
+                                           images: ["howPic1","howPic2","howPic3"]
+                                      )
+                                       .contentShape(RoundedRectangle(cornerRadius: 10))
+                                   }
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top, 13)
                     .padding(.bottom, 19)
@@ -177,11 +177,13 @@ struct ClothingRecommendationView: View {
                         }
                     }
                     .zIndex(3)
+                    
                 }
+                    
             }
         }
     }
-}
+
 
 struct NavigationRowLabel: View {
     let title: String
@@ -260,7 +262,3 @@ struct ClothingRecommendationView_Previews: PreviewProvider {
         NavigationStack {ClothingRecommendationView(vm: .preview)}
     }
 }
-
-
-
-

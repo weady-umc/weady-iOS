@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WeatherHomeView: View {
     // MARK: - ViewModel & Env
+    @State private var selected: WeatherHomeModel = .first
     @Bindable var viewModel: WeatherHomeViewModel = .init()       // 탭 세그먼트, 중기예보 상태를 관리
     private let shortData = ShortWeatherData.example              // API 실패 시 사용할 예시 데이터
     @Environment(HomeRouter.self) var router                      // 라우팅(화면 전환) 환경 객체
@@ -17,8 +18,7 @@ struct WeatherHomeView: View {
     var body: some View {
         // MARK: - 루트 레이아웃
         VStack(spacing:0){
-            // MARK: - 상단 세그먼트(날씨/옷차림/장소)
-            SegmentView
+            
             
             // MARK: - 단기예보 원본 선택(실데이터 우선, 없으면 예시)
             let base = fetchedShort ?? shortData
@@ -36,8 +36,38 @@ struct WeatherHomeView: View {
                 case .third:   // 장소
                     CurationView()
                 }
+                
             }
+            .zIndex(0)
+            
         }
+        
+        .edgeSwipeBack(topExclusion: 100) {
+                router.pop()
+            }
+        .toolbar(.hidden, for: .navigationBar)
+        .safeAreaInset(edge: .top) {
+            VStack(spacing: 0) {
+                Spacer().frame(height: 100)
+                CustomNavBar(
+                    viewTitle: "",
+                    showLogoButton: true,
+                    showAlarmButton: true,
+                    showBottomDivider: false,
+                    alarmAction: { router.push(.alarm) }
+                )
+                // 세그먼트 바로 이어서
+                SegmentView
+                    .padding(.horizontal, 10)
+                    .background(Color.white)              // 흰 바 유지
+                    .overlay(Divider(), alignment: .bottom)
+            }
+            .background(Color.white.ignoresSafeArea(edges: .top))
+        }
+        .zIndex(999)
+
+
+        
         // MARK: - 진입 시 단기예보 요청 (한 번 가져오고 상태에 저장)
         .task {
             WeatherServices.shared.fetchShortWeather { result in
@@ -52,7 +82,7 @@ struct WeatherHomeView: View {
         }
         // MARK: - 토큰 사전 세팅 (Moya Plugin/헤더에서 참조한다고 가정)
         .onAppear {
-            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MTgzMDczfQ.FA0WXJieO-2cQsi-I8ig-7PSMfubAmn0gUUfZmjo_CQaspP9bvhhAUTEEzrxHvTGTL7mMf5ZJWYKwSxaDlxgUQ", forKey: "accessToken")
+            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MjU2MzEzfQ.DD67G9E-MkUN05goqjRO9ldykXy4fdjKcuZ6J1WQJPfp4nu-ciUQSzMsfotxo9bVBzuZEFVfdSKEhQbPVr9NVw", forKey: "accessToken")
         }
     }
     
@@ -63,6 +93,7 @@ struct WeatherHomeView: View {
             Image(weather.weatherBackground)
                 .resizable()
                 .ignoresSafeArea()
+                .allowsHitTesting(false)
             
             VStack {
                 // MARK: - 현재 위치 헤더(아이콘, 위치명, 위치 변경 버튼)
@@ -82,7 +113,9 @@ struct WeatherHomeView: View {
                         print("current router.path after push: \(router.path)")
                     }) {
                         Image("downIcon")
+                            .padding(8)
                     }
+                    .zIndex(2)
                     
                 }
                 .padding(.top, 12)
@@ -91,8 +124,8 @@ struct WeatherHomeView: View {
                 
                 // MARK: - 메인 카드(현재온도/최저·최고/아이콘 등)
                 WeatherMainCardView(weather: weather)
+                    .padding(.bottom, 45)
                 
-                Spacer().frame(height: 45)
                 
                 // MARK: - 시간별 예보
                 HourlyWeatherScrollView(hourlyWeatherList: weather.hourlyWeather)
@@ -102,8 +135,9 @@ struct WeatherHomeView: View {
                 
                 // MARK: - 강수 확률 / 풍속 요약
                 bigRainWind(weather: weather)
+                    .padding(.bottom, 25)
                 
-                Spacer().frame(height: 40)
+                //Spacer().frame(height: 40)
                 
                 // MARK: - 중기예보 리스트
                 MidTermSectionView(items: viewModel.midTermForecasts)
@@ -131,7 +165,7 @@ struct WeatherHomeView: View {
     }
     
     // MARK: - 세그먼트(탭) 헤더
-    private var SegmentView: some View {
+     var SegmentView: some View {
         HStack(spacing: 0) {
             ForEach(WeatherHomeModel.allCases, id: \.id) { segment in
                 sheetSegment(segment: segment)
@@ -139,6 +173,8 @@ struct WeatherHomeView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 24)
+        .padding(.top, 5)
+        .padding(.bottom, 0)
     }
     
     // MARK: - 세그먼트 버튼(선택 상태에 따라 텍스트/언더라인 색상 변경)
@@ -264,7 +300,7 @@ struct WeatherHomeView: View {
                             .foregroundStyle(Color.white100.opacity(0.8))
                         Image(WeatherLocationAddViewModel.mapSkyStatusToIcon(forecast.amSkyStatus))
                             .resizable().scaledToFit()
-                            .frame(width: 20, height: 20)
+                            .frame(width: 30, height: 30)
                     }
                     VStack(spacing: 2) {
                         Text("오후")
