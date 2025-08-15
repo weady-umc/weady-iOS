@@ -72,7 +72,7 @@ final class StartViewModel: ObservableObject {
         defer { isSubmitting = false }
 
         do {
-            let res = try await service.submit(body: body)
+            _ = try await service.submit(body: body)
             // 성공이면 그대로 홈 이동
             navigateHome = true
         } catch let api as APIErrorResponse {

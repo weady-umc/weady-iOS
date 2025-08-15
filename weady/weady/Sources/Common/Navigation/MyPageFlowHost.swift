@@ -14,6 +14,7 @@ enum MyPageRoute: Hashable {
     case mypage
     case setting
     case profileEdit
+    case weadyboardUpload
 }
 
 // MARK: - MyPageRouter
@@ -49,6 +50,8 @@ struct MyPageFlowHost: View {
                         SettingView()
                     case .profileEdit:
                         ProfileEditView(viewModel: ProfileEditViewModel(mypageViewModel: mypageVM))
+                    case .weadyboardUpload:   
+                            UploadView()
                     }
                 }
         }

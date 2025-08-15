@@ -11,105 +11,106 @@ struct MyPageView: View {
     @Environment(WeadyboardRouteBridge.self) private var weadyboardBridge
 
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .top) {
-                VStack(alignment: .leading) {
-                    Spacer().frame(height: 20)
-                    
-                    // MARK: - 상단 헤드라인
-                    HStack {
-                        Text("마이페이지")
-                            .fontName(.headingSemibold20)
-                        Spacer()
-                        Button {
-                            router.push(.setting)
-                        } label: {
-                            Image("line3bar")
-                                .frame(width: 44, height: 44)
-                        }
-                    }
-                    .padding(.horizontal)
-                    
-                    // MARK: - 프로필
-                    MyPageProfile(profile: viewModel.profile)
-                        .padding(.horizontal)
-                        .padding(.top, 15)
-                    
-                    // MARK: - 프로필 편집 버튼
-                    Button {
-                        router.push(.profileEdit)
-                    } label: {
-                        Text("프로필 편집")
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 9)
-                            .background(Color.gray500)
-                            .cornerRadius(4)
-                            .fontName(.homeSemibold12)
-                            .foregroundStyle(Color.black100)
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 20)
-                    
-                    // MARK: - 날짜 & 보기 필터
-                    HStack {
-                        MyPageDateFilter(
-                            selectedMonth: $viewModel.month,
-                            selectedYear: $viewModel.year,
-                            showPicker: $showPicker
-                        )
-                        Spacer()
-                        MyPageFilter(selectedFilter: $viewModel.selectedFilter)
-                    }
-                    .padding(.horizontal)
-                    
-                    // MARK: - 달력
-                    ScrollView {
-                        MyPageCalendar(viewModel: viewModel)
-                            .padding(.horizontal, 10)
-                    }
-                    .frame(height: 400)
-                    .padding(.top, 8)
-                    
-                    // MARK: - 게시물 업로드 버튼
-                    HStack {
-                        Spacer()
-                        Button {
-                            weadyboardBridge.navigate(.weadyboardUpload)
-                        } label: {
-                            Image("boardUploadIcon")
-                                .frame(width: 40, height: 40)
-                                .shadow(color: .black.opacity(0.25), radius: 2)
-                        }
-                        .padding(.horizontal)
-                    }
-                }
+        ZStack(alignment: .top) {
+            VStack(alignment: .leading) {
+                Spacer().frame(height: 20)
                 
-                // MARK: - Date Picker 오버레이
-                if showPicker {
-                    VStack(spacing: 0) {
-                        PickerOverlayView(
-                            selectedMonth: $viewModel.month,
-                            selectedYear: $viewModel.year,
-                            months: months,
-                            years: years
-                        )
+                // MARK: - 상단 헤드라인
+                HStack {
+                    Text("마이페이지")
+                        .fontName(.headingSemibold20)
+                    Spacer()
+                    Button {
+                        router.push(.setting)
+                    } label: {
+                        Image("line3bar")
+                            .frame(width: 44, height: 44)
                     }
-                    .offset(x: -135)
+                }
+                .padding(.horizontal)
+                
+                // MARK: - 프로필
+                MyPageProfile(profile: viewModel.profile)
+                    .padding(.horizontal)
+                    .padding(.top, 15)
+                
+                // MARK: - 프로필 편집 버튼
+                Button {
+                    router.push(.profileEdit)
+                } label: {
+                    Text("프로필 편집")
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 9)
+                        .background(Color.gray500)
+                        .cornerRadius(4)
+                        .fontName(.homeSemibold12)
+                        .foregroundStyle(Color.black100)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 20)
+                
+                // MARK: - 날짜 & 보기 필터
+                HStack {
+                    MyPageDateFilter(
+                        selectedMonth: $viewModel.month,
+                        selectedYear: $viewModel.year,
+                        showPicker: $showPicker
+                    )
+                    Spacer()
+                    MyPageFilter(selectedFilter: $viewModel.selectedFilter)
+                }
+                .padding(.horizontal)
+                
+                // MARK: - 달력
+                ScrollView {
+                    MyPageCalendar(viewModel: viewModel)
+                        .padding(.horizontal, 10)
+                }
+                .frame(height: 400)
+                .padding(.top, 8)
+                
+                // MARK: - 게시물 업로드 버튼
+                HStack {
+                    Spacer()
+                    Button {
+                        router.push(.weadyboardUpload)
+
+                    } label: {
+                        Image("boardUploadIcon")
+                            .frame(width: 40, height: 40)
+                            .shadow(color: .black.opacity(0.25), radius: 2)
+                    }
+                    .padding(.horizontal)
                 }
             }
-            .onChange(of: viewModel.year) { oldValue, newValue in
-                viewModel.fetchMypageData()
+            
+            // MARK: - Date Picker 오버레이
+            if showPicker {
+                VStack(spacing: 0) {
+                    PickerOverlayView(
+                        selectedMonth: $viewModel.month,
+                        selectedYear: $viewModel.year,
+                        months: months,
+                        years: years
+                    )
+                }
+                .offset(x: -135)
             }
-            .onChange(of: viewModel.month) { oldValue, newValue in
-                viewModel.fetchMypageData()
-            }
-            .onChange(of: viewModel.selectedFilter) { oldValue, newValue in
-            // TODO: 보기 필터 로컬 적용 (추후 api 반영)
-            }
+        }
+        .onChange(of: viewModel.year) { _, _ in
+            viewModel.fetchMypageData()
+        }
+        .onChange(of: viewModel.month) { _, _ in
+            viewModel.fetchMypageData()
+        }
+        .onChange(of: viewModel.selectedFilter) { _, _ in
+            // TODO: 보기 필터 로컬 적용 (추후 API 반영)
         }
     }
 }
 
 #Preview {
-    MyPageView()
+    let router = MyPageRouter()
+    MyPageView(viewModel: MypageViewModel())
+        .environment(router)
 }
