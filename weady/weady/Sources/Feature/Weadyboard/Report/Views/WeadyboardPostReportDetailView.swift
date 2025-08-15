@@ -35,7 +35,7 @@ struct WeadyboardPostReportDetailView: View {
                 if let onBack { onBack() } else { dismiss() }
             }
             
-            Spacer().frame(height: 34)
+            Spacer().frame(height: 24)
             
             Text(reason.detailTitle)
                 .fontName(.headingSemibold20)

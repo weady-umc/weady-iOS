@@ -24,7 +24,7 @@ struct WeadyboardPostReportSheet: View {
                 onClose()
             }
             
-            Spacer().frame(height: 20)
+            Spacer().frame(height: 24)
             
             // 사유 리스트
             ScrollView(showsIndicators: false) {
