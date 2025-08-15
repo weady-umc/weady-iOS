@@ -8,14 +8,16 @@
 import SwiftUI
 
 struct WeadyboardPostMoreActionSheet: View {
-    @Binding var showReportSheet: Bool
     let boardId: Int
     @ObservedObject var reportViewModel: WeadyboardReportViewModel
     @EnvironmentObject private var toast: ToastCenter
 
     @State private var showUnhideBanner: Bool = false
     @State private var unhideDismissWorkItem: DispatchWorkItem?
-    
+
+    var onClose: () -> Void
+    var onReportTap: () -> Void
+
     var body: some View {
         VStack(spacing: 0) {
             
@@ -48,13 +50,14 @@ struct WeadyboardPostMoreActionSheet: View {
                     title: "게시물 신고하기",
                     titleColor: Color(UIColor.systemRed), 
                     action: {
-                        showReportSheet = true
+                        reportViewModel.selectedReasonIndex = nil
+                        onReportTap()
                     }
                 )
             }
             .padding(.top, 24)
         }
-        .frame(width: 375, height: 255)
+        .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.white100)

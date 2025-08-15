@@ -13,6 +13,7 @@ import Observation
 enum MyPageRoute: Hashable {
     case mypage
     case setting
+    case profileEdit
 }
 
 // MARK: - MyPageRouter
@@ -45,6 +46,8 @@ struct MyPageFlowHost: View {
                         MyPageView()
                     case .setting:
                         SettingView()
+                    case .profileEdit:
+                        ProfileEditView()
                     }
                 }
         }

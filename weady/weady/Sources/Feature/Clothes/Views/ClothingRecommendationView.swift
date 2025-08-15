@@ -261,6 +261,3 @@ struct ClothingRecommendationView_Previews: PreviewProvider {
     }
 }
 
-
-
-

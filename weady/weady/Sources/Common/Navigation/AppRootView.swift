@@ -56,7 +56,8 @@ struct AppRootView: View {
                         
                     case .basetab:
                         ZStack(alignment: .bottom) {
-                            BaseTabScreen(selectedTab: $selectedTab)
+                            BaseTabScreen(selectedTab: $selectedTab,
+                                          isTabBarHidden: $isTabBarHidden)
                                 .environment(router)
                                 .environmentObject(router)
                                 .environment(tabController)

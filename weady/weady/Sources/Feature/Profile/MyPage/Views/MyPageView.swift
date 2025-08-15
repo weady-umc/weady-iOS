@@ -7,16 +7,23 @@ struct MyPageView: View {
     private let months = Array(1...12)
     private let years = Array(2015...2025)
     
+    @Environment(MyPageRouter.self) private var router
+    @Environment(WeadyboardRouteBridge.self) private var weadyboardBridge
+
     var body: some View {
-        NavigationStack {
             ZStack(alignment: .top) { 
                 VStack(alignment: .leading) {
+                    Spacer()
+                        .frame(height: 20)
+                    
                     // MARK: - 상단 헤드라인
                     HStack {
                         Text("마이페이지")
                             .fontName(.headingSemibold20)
                         Spacer()
-                        NavigationLink(destination: SettingView()) {
+                        Button {
+                            router.push(.setting)
+                        } label: {
                             Image("line3bar")
                                 .frame(width: 44, height: 44)
                         }
@@ -29,7 +36,9 @@ struct MyPageView: View {
                         .padding(.top, 15)
                     
                     // MARK: - 프로필 편집 버튼
-                    NavigationLink(destination: ProfileEditView()) {
+                    Button {
+                        router.push(.profileEdit)
+                    } label: {
                         Text("프로필 편집")
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 9)
@@ -64,6 +73,7 @@ struct MyPageView: View {
                     HStack {
                         Spacer()
                         Button(action: {//TODO: 게시물 업로드로 이동
+                            weadyboardBridge.navigate(.weadyboardUpload)
                             }) {
                             Image("boardUploadIcon")
                                 .frame(width: 40, height: 40)
@@ -86,7 +96,7 @@ struct MyPageView: View {
                     .offset(x: -135)
                 }
             }
-        }
+        
     }
 }
 
