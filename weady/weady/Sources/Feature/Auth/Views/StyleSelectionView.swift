@@ -12,21 +12,22 @@ struct StyleSelectionView: View {
     @StateObject private var vm: StyleSelectionViewModel
     @State private var showNext = false
 
-    private let columns = Array(
-        repeating: GridItem(.flexible(), spacing: 15),
-        count: 3
-    )
+    private let gender: GenderCode?
+    private let agreements: [OnboardingAgreement]
 
-    // VM 주입용 init
-    init(nickname: String,
-             service: TagServiceProtocol = TagService())
-    {
-        let viewModel = StyleSelectionViewModel(
-            nickname: nickname,
-            service: service
-        )
-        _vm = StateObject(wrappedValue: viewModel)
+    init(
+        nickname: String,
+        gender: GenderCode? = nil,
+        agreements: [OnboardingAgreement],
+        service: TagServiceProtocol = TagService()
+    ) {
+        self.gender = gender
+        self.agreements = agreements
+        _vm = StateObject(wrappedValue: StyleSelectionViewModel(nickname: nickname, service: service))
     }
+    
+    private let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 15), count: 3)
+
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -36,15 +37,29 @@ struct StyleSelectionView: View {
             Spacer()
             footerView()
         }
-        .onAppear { vm.loadCategories() }
-        //다음 뷰 연결
-        .fullScreenCover(isPresented: $vm.didTapSkip) {
-            // 건너뛸 때 이동할 뷰
-            StartView(nickname: vm.nickname)
+        .onAppear {
+            print("DEBUG Style →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
+            vm.loadCategories()
         }
+        // 다음 → StartView (스타일 포함)
         .fullScreenCover(isPresented: $vm.didTapNext) {
-            // 다음에 이동할 뷰
-            StartView(nickname: vm.nickname)
+            let styleIds64: [Int64] = Array(vm.selectedIds).map { Int64($0) }.sorted()
+            StartView.onboarding(
+                nickname: vm.nickname,
+                gender: gender,
+                styleIds: styleIds64,
+                agreements: agreements
+            )
+        }
+        // 스킵 → StartView (스타일 없음)
+        .fullScreenCover(isPresented: $vm.didTapSkip) {
+            let styleIds64: [Int64] = []   // 스킵이면 빈 배열
+            StartView.onboarding(
+                nickname: vm.nickname,
+                gender: gender,
+                styleIds: styleIds64,
+                agreements: agreements
+            )
         }
     }
     
@@ -150,9 +165,11 @@ struct CategoryButton: View {
         }
     }
 }
-
+/*
 struct StyleSelectionView_Previews: PreviewProvider {
     static var previews: some View {
         StyleSelectionView(nickname: "테스트")
     }
 }
+
+*/

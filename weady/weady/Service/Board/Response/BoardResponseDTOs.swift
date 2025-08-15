@@ -15,6 +15,7 @@ struct BoardDetailResponseDTO: Decodable {
     let isPublic: Bool
     let goodStatus: Bool
     let goodCount: Int
+    let commentCount: Int
     let imgCount: Int?
     let imageDtoList: [BoardImageDTO]
     let content: String
@@ -25,7 +26,7 @@ struct BoardDetailResponseDTO: Decodable {
     let styleIdList: [Int]
     let brandDtoList: [BrandDTO]
     let createdAt: String
-    let updatedAt: String
+    let updatedAt: String?
 }
 
 struct BoardImageDTO: Decodable {

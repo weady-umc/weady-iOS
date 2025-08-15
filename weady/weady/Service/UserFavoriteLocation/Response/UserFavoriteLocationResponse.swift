@@ -26,11 +26,11 @@ struct UserFavoriteLocation : Decodable {
 }
 
 struct PostFavoriteLocationResponse: Decodable {
-    let code: Int
-    let message: String
-    let data: LocationID
+    let code: Int?
+    let message: String?
+    let data: LocationID?
 }
 
 struct LocationID: Decodable {
-    let locationId: Int
+    let locationId: Int?
 }

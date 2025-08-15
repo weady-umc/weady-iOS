@@ -12,11 +12,16 @@ import Observation
 /// Home 플로우에서 사용하는 라우트 정의
 enum HomeRoute: Hashable {
     case home
-    case weatheraddlocation
+    case weatheradd(AddressDocument, ShortWeatherData)
     case weathersearch
     case weatherlocation
+
+    case weatherhome
+    case clothes
+
     case curationdetail(curationId: Int64)
     case curation
+
 }
 
 // MARK: - HomeRouter
@@ -49,21 +54,32 @@ struct HomeFlowHost: View {
                     switch route {
                     case .home:
                         HomeView()
-                    case .weatheraddlocation:
+                    case .weatherhome:
+                        WeatherHomeView()
+                    case .weatheradd(let place, let weather):
                         WeatherLocationAddView(
                             viewModel: WeatherLocationAddViewModel(),
                             locationViewModel: WeatherLocationViewModel(),
-                            selectedPlace: .constant(nil),
-                            weather: ShortWeatherData.example
+                            selectedPlace: .constant(place),
+                            onComplete: {
+                                router.reset()
+                                router.push(.weatherlocation)
+                            },
+                            weather: weather
                         )
                     case .weathersearch:
                         WeatherSearchView(selectedPlace: .constant(nil))
                     case .weatherlocation:
                         WeatherLocationView()
+
+                    case .clothes:
+                        ClothingRecommendationView()
+
                     case .curationdetail(let curationId):
                         DetailCurationView(curationId: curationId)
                     case .curation:
                         CurationView()
+
                     }
                 }
         }

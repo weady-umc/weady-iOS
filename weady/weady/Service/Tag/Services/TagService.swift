@@ -23,7 +23,6 @@ protocol TagServiceProtocol {
     func getClothesStyleCategories(completion: @escaping (Result<[ClothesStyleCategoryResponseDTO], NetworkError>) -> Void)
 }
 
-/// 실제 네트워크 호출 구현체
 final class TagService: TagServiceProtocol {
     private let network = DefaultNetworkManager<TagEndpoints>()
     

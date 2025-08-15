@@ -17,12 +17,9 @@ struct WeatherLocationView: View {
 
     
     var body: some View {
-        NavigationStack(path: Binding(
-            get: { router.path },
-            set: { router.path = $0 }
-        )) {
+        
             ZStack(alignment: .top) {
-                Color.white.ignoresSafeArea()
+                
                 VStack{
                     
                     Spacer().frame(height: 25)
@@ -42,40 +39,29 @@ struct WeatherLocationView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden(true)
                 .onAppear {
-                    UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU0NzQ0NTMyfQ.QvipLyoLNcIYzj7qTuBsbEWO8cPDkbl1XJxe9cR-MZoh2lPP0yIcaCIXp8FkpkxZVipoJBEcuC0eaGTlVvOGnw", forKey: "accessToken")
-                }
-                .onAppear {
+                    UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MTgzMDczfQ.FA0WXJieO-2cQsi-I8ig-7PSMfubAmn0gUUfZmjo_CQaspP9bvhhAUTEEzrxHvTGTL7mMf5ZJWYKwSxaDlxgUQ", forKey: "accessToken")
+                
                     viewModel.loadFavorites()
                 }
 
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
-                            dismiss()
+                            router.pop()
                         }) {
                             Image("backicon")
                                 .foregroundColor(.black)
                         }
                         
                     }
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                            EditButton()
-                        }
-                }
-                .navigationDestination(for: HomeRoute.self) { route in
-                        switch route {
-                        case .weathersearch:
-                            WeatherSearchView(selectedPlace: $selectedPlace)
-                        default:
-                            HomeView()
-                        }
-                    }
+                                    }
+               
                 
                 Divider()
                     .frame(height: 1)
                     
             }
-        }
+        
     }
     
     private var searchBar: some View {
@@ -149,11 +135,11 @@ struct WeatherLocationView: View {
                 
             } else {
                 List {
-                    ForEach(viewModel.favoriteLocations, id: \.id) { weather in
-                        HStack {
-                            if editMode?.wrappedValue == .active {
-                                Button(action: {
-                                    deleteItem(weather)
+                    ForEach(viewModel.favoriteLocations, id: \.id) { (weather: WeatherData) in
+                    HStack {
+                    if editMode?.wrappedValue == .active {
+                        Button(action: {
+                            deleteItem(weather)
                                 }) {
                                     Image("deleteicon")
                                         .resizable()
@@ -165,26 +151,26 @@ struct WeatherLocationView: View {
                                 
                             }
                             
-                            WeatherLocationCardView(
-                                data: weather,
-                                isCurrentLocation: false,
-                                editMode: editMode?.wrappedValue == .active
-                            )
+                WeatherLocationCardView(
+                    data: weather,
+                    isCurrentLocation: false,
+                    editMode: editMode?.wrappedValue == .active
+                )
+                .allowsHitTesting(editMode?.wrappedValue != .active)
+                .contentShape(Rectangle()) // 클릭 영역 확장
+                .onTapGesture {
+                    router.push(.weatherhome)
+                    
+                }
+
                             
-                        }
+            }
                         .frame(alignment: .leading)
                         .listRowInsets(EdgeInsets()) // 여백 제거
                         .listRowSeparator(.hidden)
                         .padding(.bottom, 8)
                     }
-                    .onMove { source, destination in
-                        print("Move from \(source) to \(destination)")
-                        viewModel.favoriteLocations.move(fromOffsets: source, toOffset: destination)
-                        print(viewModel.favoriteLocations.map { $0.location })
-                        
                     
-                    }
-
                 }
                 .listStyle(.plain)
             }
@@ -200,17 +186,12 @@ struct WeatherLocationView: View {
 
 
     func deleteItem(_ weather: WeatherData) {
-        guard let favId = weather.favoriteId else {
-            // 서버 ID 없으면 로컬만 제거
-            if let idx = viewModel.favoriteLocations.firstIndex(of: weather) {
-                viewModel.favoriteLocations.remove(at: idx)
-            }
-            return
-        }
-
-        if let idx = viewModel.favoriteLocations.firstIndex(of: weather) {
+        guard let favId = weather.favoriteId else { return }
+        
+        if let idx = viewModel.favoriteLocations.firstIndex(where: { $0.id == weather.id }) {
             let removed = weather
-            viewModel.favoriteLocations.remove(at: idx) // 낙관적 제거
+            viewModel.favoriteLocations.remove(at: idx)
+            print("🗑️ 로컬에서 즐겨찾기 제거: \(favId)")
 
             viewModel.deleteFavoriteFromServer(favoriteId: favId) { ok in
                 if ok {
@@ -231,5 +212,10 @@ struct WeatherLocationView: View {
 
 #Preview {
     WeatherLocationView()
+        .environment(HomeRouter())
         .environment(NavigationRouter())
 }
+#Preview {
+    HomeFlowHost() // 여기에 WeatherLocationView를 보여주는 루트
+}
+

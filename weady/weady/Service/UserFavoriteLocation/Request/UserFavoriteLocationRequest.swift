@@ -9,6 +9,7 @@ import Foundation
 
 struct PostFavoriteLocationRequest: Encodable {
     let bCode: String
+
 }
 
 struct PatchDefaultFavoriteLocationRequest: Encodable {

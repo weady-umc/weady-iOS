@@ -86,9 +86,10 @@ final class WeatherSearchViewModel: ObservableObject {
         weatherService.getPreview(bCode: place.address.bCode, x: x, y: y)
             .sink(receiveCompletion: { result in
                 if case .failure(let error) = result {
-                    print("❌ 날씨 API 오류: \(error)")
-                    completion(nil)
-                }
+                                print("❌ 날씨 API 오류: \(error) → 더미 데이터 사용")
+                                let dummy = self.makeDummyWeather(for: place)
+                                completion(dummy)
+                            }
             }, receiveValue: { [weak self] weather in
                 self?.previewWeather = weather
                 completion(weather)
@@ -116,5 +117,30 @@ final class WeatherSearchViewModel: ObservableObject {
         print("🌐 필터링된 결과 수: \(filtered.count)")
     }
 
-    
+    private func makeDummyWeather(for place: AddressDocument) -> ShortWeatherData {
+        return ShortWeatherData(
+            address1: place.address.region1depthName,
+            address2: place.address.region2depthName,
+            address3: place.address.region3depthName,
+            currentTmp: 20.0,
+            skyStatus: "RAINY",
+            maxTmp: 25.0,
+            minTmp: 15.0,
+            hourlyForecasts: [
+                HourlyForecast(time: 9, skyStatus: "CLEAR", tmp: 20.0),
+                HourlyForecast(time: 12, skyStatus: "CLOUDY", tmp: 22.0),
+                HourlyForecast(time: 15, skyStatus: "RAIN", tmp: 21.0)
+            ],
+            hourlyPrecipitations: [
+                HourlyPrecipitation(time: 9, probability: 0.0),
+                HourlyPrecipitation(time: 12, probability: 10.0),
+                HourlyPrecipitation(time: 15, probability: 70.0)
+            ],
+            hourlyWinds: [
+                HourlyWind(time: 9, direction: "N", speed: 1.2),
+                HourlyWind(time: 12, direction: "E", speed: 2.0),
+                HourlyWind(time: 15, direction: "W", speed: 3.5)
+            ]
+        )
+    }
 }

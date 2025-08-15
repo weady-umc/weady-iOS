@@ -28,9 +28,9 @@ class NicknameInputViewModel: ObservableObject {
     /// 다음 버튼 터치 후 유효성 검사 실패 시 에러 메시지 표시 여부
     @Published var shouldShowValidationError: Bool = false
 
-    /// 1~15자, 한글(가-힣), 영문, 숫자로만 이루어졌는지
+    /// 2~15자, 한글(가-힣), 영문, 숫자로만 이루어졌는지
     var isValidNickname: Bool {
-        let pattern = "^[가-힣A-Za-z0-9]{1,15}$"
+        let pattern = "^[가-힣A-Za-z0-9]{2,15}$" // 2~15자
         return NSPredicate(format: "SELF MATCHES %@", pattern)
             .evaluate(with: nickname)
     }

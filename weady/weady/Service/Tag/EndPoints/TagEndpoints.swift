@@ -46,4 +46,5 @@ extension TagEndpoints: TargetType {
         }
         return h
     }
+    public var sampleData: Data { Data() }
 }

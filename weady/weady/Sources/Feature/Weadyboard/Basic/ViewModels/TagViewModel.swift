@@ -10,9 +10,10 @@ import Foundation
 @MainActor
 final class TagViewModel: ObservableObject {
 
-    @Published var seasons: [SeasonTagDTO] = []
-    @Published var weathers: [WeatherTagDTO] = []
-    @Published var temperatures: [TemperatureTagDTO] = []
+    // 서버 응답 DTO
+    @Published var seasons: [SeasonTagResponseDTO] = []
+    @Published var weathers: [WeatherTagResponseDTO] = []
+    @Published var temperatures: [TemperatureTagResponseDTO] = []
 
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -32,8 +33,8 @@ final class TagViewModel: ObservableObject {
         (1, "맑은 날"),
         (2, "구름 많은 날"),
         (3, "비 오는 날"),
-        (4, "눈 오는 날"),
-        (5, "흐린 날"),
+        (4, "흐린 날"),
+        (5, "눈 오는 날"),
         (6, "바람 많은 날")
     ]
 
@@ -83,7 +84,7 @@ final class TagViewModel: ObservableObject {
         let t = Int(sliderValue)
         if !temperatures.isEmpty {
             for tag in temperatures {
-                if range(tag.minTemperature, tag.maxTemperature, contains: t) {
+                if range(Int(tag.minTemperature), Int(tag.maxTemperature), contains: t) {
                     return tag.id
                 }
             }
@@ -100,7 +101,7 @@ final class TagViewModel: ObservableObject {
 
     func sliderValue(from tagId: Int) -> Double {
         if let tag = temperatures.first(where: { $0.id == tagId }) {
-            return averageOf(min: tag.minTemperature, max: tag.maxTemperature)
+            return averageOf(min: Int(tag.minTemperature), max: Int(tag.maxTemperature))
         }
         if let r = localTemperatureRanges.first(where: { $0.id == tagId }) {
             return averageOf(min: r.min, max: r.max)
@@ -123,9 +124,9 @@ final class TagViewModel: ObservableObject {
         }
     }
 
-    private let service: BoardTagService
+    private let service: TagService
 
-    init(service: BoardTagService = BoardTagService()) {
+    init(service: TagService = TagService()) {
         self.service = service
     }
 
@@ -136,37 +137,37 @@ final class TagViewModel: ObservableObject {
         let group = DispatchGroup()
 
         group.enter()
-        service.fetchSeasonTags { [weak self] result in
+        service.getSeasonTags { [weak self] result in
             DispatchQueue.main.async {
                 if case .success(let data) = result, !data.isEmpty {
                     self?.seasons = data.sorted { $0.id < $1.id }
                 } else {
-                    self?.seasons = self?.localSeasonOrder.map { SeasonTagDTO(id: $0.id, name: $0.name) } ?? []
+                    self?.seasons = self?.localSeasonOrder.map { SeasonTagResponseDTO(id: $0.id, name: $0.name) } ?? []
                 }
                 group.leave()
             }
         }
 
         group.enter()
-        service.fetchWeatherTags { [weak self] result in
+        service.getWeatherTags { [weak self] result in
             DispatchQueue.main.async {
                 if case .success(let data) = result, !data.isEmpty {
                     self?.weathers = data.sorted { $0.id < $1.id }
                 } else {
-                    self?.weathers = self?.localWeatherOrder.map { WeatherTagDTO(id: $0.id, name: $0.name) } ?? []
+                    self?.weathers = self?.localWeatherOrder.map { WeatherTagResponseDTO(id: $0.id, name: $0.name) } ?? []
                 }
                 group.leave()
             }
         }
 
         group.enter()
-        service.fetchTemperatureTags { [weak self] result in
+        service.getTemperatureTags { [weak self] result in
             DispatchQueue.main.async {
                 if case .success(let data) = result, !data.isEmpty {
                     self?.temperatures = data.sorted { $0.id < $1.id }
                 } else {
                     self?.temperatures = self?.localTemperatureRanges.map {
-                        TemperatureTagDTO(id: $0.id, name: $0.name, minTemperature: $0.min ?? Int.min, maxTemperature: $0.max ?? Int.max)
+                        TemperatureTagResponseDTO(id: $0.id, name: $0.name, minTemperature: Double($0.min ?? Int.min), maxTemperature: Double($0.max ?? Int.max))
                     } ?? []
                 }
                 group.leave()

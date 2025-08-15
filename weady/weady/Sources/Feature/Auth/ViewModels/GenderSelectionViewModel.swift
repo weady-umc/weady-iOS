@@ -39,6 +39,15 @@ class GenderSelectionViewModel: ObservableObject {
     var canProceed: Bool {
         selected != nil
     }
+    
+    var genderCode: GenderCode? {
+        guard let selected else { return nil }
+        switch selected {
+        case .male:        return .M
+        case .female:      return .W
+        case .unspecified: return .NONE
+        }
+    }
 
     func select(_ option: GenderOption) {
         selected = option

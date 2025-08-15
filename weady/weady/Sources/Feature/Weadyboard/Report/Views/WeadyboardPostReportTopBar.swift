@@ -15,10 +15,10 @@ struct WeadyboardPostReportTopBar: View {
     var body: some View {
         VStack(spacing: 0) {
             
-            Capsule()
-                .fill(Color.gray400)
-                .frame(width: 48, height: 4)
-                .padding(.top, 30)
+//            Capsule()
+//                .fill(Color.gray400)
+//                .frame(width: 48, height: 4)
+//                .padding(.top, 30)
             
             Spacer().frame(height: 17)
 

@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct AddressSearchResponse: Decodable {
+struct AddressSearchResponse: Decodable, Hashable {
     let documents: [AddressDocument]
 }
 
-struct AddressDocument: Decodable, Identifiable {
+struct AddressDocument: Decodable, Identifiable, Hashable{
     let address_name: String
     var id: String { address.bCode + x + y }
 
@@ -20,7 +20,7 @@ struct AddressDocument: Decodable, Identifiable {
     let y: String
 }
 
-struct AddressInfo: Decodable {
+struct AddressInfo: Decodable, Hashable {
     let region1depthName: String
     let region2depthName: String
     let region3depthName: String

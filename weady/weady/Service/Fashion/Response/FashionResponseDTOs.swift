@@ -101,3 +101,30 @@ extension TagDTO {
         Tag(id: id, name: name)
     }
 }
+
+
+
+struct FashionSummaryResponseDTO: Decodable {
+    let code: Int
+    let message: String
+    let data: FashionSummaryDTO
+}
+
+struct FashionSummaryDTO: Decodable {
+    let locationId: Int
+    let recommendation: String
+    let imageURL: String
+}
+
+// 필요하면 도메인 변환
+struct FashionSummary: Equatable {
+    let locationId: Int
+    let recommendation: String
+    let imageURL: String
+}
+
+extension FashionSummaryDTO {
+    func toDomain() -> FashionSummary {
+        .init(locationId: locationId, recommendation: recommendation, imageURL: imageURL)
+    }
+}

@@ -54,9 +54,11 @@ extension UserFavoriteLocationEndpoints: TargetType {
         switch self {
         case .getUserFavoriteLocation:
             return .requestPlain
-        case .postUserFavoriteLocation(let bCode):
-            let body = PostFavoriteLocationRequest(bCode: bCode)
-            return .requestJSONEncodable(body)
+        case let .postUserFavoriteLocation(bCode):
+            return .requestParameters(
+                parameters: ["bCode": bCode],
+                encoding: JSONEncoding.default
+            )
         case .patchDefaultFavoriteLocation(let locationID):
             let body = PatchDefaultFavoriteLocationRequest(userFavoriteLocationId: locationID)
             return .requestJSONEncodable(body)

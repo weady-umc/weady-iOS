@@ -25,7 +25,6 @@ struct WeatherLocationAddView: View {
         ZStack{
             if let weather = viewModel.weather {
                 Image(weather.weatherBackground)
-                //Image("weatherAdd_rainy")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 335, height: 694)
@@ -47,7 +46,9 @@ struct WeatherLocationAddView: View {
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 20, height: 20)
                         }
+                        .offset(y:-30)
                     }
+                   
                     
                     HStack{
                         Image("placeIcon")
@@ -61,17 +62,17 @@ struct WeatherLocationAddView: View {
                         
                     }
                     
-                    Spacer().frame(height: 24)
+                    Spacer().frame(height: 35)
                     
                     WeatherMainCardView(weather: weather)
                     
                     
-                    Spacer().frame(height: 45)
+                    Spacer().frame(height: 50)
                     
                     HourlyWeatherScrollView(hourlyWeatherList: weather.hourlyWeather)
-                        .padding(.horizontal,60)
+                        .padding(.horizontal,70)
                     
-                    Spacer().frame(height: 36)
+                    Spacer().frame(height: 45)
                     
                     //강수량
                     
@@ -79,14 +80,24 @@ struct WeatherLocationAddView: View {
                     
                     Spacer().frame(height: 80)
                     
-                    ///즐겨찾기 버튼
-                    Button(action: {
-                        if let place = selectedPlace, let weatherData = viewModel.weather {
-                            locationViewModel.addFavorite(from: place, with: weatherData)
-                        }
-                        dismiss()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            onComplete?()  // 시트 밖에서 push
+            Button(action: {
+                guard let place = selectedPlace,
+                    let weatherData = viewModel.weather else { return }
+
+                // 1. 서버 API로 즐겨찾기 추가
+            locationViewModel.addFavoriteToServer(bCode: place.address.bCode) { success in
+                if success {
+                    print("✅ 서버 즐겨찾기 추가 성공")
+                        // 2. 로컬 목록에도 추가
+                        locationViewModel.addFavorite(from: place, with: weatherData)
+                        // 3. 성공 시 화면 이동
+                        DispatchQueue.main.async {
+                        router.push(.weatherlocation)
+                    }
+                } else {
+                    print("❌ 서버 즐겨찾기 추가 실패")
+                        // 실패 시 Alert을 띄우거나 메시지 표시 가능
+                            }
                         }
                     }) {
                         ZStack {
@@ -113,6 +124,9 @@ struct WeatherLocationAddView: View {
         }
         .onAppear {
             viewModel.weather = viewModel.convertToWeatherAddData(from: weather)
+        }
+        .onAppear {
+            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MTkyMjMzfQ.0SZnNvaV9kaOSZpVOfmMpPpFCJyt-hlbgO9no5PLQv4el9_BOOV3PL_v_bq8M2TUBuRmykydbQzIZ2v-cj4AIA", forKey: "accessToken")
         }
         
     }
@@ -156,7 +170,7 @@ struct WeatherLocationAddView: View {
         
         var body: some View{
             VStack{
-                Text(weather.time)
+                Text(hourLabel(weather.time))
                     .foregroundStyle(Color.white100)
                     .fontName(.metaSemibold12)
                 
@@ -173,6 +187,15 @@ struct WeatherLocationAddView: View {
                 
             }
         }
+        // MARK: - Hour label formatter
+        private func hourLabel(_ time: String) -> String {
+            // "0", "100", "2300", "23:00" 모두 처리
+            let digits = time.filter(\.isNumber)
+            guard let n = Int(digits) else { return time }
+            let hour = (n >= 100) ? (n / 100) : n   // 2300→23, 100→1, 0→0
+            return "\(hour % 24)시"
+        }
+
         
     }
     struct HourlyWeatherScrollView: View {
@@ -259,5 +282,7 @@ struct rainWind :View {
         selectedPlace: .constant(dummyPlace),
         weather: ShortWeatherData.example
     )
-//    .environmentObject(NavigationRouter())
+
+    .environment(HomeRouter())
+
 }

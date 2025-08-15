@@ -21,9 +21,12 @@ final class WeadyboardReportViewModel: ObservableObject {
                 switch result {
                 case .success:
                     self?.isSuccess = true
+                    self?.errorMessage = nil
+                    completion(.success(()))
                 case .failure(let error):
                     self?.isSuccess = false
                     self?.errorMessage = error.localizedDescription
+                    completion(.failure(error))             
                 }
             }
         }
@@ -36,39 +39,45 @@ final class WeadyboardReportViewModel: ObservableObject {
                 switch result {
                 case .success:
                     self?.isSuccess = true
+                    completion(.success(()))
                 case .failure(let error):
                     self?.isSuccess = false
                     self?.errorMessage = error.localizedDescription
+                    completion(.failure(error))               
                 }
             }
         }
     }
     
     // 게시물 숨기기 취소
-    func unhide(boardId: Int) {
+    func unhide(boardId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
         BoardService().unhideBoard(boardId: boardId) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success:
                     self?.isSuccess = true
+                    completion(.success(()))
                 case .failure(let error):
                     self?.isSuccess = false
                     self?.errorMessage = error.localizedDescription
+                    completion(.failure(error))
                 }
             }
         }
     }
     
     // 게시물 삭제
-    func delete(boardId: Int) {
+    func delete(boardId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
         BoardService().deleteBoard(boardId: boardId) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success:
                     self?.isSuccess = true
+                    completion(.success(()))
                 case .failure(let error):
                     self?.isSuccess = false
                     self?.errorMessage = error.localizedDescription
+                    completion(.failure(error))              
                 }
             }
         }
