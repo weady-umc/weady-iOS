@@ -58,8 +58,8 @@ struct WeadychiveView: View {
                     viewModel.WeadyboardLogOutput(size: 18, page: 0)
                 }
             }
-            .onChange(of: navigateToDelete) { isPushing in
-                guard isPushing == false else { return }
+            .onChange(of: navigateToDelete, initial: false) { oldValue, newValue in
+                guard newValue == false else { return }
                 switch selectedTopTab {
                 case .curation:
                     viewModel.CurationLogOutput()

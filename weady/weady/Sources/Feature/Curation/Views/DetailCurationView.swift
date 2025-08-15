@@ -14,6 +14,17 @@ struct DetailCurationView: View {
 
     let curationId: Int64
 
+    init(curationId: Int64) {
+        self.curationId = curationId
+        // iOS 16 이하에서도 네비게이션 바 밑 선 제거
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .white
+        appearance.shadowColor = .clear
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    }
+
     @StateObject private var vm = DetailCurationViewModel()
     @StateObject private var scrapVm = WeadychiveViewModel()
     @State private var currentIndex: Int = 0
@@ -37,7 +48,13 @@ struct DetailCurationView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-        .toolbarBackground(Color.white)
+
+        .toolbarBackground(Color.white, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+      
+       
+        
+
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { dismiss() }) {
@@ -71,6 +88,7 @@ struct DetailCurationView: View {
                 }
             }
         }
+        
         .task { await vm.load(curationId: curationId) }
     }
 }
@@ -102,7 +120,7 @@ final class DetailCurationViewModel: ObservableObject {
     }
 }
 
-// MARK: - 이미지 캐러셀ㅂ
+// MARK: - 이미지 캐러셀 (에러 처리도 포함)
 private struct DetailCurationImageCarousel: View {
     @Binding var currentIndex: Int
     let imageURLs: [URL]

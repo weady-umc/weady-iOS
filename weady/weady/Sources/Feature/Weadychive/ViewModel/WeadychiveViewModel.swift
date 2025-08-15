@@ -125,7 +125,7 @@ final class WeadychiveViewModel: ObservableObject {
             case .success(let response):
                 print("✅ 큐레이션 스크랩 추가 성공: \(response.isScraped)")
                 self.fetchScrappedCurations()
-            case .failure(let error):
+            case .failure(_):
                 print("!!!큐레이션 추가됌요!!!")
             }
         }
@@ -139,7 +139,7 @@ final class WeadychiveViewModel: ObservableObject {
             case .success(let response):
                 print("✅ 큐레이션 스크랩 삭제 성공: \(response.isScraped)")
                 self.fetchScrappedCurations()
-            case .failure(let error):
+            case .failure(_):
                 print("!!!큐레이션 삭제됌요!!!")
             }
         }

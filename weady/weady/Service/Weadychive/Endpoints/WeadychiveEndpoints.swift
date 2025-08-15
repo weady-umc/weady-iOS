@@ -37,7 +37,7 @@ extension WeadychiveEndpoints: TargetType {
             return "/api/v1/weadychive/curation/bookmarks"
         case .deleteCurationScrap(let curationId):
             return "/api/v1/weadychive/curation/bookmarks/\(curationId)"
-        case .postBoardScrap(let boardId), .deleteBoardScrap(let boardId):
+        case .postBoardScrap(_), .deleteBoardScrap(_):
             return "/api/v1/weadychive/board/bookmarks"
         case .getScrappedBoards:
             return "/api/v1/weadychive/board/my"
@@ -61,7 +61,7 @@ extension WeadychiveEndpoints: TargetType {
             return .requestPlain
         case .postCurationScrap(let curationId):
             return .requestJSONEncodable(ScrapCurationRequestDto(curationId: curationId))
-        case .deleteCurationScrap(let curationId):
+        case .deleteCurationScrap(_):
             return .requestPlain
         case .postBoardScrap(let boardId), .deleteBoardScrap(let boardId):
             return .requestJSONEncodable(ScrapBoardRequestDto(boardId: boardId))
