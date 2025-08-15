@@ -41,10 +41,10 @@ final class UploadViewModel {
 
         let styleIdList = fashionModel.selectedStyles.map { $0.rawValue }
         let brandDtoList = fashionModel.selectedTags.map { tag in
-                UploadBrand(brand: tag.brandName, product: tag.productName)
-            }
+            UploadBrand(brand: tag.brandName, product: tag.productName)
+        }
         
-        return UploadModel(
+        let uploadModel = UploadModel(
             isPublic: isPublic,
             isAdd: isAdd,
             content: content,
@@ -57,6 +57,22 @@ final class UploadViewModel {
             styleIds: styleIdList,
             brandDtoList: brandDtoList
         )
+        
+        // ** 디버깅 로그: DTO 확인 **
+        print("=== 업로드 DTO ===")
+        print("isPublic:", uploadModel.isPublic)
+        print("isAdd:", uploadModel.isAdd)
+        print("content:", uploadModel.content)
+        print("images:", uploadModel.imageDtoList.map { "\($0.imgOrder): \($0.imgUrl)" })
+        print("weatherTagId:", uploadModel.weatherTagId)
+        print("temperatureTagId:", uploadModel.temperatureTagId)
+        print("seasonTagId:", uploadModel.seasonTagId)
+        print("places:", uploadModel.placeDtoList.map { "\($0.placeName) / \($0.placeAddress)" })
+        print("styleIds:", uploadModel.styleIds)
+        print("brands:", uploadModel.brandDtoList.map { "\($0.brand) - \($0.product)" })
+        print("=================")
+        
+        return uploadModel
     }
 
     // MARK: - 매핑 함수
@@ -80,7 +96,7 @@ final class UploadViewModel {
         }
     }
     
-    // MARK: - 업로드 함수 (async/await + completion wrapper)
+    // MARK: - 업로드 함수
     func submitPost() async -> Bool {
         do {
             // 1. 이미지 업로드 후 URL 획득
@@ -93,7 +109,15 @@ final class UploadViewModel {
 
             let requestDTO = uploadModel.toCreateBoardRequestDTO
 
-            // 3. API 호출 (completion -> async 래핑)
+            // ** 디버깅 로그: Request DTO JSON 확인 **
+            if let jsonData = try? JSONEncoder().encode(requestDTO),
+               let jsonString = String(data: jsonData, encoding: .utf8) {
+                print("=== API 전송 JSON ===")
+                print(jsonString)
+                print("===================")
+            }
+
+            // 3. API 호출
             try await withCheckedThrowingContinuation { continuation in
                 boardService.createBoard(data: requestDTO) { result in
                     switch result {
@@ -104,6 +128,7 @@ final class UploadViewModel {
                     }
                 }
             }
+            
             print("!!!!! 업로드 성공")
             return true
         } catch {
@@ -114,7 +139,7 @@ final class UploadViewModel {
     
     // MARK: - 이미지 업로드 (테스트용)
     private func uploadImages(_ images: [LocalImage]) async throws -> [String] {
-        // TODO: 실제 업로드 API 연결 (테스트용 임시 URL 반환)
+        // TODO: 실제 S3 업로드 API로 교체
         return images.map { _ in
             "https://cdn.example.com/image/\(UUID().uuidString).jpg"
         }
@@ -127,10 +152,8 @@ final class UploadViewModel {
         
         var errorDescription: String? {
             switch self {
-            case .invalidData:
-                return "업로드할 데이터가 유효하지 않습니다."
-            case .uploadFailed(let reason):
-                return "업로드에 실패했습니다: \(reason)"
+            case .invalidData: return "업로드할 데이터가 유효하지 않습니다."
+            case .uploadFailed(let reason): return "업로드에 실패했습니다: \(reason)"
             }
         }
     }
