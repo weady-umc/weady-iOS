@@ -30,12 +30,12 @@ enum WeatherType: String, CaseIterable, Identifiable, Codable {
 
     var imageName: String {
         switch self {
-        case .sunny: return "sunny"
-        case .cloudy: return "cloudy"
-        case .rainy: return "rainy"
-        case .partlyCloudy: return "partlycloudy"
-        case .snowy: return "snowy"
-        case .windy: return "windy"
+        case .sunny: return "filter_sunny"
+        case .cloudy: return "filter_cloudy"
+        case .rainy: return "filter_rainy"
+        case .partlyCloudy: return "filter_partlycloudy"
+        case .snowy: return "filter_snowy"
+        case .windy: return "filter_windy"
         }
     }
 
