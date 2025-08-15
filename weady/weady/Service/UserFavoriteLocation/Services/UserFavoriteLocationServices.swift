@@ -11,9 +11,21 @@ import Moya
 // MARK: - 사용자 즐겨찾기 위치 서비스
 // MoyaProvider로 즐겨찾기 관련 API 호출/디코딩을 담당
 final class UserFavoriteLocationServices {
-    // MARK: Dependencies
-    private let provider = MoyaProvider<UserFavoriteLocationEndpoints>() // 엔드포인트 바운드된 프로바이더
-    
+    typealias Endpoint = UserFavoriteLocationEndpoints
+        
+        // MARK: - Provider 설정
+        let provider: MoyaProvider<UserFavoriteLocationEndpoints>
+        
+        public init(provider: MoyaProvider<UserFavoriteLocationEndpoints>? = nil) {
+            // 플러그인 추가
+            let plugins: [PluginType] = [
+                NetworkLoggerPlugin(configuration: .init(logOptions: .verbose)) // 로그 플러그인
+            ]
+            // provider 초기화
+            self.provider = provider ?? MoyaProvider<UserFavoriteLocationEndpoints>(plugins: plugins)
+            // 만약 토큰 자동 주입/401 자동 리프레시를 쓰고 싶으면:
+            // self.provider = provider ?? MoyaProvider<UserFavoriteLocationEndpoints>(session: Providers.session, plugins: plugins)
+        }
     // MARK: - 즐겨찾기 목록 조회
     // 성공(2xx)일 때만 디코딩 시도. 실패 시 상태/본문 로그 출력.
     func fetchFavoriteLocations(completion: @escaping (Result<[UserFavoriteLocation], Error>) -> Void) {

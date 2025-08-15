@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import KeychainSwift
 
 struct WeatherSearchView: View {
     
@@ -60,7 +61,10 @@ struct WeatherSearchView: View {
         }
         // MARK: - Token Setup
         .onAppear {
-            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MjU2MzEzfQ.DD67G9E-MkUN05goqjRO9ldykXy4fdjKcuZ6J1WQJPfp4nu-ciUQSzMsfotxo9bVBzuZEFVfdSKEhQbPVr9NVw", forKey: "accessToken")
+            if let t = KeychainSwift().get("serverAccessToken") {
+                    UserDefaults.standard.set(t, forKey: "accessToken")
+                }
+
         }
     }
     

@@ -6,6 +6,7 @@
 
 import SwiftUI
 import Moya
+import KeychainSwift
 
 struct HomeView: View {
     
@@ -151,7 +152,9 @@ struct HomeView: View {
 
         // onAppear: 토큰 세팅 + 플래그 초기화 + 위치 요청
         .onAppear {
-            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MjU2MzEzfQ.DD67G9E-MkUN05goqjRO9ldykXy4fdjKcuZ6J1WQJPfp4nu-ciUQSzMsfotxo9bVBzuZEFVfdSKEhQbPVr9NVw", forKey: "accessToken")
+            if let t = KeychainSwift().get("serverAccessToken") {
+                    UserDefaults.standard.set(t, forKey: "accessToken") 
+                }
             didSendNowLocation = false            // 매 진입마다 다시 보내도록 초기화
             didPatchNowLocation = false
             locationService.requestCurrentLocation()

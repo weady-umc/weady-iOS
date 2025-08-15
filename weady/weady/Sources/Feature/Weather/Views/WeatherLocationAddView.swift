@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import KeychainSwift
 
 struct WeatherLocationAddView: View {
     // MARK: - View Models / Routing / Selection
@@ -127,7 +128,10 @@ struct WeatherLocationAddView: View {
         }
         // MARK: - 토큰 세팅 (Moya 플러그인/헤더에서 참조한다고 가정)
         .onAppear {
-            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MjU2MzEzfQ.DD67G9E-MkUN05goqjRO9ldykXy4fdjKcuZ6J1WQJPfp4nu-ciUQSzMsfotxo9bVBzuZEFVfdSKEhQbPVr9NVw", forKey: "accessToken")
+            if let t = KeychainSwift().get("serverAccessToken") {
+                    UserDefaults.standard.set(t, forKey: "accessToken")
+                }
+
         }
     }
 }
