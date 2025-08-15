@@ -4,20 +4,19 @@ struct UploadView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel = UploadViewModel()
     
-    //MARK: - 날씨, 패션, 장소 모델 연결
+    // MARK: - 날씨, 패션, 장소 모델 연결
     @State private var weatherViewModel = WeatherViewModel()
     @State private var fashionViewModel = FashionViewModel()
     @State private var placeViewModel = PlaceViewModel()
     
-    //MARK: - 업로드 상태 관리
+    // MARK: - 업로드 상태 관리
     @State private var isUploading = false
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
     
-    //MARK: - 등록 버튼 활성화 조건 (사진 1장 + 날씨 태그)
+    // MARK: - 등록 버튼 활성화 조건 (사진 1장 + 날씨 태그)
     private var isFormValid: Bool {
         guard viewModel.localImages.count >= 1 else { return false }
-        
         if weatherViewModel.isUsingCurrentLocation {
             return weatherViewModel.currentWeather != nil
         } else {
@@ -31,20 +30,16 @@ struct UploadView: View {
         GeometryReader { geometry in
             ScrollView {
                 VStack(spacing: 16) {
-                    //MARK: - 공유/보관 상태 배너
-                    if viewModel.isPublic {
-                        StatusBanner(type: .public)
-                    } else {
-                        StatusBanner(type: .private)
-                    }
+                    // MARK: - 공유/보관 상태 배너
+                    StatusBanner(type: viewModel.isPublic ? .public : .private)
 
-                    //MARK: - 사진 추가
+                    // MARK: - 사진 추가
                     PhotoAddView(images: $viewModel.localImages)
 
                     // MARK: - 텍스트 입력
                     UploadTextView(content: $viewModel.content)
 
-                    //MARK: - 정보 추가 버튼들
+                    // MARK: - 정보 추가 버튼들
                     VStack(spacing: 15) {
                         NavBtn(title: "날씨 정보 추가", isRequired: true) {
                             AnyView(
@@ -71,7 +66,6 @@ struct UploadView: View {
                                 PlaceInfoView(viewModel: placeViewModel) {
                                     viewModel.placeModel = placeViewModel.toPlaceModel()
                                     print("업로드 모델에 장소 정보 반영 완료")
-
                                 }
                             )
                         }
@@ -79,7 +73,6 @@ struct UploadView: View {
 
                         ToggleBtn(label: "커뮤니티 게시", isOn: $viewModel.isPublic)
                         Divider()
-
                         ToggleBtn(label: "유료 광고 포함", isOn: $viewModel.isAdd)
                         Divider()
                     }
@@ -91,8 +84,8 @@ struct UploadView: View {
                             viewModel.weatherModel = weatherViewModel.toWeatherModel()
                             viewModel.fashionModel = fashionViewModel.toFashionModel()
                             viewModel.placeModel = placeViewModel.toPlaceModel()
-                            
-                            // 디버깅 출력
+
+                            // MARK: 업로드 정보 로그
                             print("=== 업로드 정보 ===")
                             print("계절:", viewModel.weatherModel.season ?? "없음")
                             print("기온:", viewModel.weatherModel.temperature?.id ?? -1)
@@ -144,9 +137,7 @@ struct UploadView: View {
             .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        dismiss()
-                    }) {
+                    Button(action: { dismiss() }) {
                         Image("backicon")
                             .resizable()
                             .frame(width: 9, height: 16)
