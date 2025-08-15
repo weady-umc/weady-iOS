@@ -11,10 +11,10 @@ struct MyPageView: View {
     @Environment(WeadyboardRouteBridge.self) private var weadyboardBridge
 
     var body: some View {
-            ZStack(alignment: .top) { 
+        NavigationStack {
+            ZStack(alignment: .top) {
                 VStack(alignment: .leading) {
-                    Spacer()
-                        .frame(height: 20)
+                    Spacer().frame(height: 20)
                     
                     // MARK: - 상단 헤드라인
                     HStack {
@@ -49,7 +49,6 @@ struct MyPageView: View {
                     }
                     .padding(.horizontal)
                     .padding(.vertical, 20)
-                            
                     
                     // MARK: - 날짜 & 보기 필터
                     HStack {
@@ -74,9 +73,9 @@ struct MyPageView: View {
                     // MARK: - 게시물 업로드 버튼
                     HStack {
                         Spacer()
-                        Button(action: {//TODO: 게시물 업로드로 이동
+                        Button {
                             weadyboardBridge.navigate(.weadyboardUpload)
-                            }) {
+                        } label: {
                             Image("boardUploadIcon")
                                 .frame(width: 40, height: 40)
                                 .shadow(color: .black.opacity(0.25), radius: 2)
@@ -85,7 +84,7 @@ struct MyPageView: View {
                     }
                 }
                 
-                // Date Picker 오버레이
+                // MARK: - Date Picker 오버레이
                 if showPicker {
                     VStack(spacing: 0) {
                         PickerOverlayView(
@@ -98,20 +97,18 @@ struct MyPageView: View {
                     .offset(x: -135)
                 }
             }
+            .onChange(of: viewModel.year) { oldValue, newValue in
+                viewModel.fetchMypageData()
+            }
+            .onChange(of: viewModel.month) { oldValue, newValue in
+                viewModel.fetchMypageData()
+            }
+            .onChange(of: viewModel.selectedFilter) { oldValue, newValue in
+            // TODO: 보기 필터 로컬 적용 (추후 api 반영)
+            }
         }
-        .onChange(of: viewModel.year) {
-            viewModel.fetchMypageData()
-        }
-        .onChange(of: viewModel.month) {
-            viewModel.fetchMypageData()
-        }
-        .onChange(of: viewModel.selectedFilter) {
-            // TODO: - 보기 필터는 로컬 적용 (추후 api 연결하여 반영)
-        }
-        
     }
 }
-
 
 #Preview {
     MyPageView()
