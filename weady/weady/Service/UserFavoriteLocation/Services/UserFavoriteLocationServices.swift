@@ -76,11 +76,19 @@ final class UserFavoriteLocationServices {
 
     // MARK: - 대표 즐겨찾기 설정
     // 요청 성공/실패만 콜백으로 전달(본문 파싱 없이 처리)
-    func updateDefaultFavoriteLocation(locationID: Int, completion: @escaping (Result<Void, Error>) -> Void) {
-        provider.request(.patchDefaultFavoriteLocation(locationID: locationID)) {
+    func updateDefaultFavoriteLocation(favoriteId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+        provider.request(.patchDefaultFavoriteLocation(favoriteId: favoriteId)) {
              result in
             switch result {
             case .success(let response):
+                guard (200...299).contains(response.statusCode) else {
+                        let body = String(data: response.data, encoding: .utf8) ?? "nil"
+                        return completion(.failure(NSError(
+                            domain: "API",
+                            code: response.statusCode,
+                            userInfo: [NSLocalizedDescriptionKey: body]
+                        )))
+                    }
                 completion(.success(()))
             case .failure(let error):
                 completion(.failure(error))
@@ -91,7 +99,7 @@ final class UserFavoriteLocationServices {
     // MARK: - 즐겨찾기 삭제
     // 성공 시 Void, 실패 시 에러. 낙관적 업데이트는 ViewModel/뷰 레벨에서 처리.
     func deleteFavoriteLocation(favoriteId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
-        provider.request(.deleteFavoriteLocation(favoriteID: favoriteId)) { result in
+        provider.request(.deleteFavoriteLocation(favoriteId: favoriteId)) { result in
             switch result {
             case .success:
                 completion(.success(()))

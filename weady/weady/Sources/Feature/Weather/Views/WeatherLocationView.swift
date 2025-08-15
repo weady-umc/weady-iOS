@@ -38,9 +38,12 @@ struct WeatherLocationView: View {
             .navigationBarBackButtonHidden(true)
             .onAppear {
                 // 토큰 세팅 및 즐겨찾기 로드
-                UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MTgzMDczfQ.FA0WXJieO-2cQsi-I8ig-7PSMfubAmn0gUUfZmjo_CQaspP9bvhhAUTEEzrxHvTGTL7mMf5ZJWYKwSxaDlxgUQ", forKey: "accessToken")
+                UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MjU2MzEzfQ.DD67G9E-MkUN05goqjRO9ldykXy4fdjKcuZ6J1WQJPfp4nu-ciUQSzMsfotxo9bVBzuZEFVfdSKEhQbPVr9NVw", forKey: "accessToken")
                 viewModel.loadFavorites()
             }
+            .edgeSwipeBack(topExclusion: 100) {
+                    router.pop()
+                }
             .toolbar {
                 // MARK: - 좌측 상단 뒤로가기
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -151,14 +154,27 @@ struct WeatherLocationView: View {
                             .allowsHitTesting(editMode?.wrappedValue != .active) // 편집 중에는 탭 비활성화
                             .contentShape(Rectangle()) // 탭 영역 확장
                             .onTapGesture {
-                                router.push(.weatherhome) // 즐겨찾기 탭 시 홈(날씨)로 이동
+                                guard editMode?.wrappedValue != .active else { return }
+                                guard let favId = weather.favoriteId else { return }
+
+                                // 기본 위치 서버 설정
+                                viewModel.setDefaultFavoriteOnServer(favoriteId: favId) { ok in
+                                    if ok {
+                                        // 성공 시 홈 화면으로 이동 (서버의 기본위치 기준으로 로드)
+                                        router.push(.weatherhome)
+                                    } else {
+                                        // 실패 시 토스트/얼럿 넣고 싶으면 여기
+                                    }
+                                }
                             }
+
                         }
                         .frame(alignment: .leading)
                         .listRowInsets(EdgeInsets())      // 기본 여백 제거
                         .listRowSeparator(.hidden)        // 구분선 숨김
                         .padding(.bottom, 8)
                     }
+                    
                 }
                 .listStyle(.plain)
             }

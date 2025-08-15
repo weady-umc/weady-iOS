@@ -118,13 +118,16 @@ struct WeatherLocationAddView: View {
                 ProgressView("날씨 정보를 불러오는 중...")
             }
         }
+        .edgeSwipeBack(topExclusion: 100) {
+                router.pop()
+            }
         // MARK: - 진입 시 변환 데이터 준비 (ShortWeatherData → WeatherAddData)
         .onAppear {
             viewModel.weather = viewModel.convertToWeatherAddData(from: weather)
         }
         // MARK: - 토큰 세팅 (Moya 플러그인/헤더에서 참조한다고 가정)
         .onAppear {
-            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MTkyMjMzfQ.0SZnNvaV9kaOSZpVOfmMpPpFCJyt-hlbgO9no5PLQv4el9_BOOV3PL_v_bq8M2TUBuRmykydbQzIZ2v-cj4AIA", forKey: "accessToken")
+            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MjU2MzEzfQ.DD67G9E-MkUN05goqjRO9ldykXy4fdjKcuZ6J1WQJPfp4nu-ciUQSzMsfotxo9bVBzuZEFVfdSKEhQbPVr9NVw", forKey: "accessToken")
         }
     }
 }
@@ -173,7 +176,7 @@ struct HourlyWeatherView: View {
             Image(weather.iconName)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 36, height: 25)
+                .frame(width: 40, height: 40)
             
             Text("\(weather.temp)º")
                 .foregroundStyle(Color.white100)
