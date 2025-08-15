@@ -23,6 +23,7 @@ enum HomeRoute: Hashable {
     case curation
     
     case alarm
+    case weadyboard
 
 }
 
@@ -83,6 +84,8 @@ struct HomeFlowHost: View {
                         CurationView()
                     case .alarm:
                         NotificationView()
+                    case .weadyboard:
+                        WeadyboardView()
 
                     }
                 }
