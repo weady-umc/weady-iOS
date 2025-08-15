@@ -85,13 +85,10 @@ struct WeadyboardPostView: View {
                                 content: post.content
                             )
                             
-                            WeadyboardPostCardView(
-                                userName: post.userName,
-                                weatherText: weatherName(for: post.weatherTagId),
-                                temperatureText: temperatureName(for: post.temperatureTagId),
-                                placeDtoList: post.placeDtoList,
-                                styleNames: post.styleIdList.compactMap { StyleTag(rawValue: $0)?.name }
-                            )
+                            WeadyboardPostCardView(viewModel: viewModel)
+                                .onAppear {
+                                    viewModel.fetchPostDetail()
+                                }
                             .padding(.horizontal, 20)
                         }
                     }
