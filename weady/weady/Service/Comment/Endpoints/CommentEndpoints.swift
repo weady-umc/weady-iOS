@@ -15,15 +15,20 @@ enum CommentEndpoints {
 }
 
 extension CommentEndpoints: TargetType {
-    var baseURL: URL { return URL(string: "https://weadyapi.pro/api/v1")! }
-
+    public var baseURL: URL {
+        guard let url = URL(string: Domain.boardURL)
+        else {
+            fatalError("잘못된 URL")
+        }
+        return url
+    }
     var path: String {
         switch self {
         case .getComments(let boardId, _),
              .postComment(let boardId, _):
-            return "/board/\(boardId)/comments"
+            return "/\(boardId)/comments"
         case .deleteComment(let commentId):
-            return "/board/comments/\(commentId)"
+            return "/comments/\(commentId)"
         }
     }
 
