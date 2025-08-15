@@ -27,17 +27,17 @@ struct NicknameInputView: View {
     private let agreements: [OnboardingAgreement]
     // 기본값 제공
     @MainActor
-      init(
-          agreements: [OnboardingAgreement],
-          viewModel: NicknameInputViewModel? = nil
-      ) {
-          self.agreements = agreements
-          if let viewModel {
-              _vm = StateObject(wrappedValue: viewModel)
-          } else {
-              _vm = StateObject(wrappedValue: NicknameInputViewModel())
-          }
-      }
+    init(
+           agreements: [OnboardingAgreement],
+           viewModel: NicknameInputViewModel? = nil
+    ) {
+        self.agreements = agreements
+        if let viewModel {
+            _vm = StateObject(wrappedValue: viewModel)
+        } else {
+            _vm = StateObject(wrappedValue: NicknameInputViewModel())
+        }
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -88,6 +88,12 @@ struct NicknameInputView: View {
                             .font(.caption)
                             .foregroundColor(.red)
                     }
+                }
+                // 중복 체크 에러
+                if let msg = vm.dupCheckMessage {
+                    Text(msg)
+                        .font(.caption)
+                        .foregroundColor(.red)
                 }
             }
             .padding(.horizontal, 32)
