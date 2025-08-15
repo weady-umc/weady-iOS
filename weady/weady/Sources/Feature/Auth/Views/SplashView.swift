@@ -18,9 +18,9 @@ struct SplashView: View {
             
             VStack(spacing: 8) {
                 Spacer()
-                Image("weady_logo")
+                Image("weady_newlogo")
                     .resizable()
-                    .frame(width: 185.3, height: 58.25)
+                    .frame(width: 150, height: 58)
 
                 Text("날씨에 딱 맞는 당신의 하루를 위하여")
                     .fontName(.metaRegular12)
