@@ -13,6 +13,7 @@ struct CurationView: View {
 //MARK: -뷰 바디
     var body: some View {
 
+        
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 // 1) 상단 텍스트: [가변] + [고정]

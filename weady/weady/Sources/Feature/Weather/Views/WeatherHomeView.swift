@@ -165,7 +165,7 @@ struct WeatherHomeView: View {
     }
     
     // MARK: - 세그먼트(탭) 헤더
-    private var SegmentView: some View {
+     var SegmentView: some View {
         HStack(spacing: 0) {
             ForEach(WeatherHomeModel.allCases, id: \.id) { segment in
                 sheetSegment(segment: segment)

@@ -13,7 +13,7 @@ import Charts
 
 struct ClothingRecommendationView: View {
     @StateObject private var vm: ClothingRecommendationViewModel
-    @State private var showLocationPicker = false
+    //@State private var showLocationPicker = false
     //private enum Route: Hashable { case weadyboard }
     @Environment(HomeRouter.self) private var router
     
@@ -56,7 +56,7 @@ struct ClothingRecommendationView: View {
                             .foregroundStyle(.appwhite100)
                         //지역 선택 화면으로 가는 버튼
                         Button {
-                            showLocationPicker = true
+                            router.push(.weatherlocation)
                         } label: {
                             Image("clothesDownIcon")
                                 .resizable()
@@ -177,7 +177,9 @@ struct ClothingRecommendationView: View {
                         }
                     }
                     .zIndex(3)
+                    
                 }
+                    
             }
         }
     }
