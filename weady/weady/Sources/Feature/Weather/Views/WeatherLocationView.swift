@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import KeychainSwift
 
 struct WeatherLocationView: View {
     // MARK: - State & Environment
@@ -38,7 +39,10 @@ struct WeatherLocationView: View {
             .navigationBarBackButtonHidden(true)
             .onAppear {
                 // 토큰 세팅 및 즐겨찾기 로드
-                UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MjU2MzEzfQ.DD67G9E-MkUN05goqjRO9ldykXy4fdjKcuZ6J1WQJPfp4nu-ciUQSzMsfotxo9bVBzuZEFVfdSKEhQbPVr9NVw", forKey: "accessToken")
+                if let t = KeychainSwift().get("serverAccessToken") {
+                        UserDefaults.standard.set(t, forKey: "accessToken")
+                    }
+
                 viewModel.loadFavorites()
             }
             .edgeSwipeBack(topExclusion: 100) {

@@ -6,6 +6,7 @@
 
 import SwiftUI
 import Moya
+import KeychainSwift
 
 struct HomeView: View {
     
@@ -51,7 +52,7 @@ struct HomeView: View {
                 
                 // MARK: - 상단 날씨 카드 3단계 상태 렌더링
                 if let data = addData {
-                    // ✅ 정상 데이터 있을 때: 실 카드
+                    //  정상 데이터 있을 때: 실 카드
                     WeatherHeaderCard(data: data)
                 } else if isLoading {
                     // ⏳ 로딩 중일 때: 스켈레톤/프로그레스
@@ -151,11 +152,14 @@ struct HomeView: View {
 
         // onAppear: 토큰 세팅 + 플래그 초기화 + 위치 요청
         .onAppear {
-            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MjU2MzEzfQ.DD67G9E-MkUN05goqjRO9ldykXy4fdjKcuZ6J1WQJPfp4nu-ciUQSzMsfotxo9bVBzuZEFVfdSKEhQbPVr9NVw", forKey: "accessToken")
+            if let t = KeychainSwift().get("serverAccessToken") {
+                    UserDefaults.standard.set(t, forKey: "accessToken")
+                }
             didSendNowLocation = false            // 매 진입마다 다시 보내도록 초기화
             didPatchNowLocation = false
             locationService.requestCurrentLocation()
         }
+        
 
         // 3) 좌표 수신부: 그대로 (guard !didSendNowLocation 유지)
         .onReceive(locationService.$coordinate.compactMap { $0 }) { coord in

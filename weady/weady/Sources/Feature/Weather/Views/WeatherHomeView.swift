@@ -6,11 +6,14 @@
 //
 
 import SwiftUI
+import KeychainSwift
+
 
 struct WeatherHomeView: View {
     // MARK: - ViewModel & Env
     @State private var selected: WeatherHomeModel = .first
-    @Bindable var viewModel: WeatherHomeViewModel = .init()       // 탭 세그먼트, 중기예보 상태를 관리
+    @State private var viewModel = WeatherHomeViewModel()
+       // 탭 세그먼트, 중기예보 상태를 관리
     private let shortData = ShortWeatherData.example              // API 실패 시 사용할 예시 데이터
     @Environment(HomeRouter.self) var router                      // 라우팅(화면 전환) 환경 객체
     @State private var fetchedShort: ShortWeatherData? = nil      // API로 받아온 단기예보 원본 캐시
@@ -63,7 +66,9 @@ struct WeatherHomeView: View {
                     .overlay(Divider(), alignment: .bottom)
             }
             .background(Color.white.ignoresSafeArea(edges: .top))
+            .transaction { $0.disablesAnimations = true }
         }
+        
         .zIndex(999)
 
 
@@ -82,7 +87,10 @@ struct WeatherHomeView: View {
         }
         // MARK: - 토큰 사전 세팅 (Moya Plugin/헤더에서 참조한다고 가정)
         .onAppear {
-            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MjU2MzEzfQ.DD67G9E-MkUN05goqjRO9ldykXy4fdjKcuZ6J1WQJPfp4nu-ciUQSzMsfotxo9bVBzuZEFVfdSKEhQbPVr9NVw", forKey: "accessToken")
+            if let t = KeychainSwift().get("serverAccessToken") {
+                    UserDefaults.standard.set(t, forKey: "accessToken")
+                }
+
         }
     }
     
@@ -308,7 +316,7 @@ struct WeatherHomeView: View {
                             .foregroundStyle(Color.white100.opacity(0.8))
                         Image(WeatherLocationAddViewModel.mapSkyStatusToIcon(forecast.pmSkyStatus))
                             .resizable().scaledToFit()
-                            .frame(width: 20, height: 20)
+                            .frame(width: 30, height: 30)
                     }
                 }
                 Spacer().frame(width: 13)
