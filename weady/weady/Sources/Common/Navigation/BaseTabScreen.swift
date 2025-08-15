@@ -14,6 +14,7 @@ import SwiftUI
 
 struct BaseTabScreen: View {
     @Binding var selectedTab: TabType
+    @Binding var isTabBarHidden: Bool
 
     var body: some View {
         VStack(spacing: 0) {
@@ -22,7 +23,7 @@ struct BaseTabScreen: View {
                 case .home:
                     HomeFlowHost() // 홈 플로우 스택
                 case .weadyboard:
-                    WeadyboardFlowHost() // 웨디보드 플로우 스택
+                    WeadyboardFlowHost(isTabBarHidden: $isTabBarHidden) // 웨디보드 플로우 스택
                 case .weadychive:
                     WeadychiveFlowHost() // 웨디카이브 플로우 스택
                 case .mypage:

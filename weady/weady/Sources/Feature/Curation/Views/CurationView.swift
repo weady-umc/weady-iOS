@@ -1,7 +1,7 @@
 import SwiftUI
 import KeychainSwift
 
-/// Curation 첫 화면 (PlaceView 레이아웃을 유지하면서 MVVM 바인딩)
+/// Curation 첫 화면
 struct CurationView: View {
 //MARK: - 프로퍼티
     @StateObject private var vm = CurationViewModel()

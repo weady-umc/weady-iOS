@@ -38,6 +38,7 @@ extension Color {
     static let sun = Color(hex: "FFD035")
     static let rain1 = Color(hex: "8BC7FF")
     static let rain2 = Color(hex: "F4FEFF")
+    static let logo = Color(hex: "FFB300")
     
     // Login
     static let login100 = Color(hex: "FEE500")
