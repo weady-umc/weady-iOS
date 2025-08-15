@@ -262,4 +262,3 @@ struct ClothingRecommendationView_Previews: PreviewProvider {
         NavigationStack {ClothingRecommendationView(vm: .preview)}
     }
 }
-
