@@ -86,7 +86,7 @@ enum WeatherTone {
             return .summerClear
 //TODO: - 데모데이용으로 색상 대조 크게 하기위해서, 여름 구름낀 날을 봄 구름낀 날의 색상으로 바꿈. 데모데이 이후 다시 여름 색상으로 변경
         case (.summer, .mostlyCloudy), (.summer, .cloudy):
-            return .springCloudy
+            return .summerCloudy
         case (.summer, .rainy):
             return .summerRainy
         case (.autumn, .clear):

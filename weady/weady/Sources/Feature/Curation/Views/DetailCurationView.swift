@@ -21,6 +21,7 @@ struct DetailCurationView: View {
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .white
         appearance.shadowColor = .clear
+        appearance.shadowImage = UIImage()
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
@@ -41,7 +42,7 @@ struct DetailCurationView: View {
                 Spacer()
             }
             .padding(.horizontal, 16)
-            .padding(.top, 100)
+            .padding(.top, 60)
 
             if vm.isLoading {
                 ProgressView().controlSize(.large)
@@ -59,7 +60,6 @@ struct DetailCurationView: View {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { dismiss() }) {
                     Image("backicon")
-                        .padding(.top, 50)
                         .padding(10)
                         .frame(width: 44, height: 44, alignment: .center)
                 }
@@ -78,13 +78,11 @@ struct DetailCurationView: View {
                         .frame(maxWidth: UIScreen.main.bounds.width * 0.68)
                    
                 }
-                .padding(.top, 50)
             }
 
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { toggleScrap() }) {
                     Image(isScrapped ? "scrapfilled" : "scrap")
-                        .padding(.top, 50)
                 }
             }
         }
