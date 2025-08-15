@@ -11,17 +11,28 @@ struct WeadyboardPostReportDetailView: View {
     let reason: ReportReason
     let selectedReasonIndex: Int
     let boardId: Int
+
     @State private var customText: String = ""
     @State private var isSubmitting = false
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var reportViewModel: WeadyboardReportViewModel
-    @EnvironmentObject private var toast: ToastCenter
-    
+
+    // 컨테이너에서 뒤로/닫기 제어
+    var onBack: (() -> Void)? = nil
+    var onClose: (() -> Void)? = nil
+
+    // 신고 성공 시 Alert
+    @State private var showAlert = false
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+    @State private var alertOnConfirm: (() -> Void)?
+
     var body: some View {
         VStack(spacing: 0) {
            
             WeadyboardPostReportTopBar(showBackButton: true) {
-                dismiss()
+                guard !isSubmitting else { return }
+                if let onBack { onBack() } else { dismiss() }
             }
             
             Spacer().frame(height: 34)
@@ -42,8 +53,8 @@ struct WeadyboardPostReportDetailView: View {
                         )
                         .padding(.top, 32)
                         .padding(.horizontal, 20)
-                    
-                    if customText.isEmpty {
+
+                    if customText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         Text("불편하셨던 이유를 남겨주세요.")
                             .fontName(.captionRegular14)
                             .foregroundColor(.gray200)
@@ -84,17 +95,21 @@ struct WeadyboardPostReportDetailView: View {
                     .foregroundColor(.white100)
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
-                    .background(Color.black100)
+                    .background(buttonBackgroundColor)
                     .cornerRadius(10)
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 40)
             }
             .disabled(isSubmitDisabled)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.white100)
-        .navigationBarHidden(true)
-        .navigationBarBackButtonHidden(true)
+        .alert(alertTitle, isPresented: $showAlert) {
+            Button("확인") {
+                alertOnConfirm?()
+                alertOnConfirm = nil
+            }
+        } message: {
+            Text(alertMessage)
+        }
     }
     
     private var isSubmitDisabled: Bool {
@@ -115,19 +130,23 @@ struct WeadyboardPostReportDetailView: View {
         
         let reportType = ReportTag.reportTypeEnglish(for: selectedReasonIndex)
         let content = reason.isCustomInput
-        ? customText.trimmingCharacters(in: .whitespacesAndNewlines)
-        : reason.detailTitle
-        
+            ? customText.trimmingCharacters(in: .whitespacesAndNewlines)
+            : reason.detailTitle
+
         reportViewModel.report(boardId: boardId, reportType: reportType, content: content) { result in
             isSubmitting = false
             switch result {
             case .success:
-                toast.showSuccess("신고가 접수되었습니다.")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    dismiss()
-                }
+                alertTitle = "신고 완료"
+                alertMessage = "신고가 접수되었습니다."
+                alertOnConfirm = { if let onClose { onClose() } else { dismiss() } }
+                showAlert = true
+
             case .failure:
-                toast.showError("신고에 실패했습니다. 잠시 후 다시 시도해주세요.")
+                alertTitle = "신고 실패"
+                alertMessage = "잠시 후 다시 시도해주세요."
+                alertOnConfirm = nil
+                showAlert = true
             }
         }
     }
