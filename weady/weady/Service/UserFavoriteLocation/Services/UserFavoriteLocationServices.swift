@@ -8,9 +8,14 @@
 import Foundation
 import Moya
 
+// MARK: - 사용자 즐겨찾기 위치 서비스
+// MoyaProvider로 즐겨찾기 관련 API 호출/디코딩을 담당
 final class UserFavoriteLocationServices {
-    private let provider = MoyaProvider<UserFavoriteLocationEndpoints>()
+    // MARK: Dependencies
+    private let provider = MoyaProvider<UserFavoriteLocationEndpoints>() // 엔드포인트 바운드된 프로바이더
     
+    // MARK: - 즐겨찾기 목록 조회
+    // 성공(2xx)일 때만 디코딩 시도. 실패 시 상태/본문 로그 출력.
     func fetchFavoriteLocations(completion: @escaping (Result<[UserFavoriteLocation], Error>) -> Void) {
         provider.request(.getUserFavoriteLocation) { result in
             switch result {
@@ -32,7 +37,8 @@ final class UserFavoriteLocationServices {
 
     }
     
-
+    // MARK: - 즐겨찾기 추가
+    // 성공 시 생성된 ID(가능하면 파싱)를 반환. 2xx가 아니면 본문을 에러로 내보냄.
     func addFavoriteLocation(bCode: String, completion: @escaping (Result<Int, Error>) -> Void) {
         provider.request(.postUserFavoriteLocation(bCode: bCode)) { result in
             switch result {
@@ -42,14 +48,14 @@ final class UserFavoriteLocationServices {
                 print("📦 body:", String(data: response.data, encoding: .utf8) ?? "nil")
 
                 guard (200...299).contains(response.statusCode) else {
-                    // 404 메시지를 그대로 위로 올려서 UI에서 보여줄 수 있게
+                    // 2xx 외에는 서버 본문을 그대로 에러 메시지로 올림(상위 UI에서 표시 가능)
                     let body = String(data: response.data, encoding: .utf8) ?? "nil"
                     return completion(.failure(NSError(domain: "API",
                                                        code: response.statusCode,
                                                        userInfo: [NSLocalizedDescriptionKey: body])))
                 }
 
-                // 유연 파싱: favoriteId / userFavoriteLocationId / locationId 아무거나
+                // 유연 파싱: favoriteId / userFavoriteLocationId / locationId 중 존재하는 키 사용
                 if let obj = try? JSONSerialization.jsonObject(with: response.data) as? [String: Any],
                    let data = obj["data"] as? [String: Any] {
                     let id = (data["favoriteId"] as? Int)
@@ -58,6 +64,7 @@ final class UserFavoriteLocationServices {
                           ?? 0
                     completion(.success(id))
                 } else {
+                    // 데이터 포맷이 다를 경우 0 반환(상위에서 재조회로 동기화 가능)
                     completion(.success(0))
                 }
 
@@ -67,7 +74,8 @@ final class UserFavoriteLocationServices {
         }
     }
 
-
+    // MARK: - 대표 즐겨찾기 설정
+    // 요청 성공/실패만 콜백으로 전달(본문 파싱 없이 처리)
     func updateDefaultFavoriteLocation(locationID: Int, completion: @escaping (Result<Void, Error>) -> Void) {
         provider.request(.patchDefaultFavoriteLocation(locationID: locationID)) {
              result in
@@ -79,6 +87,9 @@ final class UserFavoriteLocationServices {
             }
         }
     }
+
+    // MARK: - 즐겨찾기 삭제
+    // 성공 시 Void, 실패 시 에러. 낙관적 업데이트는 ViewModel/뷰 레벨에서 처리.
     func deleteFavoriteLocation(favoriteId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
         provider.request(.deleteFavoriteLocation(favoriteID: favoriteId)) { result in
             switch result {
@@ -91,4 +102,3 @@ final class UserFavoriteLocationServices {
     }
 
 }
-
