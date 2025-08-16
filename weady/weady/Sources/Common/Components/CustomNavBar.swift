@@ -38,7 +38,7 @@ struct CustomNavBar: View {
                         Image(logoImageName)
                             .resizable()
                             .scaledToFit()
-                            .frame(height: 20)
+                            .frame(height: 25)
                             .frame(width: 44, height: 44) // 탭 영역 44 유지
                     }
                         
