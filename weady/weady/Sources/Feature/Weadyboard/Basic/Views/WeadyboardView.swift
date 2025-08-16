@@ -29,7 +29,7 @@ struct WeadyboardView: View {
             VStack(spacing: 0) {
                 CustomNavBar(
                     viewTitle: "",
-                    showBackButton: false,
+                    showLogoButton: true,
                     showAlarmButton: true,
                     showBottomDivider: false
                 )
