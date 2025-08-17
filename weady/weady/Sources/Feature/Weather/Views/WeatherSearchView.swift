@@ -151,18 +151,16 @@ struct WeatherSearchView: View {
                         }
                     }) {
                         // 한 줄 아이템 UI
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 14) {
                             Text("\(place.address.region1depthName) \(place.address.region2depthName) \(place.address.region3depthName)")
-                                .font(.body)
+                                .fontName(.captionRegular14)
                                 .foregroundColor(.black)
-                            Text("법정동 코드: \(place.address.bCode)")
-                                .font(.caption)
-                                .foregroundColor(.gray)
+                            
                         }
                         .padding(.vertical, 6)
                     }
                 }
-                .listStyle(.plain)
+                
                 .frame(width: 335)
             }
         }
