@@ -9,6 +9,9 @@ import SwiftUI
 
 struct GenderSelectionView: View {
     @StateObject private var vm: GenderSelectionViewModel
+    @Environment(\.router) private var router
+    @EnvironmentObject private var onboarding: OnboardingStore
+
     
     private let agreements: [OnboardingAgreement]
     
@@ -79,7 +82,10 @@ struct GenderSelectionView: View {
             
             // 하단 버튼
             VStack(spacing: 20) {
-                Button(action: vm.skip) {
+                Button{
+                    onboarding.gender = nil
+                    router.push(.start)
+                } label: {
                     Text("건너뛰기")
                         .fontName(.bodyMedium16)
                         .foregroundStyle(Color.gray800)
@@ -91,7 +97,10 @@ struct GenderSelectionView: View {
                         )
                 }
                 
-                Button(action: vm.next) {
+                Button {
+                    onboarding.gender = selectedGenderCode
+                    router.push(.style)
+                } label: {
                     Text("다음")
                         .fontName(.bodyMedium16)
                         .frame(maxWidth: .infinity)
@@ -107,27 +116,16 @@ struct GenderSelectionView: View {
         .onAppear {
             print("DEBUG Gender →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
         }
-        // 스킵 → StartView (성별 없음, agreements 전달)
-        .fullScreenCover(isPresented: $vm.didTapSkip) {
-            StartView(
-                nickname: vm.nickname,
-                gender: .NONE,          // 성별 건너뛰기 NONE 사용
-                styleIds: [],           // 건너뛰기이므로 빈 배열
-                agreements: agreements  // 약관 그대로 릴레이
-            )
-        }
-        // 다음 → StyleSelection (선택 성별/agreements 전달)
-        .fullScreenCover(isPresented: $vm.didTapNext) {
-            StyleSelectionView(
-                nickname: vm.nickname,
-                gender: selectedGenderCode,
-                agreements: agreements
-            )
-        }
     }
 }
 
-/*#Preview {
- GenderSelectionView(nickname: "테스트")
- }
- */
+#Preview {
+    NavigationStack {
+        GenderSelectionView(
+            nickname: "영택",
+            agreements: PreviewAgreements.requiredAllAgreed
+        )
+    }
+}
+
+
