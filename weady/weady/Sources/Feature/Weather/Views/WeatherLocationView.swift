@@ -165,7 +165,7 @@ struct WeatherLocationView: View {
                                 viewModel.setDefaultFavoriteOnServer(favoriteId: favId) { ok in
                                     if ok {
                                         // 성공 시 홈 화면으로 이동 (서버의 기본위치 기준으로 로드)
-                                        router.push(.weatherhome)
+                                        router.push(.weatherhome(initial: .first))
                                     } else {
                                         // 실패 시 토스트/얼럿 넣고 싶으면 여기
                                     }

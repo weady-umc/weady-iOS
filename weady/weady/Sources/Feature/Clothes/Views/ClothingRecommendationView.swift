@@ -22,6 +22,7 @@ struct ClothingRecommendationView: View {
     @State private var helpStep: HelpStep = .intro
     
     
+    
     let same = Date()
     // 기본 init: 내부에서 VM 생성
     init() {
@@ -161,7 +162,10 @@ struct ClothingRecommendationView: View {
                 onClose: { withAnimation(.easeOut(duration: 0.2)) { showHelp = false }}
             )
         }
+        
+        
     }
+        
 }
         
 

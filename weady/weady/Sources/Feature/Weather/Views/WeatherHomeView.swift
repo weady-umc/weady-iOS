@@ -17,7 +17,8 @@ struct WeatherHomeView: View {
     private let shortData = ShortWeatherData.example              // API 실패 시 사용할 예시 데이터
     @Environment(HomeRouter.self) var router                      // 라우팅(화면 전환) 환경 객체
     @State private var fetchedShort: ShortWeatherData? = nil      // API로 받아온 단기예보 원본 캐시
-
+    private let initial: WeatherHomeModel
+    init(initial: WeatherHomeModel = .first) { self.initial = initial }
     var body: some View {
         // MARK: - 루트 레이아웃
         VStack(spacing:0){
@@ -44,32 +45,25 @@ struct WeatherHomeView: View {
             .zIndex(0)
             
         }
-        
+        .navigationBarBackButtonHidden()
         .edgeSwipeBack(topExclusion: 100) {
                 router.pop()
             }
-        .toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .top) {
             VStack(spacing: 0) {
-                Spacer().frame(height: 100)
-                CustomNavBar(
-                    viewTitle: "",
-                    showLogoButton: true,
-                    showAlarmButton: true,
-                    showBottomDivider: false,
-                    alarmAction: { router.push(.alarm) }
+                Spacer().frame(height: 90)
+
+                UnderlineSegmentedControl(
+                    items: WeatherHomeModel.allCases,
+                    selection: $viewModel.selectedSegment,
+                    title: { $0.title }
                 )
-                // 세그먼트 바로 이어서
-                SegmentView
-                    .padding(.horizontal, 10)
-                    .background(Color.white)              // 흰 바 유지
-                    .overlay(Divider(), alignment: .bottom)
+                .padding(.horizontal, 0)
+                .background(Color.white)
+                .overlay(Divider(), alignment: .bottom)
             }
             .background(Color.white.ignoresSafeArea(edges: .top))
-            .transaction { $0.disablesAnimations = true }
         }
-        
-        .zIndex(999)
 
 
         
@@ -172,42 +166,16 @@ struct WeatherHomeView: View {
         }
     }
     
-    // MARK: - 세그먼트(탭) 헤더
-     var SegmentView: some View {
-        HStack(spacing: 0) {
-            ForEach(WeatherHomeModel.allCases, id: \.id) { segment in
-                sheetSegment(segment: segment)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 24)
-        .padding(.top, 5)
-        .padding(.bottom, 0)
-    }
-    
-    // MARK: - 세그먼트 버튼(선택 상태에 따라 텍스트/언더라인 색상 변경)
-    func sheetSegment(segment: WeatherHomeModel) -> some View {
-        Button {
-            withAnimation { viewModel.selectedSegment = segment }
-        } label: {
-            VStack(spacing: 8) {
-                Text(segment.title)
-                    .foregroundStyle(viewModel.selectedSegment == segment ? Color.gray100 : Color.gray800)
-                    .fontName(.headingSemibold20)
-                if viewModel.selectedSegment == segment {
-                    Rectangle().fill(Color.gray100).frame(width: 59, height: 2)
-                } else {
-                    Rectangle().fill(Color.gray800).frame(width: 59, height: 2)
-                }
-            }
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-    }
-
     // MARK: - 강수/풍속 카드 2개 묶음
     struct bigRainWind :View {
         let weather: WeatherAddData
+        
+        private var rainLevel: RainLevel {
+            .init(probability: weather.rainProbability)
+        }
+        private var windDir: WindDirection {
+            .init(label: weather.windDirectionText)
+        }
         
         var body: some View {
             HStack{
@@ -217,13 +185,23 @@ struct WeatherHomeView: View {
                         .fill(Color.gray.opacity(0.1))
                         .frame(width: 159, height: 73)
                     
-                    VStack{
-                        Text("강수 확률")
-                            .fontName(.captionSemibold14)
-                            .foregroundStyle(Color.white100)
-                        Text("\(weather.rainProbability)%")
-                            .fontName(.captionSemibold14)
-                            .foregroundStyle(Color.white100)
+                    HStack(spacing: 10){
+                        
+                        Image(rainLevel.imageName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 31)
+                            
+                        
+                        VStack{
+                            Text("강수 확률")
+                                .fontName(.captionSemibold14)
+                                .foregroundStyle(Color.white100)
+                                .padding(.bottom, 0.5)
+                            Text("\(weather.rainProbability)%")
+                                .fontName(.captionSemibold14)
+                                .foregroundStyle(Color.white100)
+                        }
                     }
                 }
                 
@@ -234,15 +212,23 @@ struct WeatherHomeView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color.gray.opacity(0.1))
                         .frame(width: 159, height: 73)
-                    
-                    VStack{
-                        Text("풍속")
-                            .fontName(.captionSemibold14)
-                            .foregroundStyle(Color.white100)
+                    HStack(spacing: 7.5){
                         
-                        Text("\(weather.windSpeed) ms")
-                            .fontName(.captionSemibold14)
-                            .foregroundStyle(Color.white100)
+                        Image(windDir.imageName)
+                            .resizable()
+                            .frame(width: 30, height: 23)
+                            
+                        
+                        VStack{
+                            Text("풍속")
+                                .fontName(.captionSemibold14)
+                                .foregroundStyle(Color.white100)
+                                .padding(.bottom, 0.5)
+                            
+                            Text("\(weather.windSpeed) ms")
+                                .fontName(.captionSemibold14)
+                                .foregroundStyle(Color.white100)
+                        }
                     }
                 }
             }

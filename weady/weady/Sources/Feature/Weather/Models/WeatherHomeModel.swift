@@ -67,7 +67,8 @@ struct WeatherAddData {
     var lowTemperature: Int                  // 최저 기온
     var highTemperature: Int                 // 최고 기온
     var rainProbability: Int                 // 강수 확률 (%)
-    let windSpeed: Int                       // 풍속 (m/s 등 단위는 UI에서 표기)
+    var windSpeed: Int                       // 풍속 (m/s 등 단위는 UI에서 표기)
+    var windDirectionText: String
     
     var hourlyWeather: [HourlyWeather]       // 시간별 예보 리스트
 }
@@ -84,6 +85,7 @@ let example = WeatherAddData(
     highTemperature: 28,
     rainProbability: 10,
     windSpeed: 3,
+    windDirectionText: "N",
     hourlyWeather: []
 )
 

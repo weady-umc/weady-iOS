@@ -40,14 +40,14 @@ struct HomeView: View {
             
             // MARK: - 인사/타이틀
             TopView
-                .padding(.horizontal, 13)
+               
             
             
             Spacer().frame(height: 25)
             
             // MARK: - [네비 버튼] 날씨 카드 (누르면 .weatherhome 로 이동)
             Button {
-                router.push(.weatherhome)
+                router.push(.weatherhome(initial: .first))
             } label: {
                 
                 // MARK: - 상단 날씨 카드 3단계 상태 렌더링
@@ -59,7 +59,7 @@ struct HomeView: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(Color.white200)
-                            .frame(width: 335.57, height: 147)
+                            .frame(width: 335, height: 147)
                         ProgressView().padding()
                     }
                 } else {
@@ -68,7 +68,7 @@ struct HomeView: View {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(Color.white200)
                             .frame(width: 335.57, height: 147)
-                        Text(errorMessage ?? "날씨 정보를 불러오세요")
+                        Text(errorMessage ?? "날씨 정보를 불러오는중입니다...")
                             .fontName(.bodyLight16)
                             .foregroundStyle(Color.black100)
                     }
@@ -79,49 +79,22 @@ struct HomeView: View {
             
             // MARK: - [네비 버튼] 옷차림/장소 카드 (누르면 .clothes 로 이동)
             Button {
-                router.push(.clothes)
+                router.push(.weatherhome(initial: .second))
+
             } label: {
                 ClothesView
-                    .frame(width: 380, height: 120)
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.white200))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .contentShape(RoundedRectangle(cornerRadius: 12))
+                    
             }
             
             Spacer().frame(height: 35)
             
             // MARK: - [네비 버튼] 큐레이션 카드 (누르면 .curation 로 이동)
             // [네비] 큐레이션 가로 섹션 (어디 눌러도 .curation 이동)
-            // [네비 버튼] 큐레이션 섹션 (실패/빈 ⇒ PlaceView 대체)
-            Group {
-                switch curationVM.listState {
-                case .idle, .loading:
-                    // 로딩 중엔 스켈레톤처럼 보이게 (원하면 ProgressView로)
-                    PlaceView
-                        .redacted(reason: .placeholder)
-                        .contentShape(Rectangle())
-                        .onTapGesture { router.push(.curation) }
-
-                case .success:
-                    if curationVM.cards.isEmpty {
-                        // 성공인데 카드가 0개면 기본 PlaceView 노출
-                        PlaceView
-                            .contentShape(Rectangle())
-                            .onTapGesture { router.push(.curation) }
-                    } else {
-                        // 정상 데이터
-                        CurationStripView(vm: curationVM) {
-                            router.push(.curation)
-                        }
-                    }
-
-                case .failure(_):
-                    // 실패 ⇒ 기본 PlaceView 노출
-                    PlaceView
-                        .contentShape(Rectangle())
-                        .onTapGesture { router.push(.curation) }
-                }
+            
+            CurationStripView(vm: curationVM){
+                router.push(.weatherhome(initial: .third))
             }
+            
 
         }
         .padding(.bottom, 70)
@@ -201,7 +174,7 @@ struct HomeView: View {
     // MARK: - 상단 타이틀 뷰
     private var TopView: some View {
         let name = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
-        return Text( (name.isEmpty ? "안녕하세요 👋" : "\(name)님,") + "\n오늘은 이런 하루 어때요?")
+        return Text( (name.isEmpty ? "안녕하세요," : "\(name)님,") + "\n오늘은 이런 하루 어때요?")
             .foregroundStyle(Color.black100)
             .fontName(.titleSemibold24)
             .lineLimit(2)
@@ -211,139 +184,8 @@ struct HomeView: View {
     }
 
     
-    // MARK: - 옷차림 카드 뷰 (상태별 분기)
-    private var ClothesView: some View {
-        Group {
-            if isLoadingFashion {
-                // ⏳ 로딩 스켈레톤
-                
-                HStack {
-                    RoundedRectangle(cornerRadius: 8).fill(Color.white300)
-                        .frame(width: 60, height: 60)
-                        
-                    VStack(alignment: .leading, spacing: 6) {
-                        RoundedRectangle(cornerRadius: 6).fill(Color.white300).frame(width: 220, height: 14)
-                        RoundedRectangle(cornerRadius: 6).fill(Color.white300).frame(width: 180, height: 12)
-                    }
-                    Spacer()
-                    Image("rightArrow")
-                        .padding(.trailing, 20)
-                        
-                }
-                .redacted(reason: .placeholder)
-                .background(RoundedRectangle(cornerRadius: 12).fill(Color.white200))
-                .frame(width: 375, height: 170)
-
-            } else if let s = fashion {
-                //  정상 또는 실패 대체(더미) 데이터가 있는 경우
-                HStack {
-                    RemoteThumb(urlString: s.imageUrl)
-                        .frame(width: 70, height: 70)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .padding(.leading, 25)
-                        
-                    Text(s.recommendation)
-                        .fontName(.bodyLight16)
-                        .foregroundStyle(Color.black100)
-                        .multilineTextAlignment(.leading)
-                        .lineLimit(2)
-                        .padding(.leading, 25)
-                        
-                    Spacer()
-                    Image("rightArrow")
-                        .padding(.trailing, 20)
-                }
-
-            } else if let _ = fashionError {
-                //  에러 + 더미도 없는 경우: 재시도 버튼 노출
-                HStack {
-                    Image("clothesIcon").resizable().aspectRatio(contentMode: .fit)
-                        .frame(width: 70, height: 70)
-                        .padding(.leading, 25)
-                    
-                    Text("옷차림 정보를 불러오지 못했어요. 다시 시도해 주세요.")
-                        .fontName(.bodyLight16)
-                        .foregroundStyle(Color.black100)
-                        .lineLimit(2)
-                        .padding(.leading, 25)
-                    Spacer()
-                    Button {
-                        loadFashionSummary()
-                    } label: {
-                        Image("rightArrow")
-                            .padding(.trailing, 20)
-                    }
-                }
-                
-            } else {
-                //  초기/빈 상태
-                HStack {
-                    Image("clothesIcon").resizable()
-                        .frame(width: 70, height: 70)
-                        .padding(.leading, 25)
-                    
-                    Text("오늘의 옷차림을 불러오는 중…")
-                        .fontName(.bodyLight16)
-                        .foregroundStyle(Color.black100)
-                        .padding(.leading, 15)
-                    Spacer()
-                    Image("rightArrow")
-                        .padding(.trailing, 20)
-                        .padding(.leading, 10)
-                }
-            }
-        }
-    }
-
-    // MARK: - 장소 큐레이션 카드 (수평 스크롤 이미지 리스트)
-    private var PlaceView: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text("지금 날씨에 어울리는 장소만 담았어요")
-                    .fontName(.bodySemibold16)
-                    .foregroundStyle(Color.black100)
-                
-                Spacer()
-                
-                Image("rightArrow")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 10, height: 15.62)
-                    .padding(.trailing, 20)
-            }
-            .padding(.leading, 25)
-            .padding(.bottom, 10)
-            
-            ScrollView(.horizontal) {
-                LazyHStack(spacing: 16) {
-                    // NOTE: 현재는 정적 이미지 사용. 서버 연동 시 모델 리스트로 교체 예정 가정
-                    Image("homeplacedata1")
-                        .resizable()
-                        .frame(width: 259, height: 128)
-                    
-                    Image("homeplacedata2")
-                        .resizable()
-                        .frame(width: 259, height: 128)
-                    
-                    Image("homeplacedata3")
-                        .resizable()
-                        .frame(width: 259, height: 128)
-                    
-                    Image("homeplacedata4")
-                        .resizable()
-                        .frame(width: 259, height: 128)
-                    
-                    Image("homeplacedata5")
-                        .resizable()
-                        .frame(width: 259, height: 128)
-                }
-            }
-            .scrollIndicators(.hidden)
-            .padding(.leading)
-        }
-        .frame(width: 390, height: 185)
-    }
     
+
     // MARK: - API: 단기예보 → WeatherAddData 변환 후 상단 카드에 반영
     private func loadHomeWeather() {
         isLoading = true
@@ -377,15 +219,16 @@ struct HomeView: View {
             ZStack {
                 Image(data.homeBackground)                 // 날씨 상태에 따른 배경 이미지
                     .resizable()
-                    .frame(width: 375, height: 170)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .frame(width: 335, height: 147)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
                 
-                VStack {
+                VStack(spacing:0) {
                     HStack {
                         Text("\(data.temperature)º")       // 현재 기온
                             .foregroundStyle(Color.white100)
                             .fontName(.homeRegular30)
-                            .padding(.leading, 40)
+                            .padding(.leading, 18)
+                            
                         
                         Spacer()
                         
@@ -407,18 +250,67 @@ struct HomeView: View {
                                 .foregroundStyle(Color.white100)
                                 .fontName(.metaRegular10)
                         }
-                        .padding(.trailing, 35)
+                        .padding(.trailing, 12)
+                        //.padding(.top, 19)
                     }
                     
                     // 시간대별 날씨 요약 (가로 스크롤)
-                    HourlyWeatherScrollView(hourlyWeatherList: data.hourlyWeather)
-                        .padding(.horizontal, 40)
+                    HourlyWeatherHomeScrollView(hourlyWeatherList: data.hourlyWeather)
+                        .padding(.leading, 0)
+                        .padding(.trailing, 0)
+                        .padding(.top, 13)
                 }
-                .padding(.horizontal, 16)
+                
+                
+                .frame(width: 335, height: 147)
+                
+                
             }
         }
         
     }
+    // MARK: - 옷차림 카드 뷰 (상태별 분기)
+    private var ClothesView: some View {
+        let model = fashion ?? .dummy   // 성공이면 서버, 아니면 더미
+
+        return HStack {
+            RemoteThumb(urlString: model.imageUrl)
+                .frame(width: 100, height: 90)
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .padding(.leading, 24)
+            
+            VStack(alignment: .leading, spacing: 3){
+                HStack{
+                    Text("오늘은 ")
+                        .fontName(.bodyLight16)
+                        .foregroundStyle(Color.black100)
+                    Text(model.recommendation)
+                        .fontName(.bodySemibold16)
+                        .foregroundStyle(Color.black100)
+                }
+                
+                Text("\(subjectparticle(for: model.recommendation)) 딱 좋은 날이에요")
+                    .fontName(.bodyLight16)
+                    .foregroundStyle(Color.black100)
+            }
+            .padding(.leading, 5)
+            
+
+            Spacer()
+            Image("rightArrow")
+                .resizable()
+                .frame(width: 10, height: 16)
+                .padding(.trailing, 16)
+                .padding(.leading, 19)
+        }
+        .frame(width: 335, height: 100)
+        .background(RoundedRectangle(cornerRadius: 6).fill(Color.white200))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .contentShape(RoundedRectangle(cornerRadius: 6))
+        //.padding(.horizontal, 17)
+    }
+    
+
         
     // MARK: - API: 옷차림 요약 불러오기
     private func loadFashionSummary() {
@@ -445,6 +337,20 @@ struct HomeView: View {
         }
     }
 
+    // MARK: - 조사 선택 ('이/가')
+    private func subjectparticle(for word: String) -> String {
+        // 공백/개행 제거
+        let trimmed = word.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let lastScalar = trimmed.unicodeScalars.last else { return "이" }
+
+        let v = lastScalar.value
+        guard (0xAC00...0xD7A3).contains(v) else {
+            return "이" // 한글 음절이 아니면 기본값
+        }
+        let index = v - 0xAC00
+        let jong = index % 28
+        return (jong == 0) ? "가" : "이"  // 받침 없으면 '가', 있으면 '이'
+    }
         
     /// MARK: - 더미 추천 문구 생성 (온도 기준)
     private func makeFallbackRecommendation(from temp: Int?) -> String {
@@ -485,39 +391,59 @@ struct CurationStripView: View {
     @ObservedObject var vm: CurationViewModel
     var onTapAll: () -> Void      // 전체를 탭했을 때 실행
 
+    // 로컬 더미 에셋 이름
+        private let dummyImages = [
+            "homeplacedata1", "homeplacedata2", "homeplacedata3",
+            "homeplacedata4", "homeplacedata5"
+        ]
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 0){
                 Text("지금 날씨에 어울리는 장소")
                     .fontName(.bodySemibold16)
-                    .padding(.leading, 10)
+                    .padding(.leading, 25)
                     .foregroundStyle(Color.black100)
                 Spacer()
                 Image("rightArrow")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 10, height: 16)
-                    .padding(.leading, 25)
-                    .padding(.bottom, 10)
+                    .frame(width: 10, height: 15.63)
+                    .padding(.trailing, 36)
+                //.padding(.bottom, 10)
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 10)
-
+            .padding(.bottom, 19)
+            
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 12) {
-                    ForEach(vm.cards) { card in
-                        CardTile(title: card.title, imageURL: card.thumbnailURL)
+                LazyHStack(spacing: 13){
+                    if vm.cards.isEmpty {
+                        // 더미 카드
+                        ForEach(dummyImages, id: \.self) { name in
+                            Image(name)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 259, height: 128)
+                                .clipped()
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                        }
+                    } else {
+                        // 서버 카드
+                        ForEach(vm.cards) { card in
+                            CardTile(title: card.title, imageURL: card.thumbnailURL)
+                                .frame(width: 259, height: 128)
+                        }
                     }
                 }
-                .padding(.horizontal, 16)
+                
+                .padding(.leading, 20)
             }
-            .frame(height: 128)
         }
-        //  섹션 전체를 탭하면 이동 (카드에 개별 onTap 없음)
-        .contentShape(Rectangle())
-        .onTapGesture { onTapAll() }
         
-        .padding(.horizontal, 5)
+        .frame(height: 171)
+        
+        .contentShape(Rectangle())
+        .onTapGesture(perform: onTapAll)
+        
     }
 }
 
@@ -533,13 +459,13 @@ private struct CardTile: View {
                 case .success(let image): image
                         .resizable()
                         .scaledToFill()
-                        .scaleEffect(0.97)
-                        .frame(width: 320, height: 128, alignment: .leading)
+                        //.scaleEffect(0.97)
+                        .frame(width: 259, height: 128, alignment: .leading)
                         .clipped()
                 default: Image("homeplacedata1")
                 }
             }
-            .frame(width: 270, height: 128)
+            .frame(width: 259, height: 128)
             .clipped()
 
             LinearGradient(colors: [.clear, .black.opacity(0.55)],
@@ -549,7 +475,7 @@ private struct CardTile: View {
 
             
         }
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
     }
 }
 
