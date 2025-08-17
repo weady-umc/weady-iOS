@@ -72,8 +72,11 @@ struct UploadView: View {
                         Divider()
 
                         ToggleBtn(label: "커뮤니티 게시", isOn: $viewModel.isPublic)
+                            .padding(.vertical, 6)
                         Divider()
+                        
                         ToggleBtn(label: "유료 광고 포함", isOn: $viewModel.isAdd)
+                            .padding(.vertical, 6)
                         Divider()
                     }
 
