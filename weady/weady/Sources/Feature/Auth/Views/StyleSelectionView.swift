@@ -11,6 +11,9 @@ struct StyleSelectionView: View {
     // 외부 주입용 ViewModel
     @StateObject private var vm: StyleSelectionViewModel
     @State private var showNext = false
+    @Environment(\.router) private var router
+    @EnvironmentObject private var onboarding: OnboardingStore
+
 
     private let gender: GenderCode?
     private let agreements: [OnboardingAgreement]
@@ -37,29 +40,8 @@ struct StyleSelectionView: View {
             Spacer()
             footerView()
         }
-        .onAppear {
-            print("DEBUG Style →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
+        .onAppear {	
             vm.loadCategories()
-        }
-        // 다음 → StartView (스타일 포함)
-        .fullScreenCover(isPresented: $vm.didTapNext) {
-            let styleIds64: [Int64] = Array(vm.selectedIds).map { Int64($0) }.sorted()
-            StartView.onboarding(
-                nickname: vm.nickname,
-                gender: gender,
-                styleIds: styleIds64,
-                agreements: agreements
-            )
-        }
-        // 스킵 → StartView (스타일 없음)
-        .fullScreenCover(isPresented: $vm.didTapSkip) {
-            let styleIds64: [Int64] = []   // 스킵이면 빈 배열
-            StartView.onboarding(
-                nickname: vm.nickname,
-                gender: gender,
-                styleIds: styleIds64,
-                agreements: agreements
-            )
         }
     }
     
@@ -115,7 +97,10 @@ struct StyleSelectionView: View {
     @ViewBuilder
     private func footerView() -> some View {
         VStack(spacing: 20) {
-            Button(action: vm.skip) {
+            Button {
+                onboarding.styleIds = []
+                router.push(.start)
+            } label: {
                 Text("건너뛰기")
                     .fontName(.bodyMedium16)
                     .foregroundStyle(Color.gray800)
@@ -127,7 +112,10 @@ struct StyleSelectionView: View {
                     )
             }
             
-            Button(action: vm.next) {
+            Button {
+                onboarding.styleIds = vm.selectedStyleIds64
+                router.push(.start)
+            } label: {
                 Text("다음")
                     .fontName(.bodyMedium16)
                     .frame(maxWidth: .infinity)

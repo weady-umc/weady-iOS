@@ -20,6 +20,7 @@ extension StartView {
 
 struct StartView: View {
     @Environment(\.router) private var router
+    @EnvironmentObject private var onboarding: OnboardingStore
     @StateObject private var vm: StartViewModel
     @State private var showHome = false
     
@@ -83,7 +84,7 @@ struct StartView: View {
             // 4) 다음 버튼
             
             Button{
-                vm.startTapped() // 여기서만 POST
+                vm.startTapped()
             } label: {
                 Text("웨디 시작하기")
                     .fontName(.bodyMedium16)
@@ -101,10 +102,10 @@ struct StartView: View {
         .alert(item: $vm.alert) { a in
             Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
         }
-        // 성공 시 Home
-        .onChange(of: vm.navigateHome) { oldValue, newValue in
-            guard newValue else { return }
+        .onChange(of: vm.navigateHome) { _, go in
+            guard go else { return }
             router.reset(to: .basetab)
+            onboarding.reset()
         }
     }
 }
