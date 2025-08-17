@@ -145,7 +145,7 @@ struct WeatherMainCardView: View {
             Text("\(weather.temperature)º")
                 .foregroundStyle(Color.white100)
                 .fontName(.headingMedium80)
-                .padding(.trailing, 30)
+                .padding(.trailing, 31)
             
             VStack{
                 Image("\(weather.weatherIcon)")

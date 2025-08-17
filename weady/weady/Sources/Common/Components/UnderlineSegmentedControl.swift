@@ -36,6 +36,6 @@ struct UnderlineSegmentedControl<Item: Hashable>: View {
             Spacer(minLength: 0)
         }
         .padding(.leading, 0)
-        .padding(.top, 44)
+        .padding(.top, 5)
     }
 }

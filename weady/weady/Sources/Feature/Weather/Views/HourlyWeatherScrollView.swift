@@ -26,7 +26,7 @@ struct HourlyWeatherScrollView: View {
 }
 
 // MARK: - 시간별 홈화면 스크롤 컨테이너
-struct HourlyWeatherHomeScrollView: View {
+struct HourlyHomeScrollView: View {
     let hourlyWeatherList: [HourlyWeather]
 
     var body: some View {
@@ -39,6 +39,34 @@ struct HourlyWeatherHomeScrollView: View {
             }
         }
         .scrollTargetBehavior(.viewAligned)
+        
+    }
+}
+// MARK: - 시간별 홈화면 스크롤 컨테이너
+struct HourlyWeatherHomeScrollView: View {
+    let hourlyWeatherList: [HourlyWeather]
+
+    var body: some View {
+        ZStack{
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.gray.opacity(0.1))
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(hourlyWeatherList) { item in
+                        HourlyWeatherView(weather: item)
+                        
+                    }
+                }
+                .padding(.leading, 8)
+                //.padding(.trailing, 22)
+            }
+            .scrollTargetBehavior(.viewAligned)
+        }
+        .frame(width: 335, height: 96)
+        
+        
+        .clipShape(RoundedRectangle(cornerRadius: 10))
         
     }
 }
@@ -66,11 +94,22 @@ struct HourlyWeatherView: View {
 }
 
 // MARK: - Hour label formatter
-private func hourLabel(_ time: String) -> String {
+private func hourLabel(_ time: String, now: Date = Date()) -> String {
     // "0", "100", "2300", "23:00" 모두 처리
     let digits = time.filter(\.isNumber)
-    guard let n = Int(digits) else { return time }
-    let hour = (n >= 100) ? (n / 100) : n   // 2300→23, 100→1, 0→0
-    return "\(hour % 24)시"
+    guard !digits.isEmpty, let n = Int(digits) else { return time }
+
+    // 24시간제로 시간 뽑기
+    let hour24: Int = (digits.count >= 3) ? ((n / 100) % 24) : (n % 24)
+
+    // 현재 시간이면 "지금"
+    let currentHour = Calendar.current.component(.hour, from: now) // 로컬 타임존
+    if hour24 == currentHour { return "지금" }
+
+    // 오전/오후 + 12시간제 표기
+    let isPM = hour24 >= 12
+    let hour12 = (hour24 % 12 == 0) ? 12 : (hour24 % 12) // 0/12 → 12시로 표시
+    return "\(isPM ? "오후" : "오전") \(hour12)시"
 }
+
 

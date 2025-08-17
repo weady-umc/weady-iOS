@@ -19,6 +19,7 @@ final class WeatherSearchViewModel: ObservableObject {
     @Published var searchResults: [AddressDocument] = []        // 카카오 주소 검색 원본 결과
     @Published var previewWeather: ShortWeatherData?            // 선택 항목의 날씨 미리보기
     @Published var filteredResults: [AddressDocument] = []      // 화면 표시용 필터링 결과
+    @Published var isLoading: Bool = false
 
     // MARK: - Dependencies
     private let kakaoService = KakaoSearchService()             // 카카오 주소 검색 서비스
@@ -48,18 +49,22 @@ final class WeatherSearchViewModel: ObservableObject {
         }
         
         print("🔍 주소 검색 요청: \(address)")
+        
+        isLoading = true
 
         kakaoService.searchAddress(address: address) { [weak self] result in
             DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.isLoading = false
                 switch result {
                 case .success(let documents):
                     print("✅ 주소 검색 결과 수: \(documents.count)")
-                    self?.searchResults = documents
-                    self?.filterResults(for: self?.searchText ?? "")
+                    self.searchResults = documents
+                    self.filterResults(for: self.searchText)
                 case .failure(let error):
                     print("❌ 주소 검색 실패: \(error.localizedDescription)")
-                    self?.searchResults = []
-                    self?.filteredResults = []
+                    self.searchResults = []
+                    self.filteredResults = []
                 }
             }
         }
@@ -150,5 +155,13 @@ final class WeatherSearchViewModel: ObservableObject {
                 HourlyWind(time: 15, direction: "W", speed: 3.5)
             ]
         )
+    }
+    // 초기화/클리어 유틸
+    func clearAll() {
+        searchText = ""
+        searchResults = []
+        filteredResults = []
+        previewWeather = nil
+        isLoading = false
     }
 }

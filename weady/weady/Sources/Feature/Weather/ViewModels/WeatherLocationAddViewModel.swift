@@ -84,7 +84,8 @@ class WeatherLocationAddViewModel: ObservableObject {
                 HourlyWeather(
                     time: "\($0.time)시",                                                    // 예: 13 → "13시"
                     iconName: WeatherLocationAddViewModel.mapSkyStatusToIcon($0.skyStatus),  // 시간별 소형 아이콘
-                    temp: "\($0.tmp)"                                                        // 표기용 문자열
+                    temp: String(Int($0.tmp.rounded()))
+                        // 표기용 문자열
                 )
             }
         )

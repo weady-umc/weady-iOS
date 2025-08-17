@@ -31,6 +31,7 @@ struct HomeView: View {
     
     @StateObject private var curationVM = CurationViewModel()
     
+    
     var body: some View {
 
         VStack {
@@ -255,7 +256,7 @@ struct HomeView: View {
                     }
                     
                     // 시간대별 날씨 요약 (가로 스크롤)
-                    HourlyWeatherHomeScrollView(hourlyWeatherList: data.hourlyWeather)
+                    HourlyHomeScrollView(hourlyWeatherList: data.hourlyWeather)
                         .padding(.leading, 0)
                         .padding(.trailing, 0)
                         .padding(.top, 13)

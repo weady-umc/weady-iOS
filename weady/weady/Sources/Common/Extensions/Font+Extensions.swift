@@ -11,7 +11,7 @@ enum AppTextStyle {
     case titleBold24, titleSemibold24, titleMedium24
     case headingBold20, headingSemibold20, headingMedium20, headingRegular20, headingMedium80
     case bodyBold16, bodySemibold16, bodyMedium16, bodyRegular16, bodyLight16
-    case captionSemibold14, captionMedium14, captionRegular14, captionLight14
+    case captionSemibold14, captionMedium14, captionRegular14, captionLight14, captionRegular13
     case metaSemibold12, metaMedium12, metaRegular12
     case metaMedium10, metaRegular10, metaMedium8, metaRegular8, metaSemibold21
     case homeRegular30, homeSemibold12, homeMedium11, homeRegular11,homeSemibold30
@@ -40,6 +40,8 @@ enum AppTextStyle {
         case .captionRegular14: return .custom("Pretendard-Regular", size: 14)
         case .captionLight14: return .custom("Pretendard-Light", size: 14)
             
+        case .captionRegular13: return .custom("Pretendard-Regular", size: 13)
+            
         case .metaSemibold12: return .custom("Pretendard-SemiBold", size: 12)
         case .metaMedium12: return .custom("Pretendard-Medium", size: 12)
         case .metaRegular12: return .custom("Pretendard-Regular", size: 12)
@@ -65,6 +67,7 @@ enum AppTextStyle {
         case .bodyBold16, .bodySemibold16, .bodyMedium16, .bodyRegular16, .bodyLight16: return 16
         case .captionSemibold14, .captionMedium14, .captionRegular14, .captionLight14: return 14
         case .metaSemibold12, .metaMedium12, .metaRegular12, .homeSemibold12: return 12
+        case .captionRegular13: return 13
         case .metaMedium10, .metaRegular10: return 10
         case .metaMedium8, .metaRegular8: return 8
         case .homeRegular30, .homeSemibold30: return 30
@@ -85,6 +88,7 @@ enum AppTextStyle {
         case .homeRegular30, .homeSemibold30: return 30
         case .homeMedium11, .homeRegular11: return 11
         case .homeSemibold12: return 14
+        case .captionRegular13: return 13
 
         }
     }
