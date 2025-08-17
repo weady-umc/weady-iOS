@@ -163,10 +163,18 @@ private struct SafariSheet: UIViewControllerRepresentable {
     }
 }
 
+// 프리뷰용 약관 페이로드 헬퍼
+#if DEBUG
+enum PreviewAgreements {
+    static let requiredAllAgreed: [OnboardingAgreement] = [
+        OnboardingAgreement(termsType: .AGE,     isAgreed: true),
+        OnboardingAgreement(termsType: .SERVICE, isAgreed: true),
+        OnboardingAgreement(termsType: .PRIVACY, isAgreed: true),
+    ]
+}
+#endif
+
 
 #Preview {
-    NavigationStack {
-        TermsAgreementView()
-    }
+    NavigationStack { TermsAgreementView() }
 }
-

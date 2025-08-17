@@ -165,11 +165,14 @@ struct CategoryButton: View {
         }
     }
 }
-/*
-struct StyleSelectionView_Previews: PreviewProvider {
-    static var previews: some View {
-        StyleSelectionView(nickname: "테스트")
+
+#Preview {
+    NavigationStack {
+        StyleSelectionView(
+            nickname: "영택",
+            agreements: PreviewAgreements.requiredAllAgreed
+        )
     }
 }
 
-*/
+

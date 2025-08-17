@@ -127,7 +127,13 @@ struct GenderSelectionView: View {
     }
 }
 
-/*#Preview {
- GenderSelectionView(nickname: "테스트")
- }
- */
+#Preview {
+    NavigationStack {
+        GenderSelectionView(
+            nickname: "영택",
+            agreements: PreviewAgreements.requiredAllAgreed
+        )
+    }
+}
+
+

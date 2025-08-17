@@ -131,7 +131,8 @@ struct NicknameInputView: View {
     }
 }
 
-/*#Preview {
-    NicknameInputView()
+#Preview {
+    NavigationStack {
+        NicknameInputView(agreements: PreviewAgreements.requiredAllAgreed)
+    }
 }
-*/
