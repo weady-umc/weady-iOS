@@ -43,6 +43,7 @@ struct WeadyboardPostView: View {
                 CustomNavBar(
                     viewTitle: "",
                     showBackButton: true,
+                    showBottomDivider: false,
                     backAction: {
                         isTabBarHidden = false
                         dismiss()
@@ -51,14 +52,14 @@ struct WeadyboardPostView: View {
                 
                 if let post = viewModel.post {
                     ScrollView(showsIndicators: false) {
-                        VStack(spacing: 16) {
-                            Spacer()
+                        VStack(spacing: 16 * .deviceScale) {
                             
                             WeadyboardUserHeaderView(
                                 userName: post.userName,
                                 userProfileImageUrl: post.userProfileImageUrl,
                                 onMoreTap: { present(.more) }
                             )
+                            .padding(.bottom, -5 * .deviceScale)
                             
                             WeadyboardPostImageView(images: post.imageDtoList.map { $0.imgUrl })
                             
@@ -89,11 +90,11 @@ struct WeadyboardPostView: View {
                                 .onAppear {
                                     viewModel.fetchPostDetail()
                                 }
-                            .padding(.horizontal, 20)
+                            .padding(.horizontal, 20 * .deviceScale)
                         }
                     }
                 } else if viewModel.isLoading {
-                    ProgressView().padding(.top, 100)
+                    ProgressView().padding(.top, 100 * .deviceScale)
                 } else if let error = viewModel.errorMessage {
                     Text(error).foregroundColor(.red)
                 }
@@ -128,7 +129,7 @@ struct WeadyboardPostView: View {
         }
         .sheet(isPresented: $showCommentSheet) {
             WeadyboardPostCommentSheet(boardId: boardId)
-                .presentationDetents([.height(624)])
+                .presentationDetents([.height(594 * .deviceScale)])
                 .presentationDragIndicator(.visible)
         }
         .navigationBarBackButtonHidden(true)

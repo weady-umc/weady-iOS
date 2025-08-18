@@ -6,23 +6,46 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct WeadyboardPostImageView: View {
     let images: [String]
+    private let targetWidth: CGFloat = 375 * .deviceScale
+    private let placeholderHeight: CGFloat = 300 * .deviceScale
+
+    @State private var selection: Int = 0
+    @State private var heights: [Int: CGFloat] = [:]
+
+    private var currentHeight: CGFloat {
+        heights[selection] ?? placeholderHeight
+    }
 
     var body: some View {
-        TabView {
-            ForEach(images, id: \.self) { url in
-                AsyncImage(url: URL(string: url)) { img in
-                    img.resizable().scaledToFill()
-                } placeholder: {
-                    Color.gray200
-                }
-                .frame(width: 375, height: 470)
-                .clipped()
+        TabView(selection: $selection) {
+            ForEach(Array(images.enumerated()), id: \.offset) { index, urlString in
+                KFImage(URL(string: urlString))
+                    .placeholder {
+                        ZStack { ProgressView() }
+                            .frame(width: targetWidth)
+                            .aspectRatio(1, contentMode: .fit)
+                    }
+                    .onSuccess { result in
+                        let img = result.image
+                        let ratio = img.size.height / max(img.size.width, 1)
+                        let h = targetWidth * ratio
+                        if heights[index] != h { heights[index] = h }
+                    }
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: targetWidth)
+                    .tag(index)
             }
         }
-        .frame(height: 470)
+        .frame(width: targetWidth, height: currentHeight) 
+        .frame(maxWidth: .infinity)
         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+        .onAppear {
+            if selection >= images.count { selection = max(0, images.count - 1) }
+        }
     }
 }

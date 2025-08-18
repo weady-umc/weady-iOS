@@ -13,18 +13,19 @@ struct CommentCell: View {
     var onTapReply: ((CommentResponseDTO) -> Void)? = nil
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 8 * .deviceScale) {
             HStack(alignment: .top, spacing: 12) {
                 AsyncImage(url: URL(string: comment.profileImageUrl ?? "")) { image in
                     image.resizable().scaledToFill()
                 } placeholder: {
-                    Color.gray200
+                    Image("profileimage") // 기본 프로필 이미지
+                        .resizable()
                 }
-                .frame(width: 32, height: 32)
+                .frame(width: 35 * .deviceScale, height: 35 * .deviceScale)
                 .clipShape(Circle())
                 
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack(spacing: 8) {
+                VStack(alignment: .leading, spacing: 6 * .deviceScale) {
+                    HStack(spacing: 8 * .deviceScale) {
                         Text(comment.username)
                             .font(.system(size: 14, weight: .semibold))
                         Text(comment.createdAt.relativeTimeString())
@@ -44,31 +45,31 @@ struct CommentCell: View {
                             .foregroundColor(.gray900)
                     }
                     .buttonStyle(.plain)
-                    .padding(.top, 2)
+                    .padding(.top, 2 * .deviceScale)
                 }
             }
-            .padding(.vertical, 2)
+            .padding(.vertical, 2 * .deviceScale)
             .onLongPressGesture {
                 onLongPressDelete?(comment.commentId)
             }
             
             // 대댓글 목록
             if !comment.childCommentsList.isEmpty {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 10 * .deviceScale) {
                     ForEach(comment.childCommentsList) { child in
-                        HStack(alignment: .top, spacing: 8) {
-                            Spacer().frame(width: 44)
+                        HStack(alignment: .top, spacing: 8 * .deviceScale) {
+                            Spacer().frame(width: 44 * .deviceScale)
                             
                             AsyncImage(url: URL(string: child.profileImageUrl ?? "")) { image in
                                 image.resizable().scaledToFill()
                             } placeholder: {
                                 Color.gray200
                             }
-                            .frame(width: 24, height: 24)
+                            .frame(width: 24 * .deviceScale, height: 24 * .deviceScale)
                             .clipShape(Circle())
                             
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack(spacing: 6) {
+                            VStack(alignment: .leading, spacing: 4 * .deviceScale) {
+                                HStack(spacing: 6 * .deviceScale) {
                                     Text(child.username)
                                         .font(.system(size: 13, weight: .semibold))
                                     Text(child.createdAt.relativeTimeString())
@@ -95,12 +96,12 @@ struct CommentCell: View {
 //                                        .foregroundColor(.gray900)
 //                                }
                                 .buttonStyle(.plain)
-                                .padding(.top, 2)
+                                .padding(.top, 2 * .deviceScale)
                             }
                         }
                     }
                 }
-                .padding(.top, 2)
+                .padding(.top, 2 * .deviceScale)
             }
         }
     }

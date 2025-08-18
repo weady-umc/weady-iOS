@@ -16,8 +16,11 @@ struct WeadyboardPostCommentSheet: View {
     @State private var inputText: String = ""
     @State private var isPosting: Bool = false
 
-    init(boardId: Int) {
+    private let userProfileImageUrl: String?
+
+    init(boardId: Int, userProfileImageUrl: String? = nil) {
         _viewModel = StateObject(wrappedValue: CommentViewModel(boardId: boardId))
+        self.userProfileImageUrl = userProfileImageUrl
     }
 
     private var canSend: Bool {
@@ -69,23 +72,52 @@ struct WeadyboardPostCommentSheet: View {
 
     private var inputBar: some View {
         HStack(spacing: 8) {
-            TextField("댓글을 남겨서 의견을 공유해보세요.", text: $inputText)
-                .fontName(.captionRegular14)
-                .padding(.horizontal, 12)
+            // 프로필 이미지 (왼쪽)
+            Group {
+                if let urlStr = userProfileImageUrl,
+                   let url = URL(string: urlStr), !urlStr.isEmpty {
+                    AsyncImage(url: url) { img in
+                        img.resizable().scaledToFill()
+                    } placeholder: {
+                        Image("profileimage")
+                            .resizable().scaledToFill()
+                    }
+                } else {
+                    Image("profileimage")
+                        .resizable().scaledToFill()
+                }
+            }
+            .frame(width: 35, height: 35)
+            .clipShape(Circle())
+            
+            // 텍스트필드 + 전송버튼을 ZStack 내부의 HStack으로 구성
+            ZStack {
+                HStack(spacing: 8) {
+                    TextField("댓글을 남겨서 의견을 공유해보세요.", text: $inputText)
+                        .fontName(.captionRegular14)
+                        .focused($isFocused)
+                        .padding(.leading, 12)
+                    
+                    Spacer(minLength: 0)
+                    
+                    Button {
+                        sendTapped()
+                    } label: {
+                        Image(canSend ? "sendicon_activated" : "sendicon")
+                    }
+                    .disabled(!canSend || isPosting)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+                    .padding(.trailing, 4)
+                }
                 .frame(height: 44)
                 .background(Color.white)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10).stroke(Color.gray500, lineWidth: 1)
-                )
-                .focused($isFocused)
-
-            Button {
-                sendTapped()
-            } label: {
-                Image(canSend ? "sendicon_activated" : "sendicon")
             }
-            .disabled(!canSend || isPosting)
-            .frame(width: 44, height: 44)
+            // 테두리는 overlay로 표현
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.gray500, lineWidth: 1)
+            )
         }
         .padding(.horizontal, 16)
         .padding(.top, 6)

@@ -24,7 +24,7 @@ struct WeadyboardPostReportSheet: View {
                 onClose()
             }
             
-            Spacer().frame(height: 24)
+            Spacer().frame(height: 24 * .deviceScale)
             
             // 사유 리스트
             ScrollView(showsIndicators: false) {
@@ -41,10 +41,10 @@ struct WeadyboardPostReportSheet: View {
                                 Spacer()
                                 Image("arrow_right")
                                     .resizable()
-                                    .frame(width: 6, height: 10)
+                                    .frame(width: 6 * .deviceScale, height: 10 * .deviceScale)
                             }
-                            .padding(.horizontal, 20)
-                            .frame(height: 50)
+                            .padding(.horizontal, 20 * .deviceScale)
+                            .frame(height: 50 * .deviceScale)
                         }
                         
                         // 구분선
@@ -55,10 +55,10 @@ struct WeadyboardPostReportSheet: View {
                     }
                 }
             }
-            .padding(.top, 8)
+            .padding(.top, 8 * .deviceScale)
             Spacer()
         }
-        .frame(width: 375, height: 759)
+        .frame(width: 375 * .deviceScale, height: 759 * .deviceScale)
         .background(Color.white100)
     }
 }
