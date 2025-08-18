@@ -44,7 +44,7 @@ struct AppRootView: View {
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
                     case .login:
-                        LoginView()
+                        AppleLoginView()
                             .environment(router)
                             .environmentObject(router)
                             .navigationBarHidden(true)
