@@ -85,25 +85,26 @@ struct WeadyboardFilterSheet: View {
                         // MARK: - 날씨
                         sectionTitle("날씨")
 
-                        let weatherColumns: [GridItem] = Array(
-                            repeating: GridItem(.flexible(), spacing: 12 * .deviceScale),
-                            count: 3
-                        )
-                        LazyVGrid(columns: weatherColumns, spacing: 15 * .deviceScale) {
-                            ForEach(tagVM.weathers, id: \.id) { tag in
-                                FilterIconTag(
-                                    label: tag.name,
-                                    imageName: weatherIconName(for: tag.id),
-                                    isSelected: tagVM.selectedWeatherIds.contains(tag.id),
-                                    selectedBackground: .black100,
-                                    selectedTextColor: .white100,
-                                    unselectedBackground: .white400,
-                                    unselectedTextColor: .black100
-                                ) {
-                                    if tagVM.selectedWeatherIds.contains(tag.id) {
-                                        tagVM.selectedWeatherIds.remove(tag.id)
-                                    } else {
-                                        tagVM.selectedWeatherIds.insert(tag.id)
+                        VStack(alignment: .leading, spacing: 15 * .deviceScale) {
+                            let rows = chunk(tagVM.weathers, by: 3)
+                            ForEach(rows.indices, id: \.self) { rowIndex in
+                                HStack(spacing: 12 * .deviceScale) {
+                                    ForEach(rows[rowIndex], id: \.id) { tag in
+                                        FilterIconTag(
+                                            label: tag.name,
+                                            imageName: weatherIconName(for: tag.id),
+                                            isSelected: tagVM.selectedWeatherIds.contains(tag.id),
+                                            selectedBackground: .black100,
+                                            selectedTextColor: .white100,
+                                            unselectedBackground: .white400,
+                                            unselectedTextColor: .black100
+                                        ) {
+                                            if tagVM.selectedWeatherIds.contains(tag.id) {
+                                                tagVM.selectedWeatherIds.remove(tag.id)
+                                            } else {
+                                                tagVM.selectedWeatherIds.insert(tag.id)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -164,5 +165,13 @@ struct WeadyboardFilterSheet: View {
                 .fill(Color.gray600)
                 .frame(height: 1)
         }
+    }
+}
+
+// MARK: - Local helper: 배열을 N개씩 자르기
+private func chunk<T>(_ array: [T], by size: Int) -> [[T]] {
+    guard size > 0 else { return [] }
+    return stride(from: 0, to: array.count, by: size).map {
+        Array(array[$0 ..< min($0 + size, array.count)])
     }
 }

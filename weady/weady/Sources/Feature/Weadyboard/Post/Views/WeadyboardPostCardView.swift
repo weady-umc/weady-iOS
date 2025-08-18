@@ -117,6 +117,7 @@ struct WeadyboardPostCardView: View {
                                 }
                             }
                         }
+                        .frame(height: 85 * .deviceScale)
                         .padding(12 * .deviceScale)
                         .background(Color.white100)
                         .cornerRadius(10)
@@ -132,6 +133,7 @@ struct WeadyboardPostCardView: View {
                                 .foregroundColor(.appblack100)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
+                        .frame(height: 85 * .deviceScale)
                         .padding(12 * .deviceScale)
                         .background(Color.white100)
                         .cornerRadius(10)
@@ -153,6 +155,7 @@ struct WeadyboardPostCardView: View {
                                 }
                             }
                         }
+                        .frame(height: 85 * .deviceScale)
                         .padding(12 * .deviceScale)
                         .background(Color.white100)
                         .cornerRadius(10)
@@ -168,6 +171,7 @@ struct WeadyboardPostCardView: View {
                                 .foregroundColor(.appblack100)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
+                        .frame(height: 85 * .deviceScale)
                         .padding(12 * .deviceScale)
                         .background(Color.white100)
                         .cornerRadius(10)

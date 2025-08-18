@@ -17,13 +17,12 @@ struct FilterIconTag: View {
     let unselectedBackground: Color
     let unselectedTextColor: Color
     let onTap: () -> Void
-
-    var fillWidth: Bool = false
     
     private var iconSize: CGSize {
         iconSizeMap[imageName] ?? CGSize(width: 16 * .deviceScale, height: 16 * .deviceScale)
     }
 
+    // 아이콘 개별 사이즈 매핑
     private let iconSizeMap: [String: CGSize] = [
         "filter_sunny":        CGSize(width: 15 * .deviceScale,    height: 15 * .deviceScale),
         "filter_cloudy":       CGSize(width: 16.79 * .deviceScale, height: 12.5 * .deviceScale),
@@ -35,25 +34,24 @@ struct FilterIconTag: View {
 
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: 6  * .deviceScale) {
+            HStack(spacing: 6 * .deviceScale) {
                 Image(imageName)
                     .resizable()
                     .renderingMode(.original)
                     .frame(width: iconSize.width, height: iconSize.height)
-                    .alignmentGuide(.firstTextBaseline) { d in d[.bottom] }
 
                 Text(label)
                     .fontName(.metaMedium12)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.9)
                     .foregroundColor(isSelected ? selectedTextColor : unselectedTextColor)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .fixedSize(horizontal: true, vertical: false)
             }
             .padding(.horizontal, 12 * .deviceScale)
-            .frame(height: 26 * .deviceScale, alignment: .center)
-            .contentShape(RoundedRectangle(cornerRadius: 20))
+            .padding(.vertical, 5 * .deviceScale)
+            .frame(height: 26 * .deviceHeightScale)
             .background(isSelected ? selectedBackground : unselectedBackground)
             .clipShape(RoundedRectangle(cornerRadius: 20))
+            .contentShape(RoundedRectangle(cornerRadius: 20))
         }
         .buttonStyle(.plain)
     }
