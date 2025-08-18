@@ -20,8 +20,10 @@ struct WeadyboardPostImageView: View {
         heights[selection] ?? placeholderHeight
     }
 
+    @Binding var currentIndex: Int
+    
     var body: some View {
-        TabView(selection: $selection) {
+        TabView(selection: $currentIndex) {
             ForEach(Array(images.enumerated()), id: \.offset) { index, urlString in
                 KFImage(URL(string: urlString))
                     .placeholder {

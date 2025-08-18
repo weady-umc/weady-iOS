@@ -97,7 +97,9 @@ final class WeadychiveViewModel: ObservableObject {
                 switch result {
                 case .success(let response):
                     print("✅ Scrapped Boards API 성공")
-                    self?.scrappedWeadyboardItems = response.content.map {
+                    
+                    // 로컬 변수로 구성 후 오버라이드 → 최종 할당
+                    var items = response.content.map {
                         WeadyboardItem(
                             id: $0.boardId,
                             username: $0.username,
@@ -105,6 +107,22 @@ final class WeadychiveViewModel: ObservableObject {
                             weatherTagId: $0.weatherTagId
                         )
                     }
+                    
+                    // 로컬로 저장된 대표 이미지가 있으면 우선 적용
+                    for i in items.indices {
+                        let id = items[i].id
+                        if let override = WeadyPreferredImageStore.shared.url(for: Int(id)) {
+                            items[i] = WeadyboardItem(
+                                id: items[i].id,
+                                username: items[i].username,
+                                imgUrl: override,
+                                weatherTagId: items[i].weatherTagId
+                            )
+                        }
+                    }
+                    
+                    self?.scrappedWeadyboardItems = items
+                    
                     // 스크랩 여부 게시물 화면에서 확인하기 위해 추가
                     self?.scrappedBoardIds = Set(response.content.map { Int($0.boardId) })
                     self?.isWeadyboardFetchFailed = false
@@ -152,7 +170,27 @@ final class WeadychiveViewModel: ObservableObject {
     }
     
     /// 게시물 스크랩 추가
-    func addBoardScrap(boardId: Int) {
+//    func addBoardScrap(boardId: Int) {
+//        let dto = ScrapBoardRequestDto(boardId: boardId)
+//        service.postScrapBoard(dto: dto) { [weak self] result in
+//            DispatchQueue.main.async {
+//                switch result {
+//                case .success(let response):
+//                    print("✅ 웨디보드 스크랩 성공: \(response.isScrapped)")
+//                    if response.isScrapped {
+//                        self?.scrappedBoardIds.insert(boardId)
+//                    }
+//                    self?.fetchScrappedBoards()
+//                case .failure(let error):
+//                    print("❌ 웨디보드 스크랩 실패: \(error)")
+//                }
+//            }
+//        }
+//    }
+    func addBoardScrap(boardId: Int, preferredImageUrl: String?) {
+        if let preferredImageUrl {
+            WeadyPreferredImageStore.shared.set(url: preferredImageUrl, for: boardId)
+        }
         let dto = ScrapBoardRequestDto(boardId: boardId)
         service.postScrapBoard(dto: dto) { [weak self] result in
             DispatchQueue.main.async {
@@ -187,11 +225,11 @@ final class WeadychiveViewModel: ObservableObject {
     }
     
     /// 게시물 스크랩 토글
-    func toggleBoardScrap(boardId: Int) {
+    func toggleBoardScrap(boardId: Int, preferredImageUrl: String?) {
         if isScrapped(boardId: boardId) {
             removeBoardScrap(boardId: boardId)
         } else {
-            addBoardScrap(boardId: boardId)
+            addBoardScrap(boardId: boardId, preferredImageUrl: preferredImageUrl)
         }
     }
     

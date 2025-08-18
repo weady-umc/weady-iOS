@@ -30,6 +30,8 @@ struct WeadyboardPostView: View {
     @State private var sheetState: WeadyboardPostSheetState = .none
     @State private var showDim: Bool = false
 
+    @State private var currentImageIndex: Int = 0
+
     init(boardId: Int, isTabBarHidden: Binding<Bool>) {
         self.boardId = boardId
         self._isTabBarHidden = isTabBarHidden
@@ -61,7 +63,10 @@ struct WeadyboardPostView: View {
                             )
                             .padding(.bottom, -5 * .deviceScale)
                             
-                            WeadyboardPostImageView(images: post.imageDtoList.map { $0.imgUrl })
+                            WeadyboardPostImageView(
+                                images: post.imageDtoList.map { $0.imgUrl },
+                                currentIndex: $currentImageIndex
+                            )
                             
                             WeadyboardActionButtonsView(
                                 goodStatus: viewModel.post?.goodStatus ?? false,
@@ -77,7 +82,18 @@ struct WeadyboardPostView: View {
                                 },
                                 onCommentTap: { showCommentSheet = true },
                                 onBookmarkTap: {
-                                    weadychiveVM.toggleBoardScrap(boardId: boardId)
+                                    // 현재 보고 있는 이미지 URL 계산
+                                    let urls = post.imageDtoList.map { $0.imgUrl }
+                                    let preferred: String? = {
+                                        guard !urls.isEmpty else { return nil }
+                                        if currentImageIndex >= 0 && currentImageIndex < urls.count {
+                                            return urls[currentImageIndex]
+                                        } else {
+                                            return urls.first
+                                        }
+                                    }()
+                                    // 프론트 단독 방식: 로컬에 대표 이미지 저장 + 서버 스크랩 호출
+                                    weadychiveVM.toggleBoardScrap(boardId: boardId, preferredImageUrl: preferred)
                                 }
                             )
                             
