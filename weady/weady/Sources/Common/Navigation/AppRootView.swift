@@ -16,7 +16,6 @@ struct AppRootView: View {
     // MARK: Properties
     /// 전역 네비게이션 경로
     @EnvironmentObject private var router: NavigationRouter
-    @StateObject private var onboarding = OnboardingStore()
     
     /// 탭 전환 및 현재 탭 상태 보관
     @State private var tabController = AppTabController()
@@ -39,57 +38,30 @@ struct AppRootView: View {
             )
         ) {
             SplashView()
+                .environment(router)
+                .environmentObject(router)
                 .navigationBarHidden(true)
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
                     case .login:
                         LoginView()
+                            .environment(router)
+                            .environmentObject(router)
                             .navigationBarHidden(true)
                         
-                    case .onboarding, .terms:
-                        // 온보딩 첫 화면: 약관 동의
+                    case .onboarding:
                         TermsAgreementView()
-                        
-                    case .nickname:
-                        NicknameInputView(
-                            agreements: onboarding.agreements
-                        )
-                        
-                    case .preference:
-                        PreferenceInputView(
-                            nickname: onboarding.nickname,
-                            agreements: onboarding.agreements
-                        )
-                        
-                    case .gender:
-                        GenderSelectionView(
-                            nickname: onboarding.nickname,
-                            agreements: onboarding.agreements
-                        )
-                        
-                    case .style:
-                        StyleSelectionView(
-                            nickname: onboarding.nickname,
-                            agreements: onboarding.agreements
-                            // service: TagService()  // 필요 시 명시 주입
-                        )
-                        
-                    case .start:
-                        StartView(
-                            nickname: onboarding.nickname,
-                            gender: onboarding.gender,
-                            styleIds: onboarding.styleIds,
-                            agreements: onboarding.agreements
-                        )
+                            .environment(router)
+                            .environmentObject(router)
                         
                     case .basetab:
                         ZStack(alignment: .bottom) {
                             BaseTabScreen(selectedTab: $selectedTab,
                                           isTabBarHidden: $isTabBarHidden)
-                            .environment(router)
-                            .environmentObject(router)
-                            .environment(tabController)
-                            .environment(weadyboardBridge)
+                                .environment(router)
+                                .environmentObject(router)
+                                .environment(tabController)
+                                .environment(weadyboardBridge)
                             
                             // 탭바 오버레이
                             if !isTabBarHidden {
@@ -110,9 +82,8 @@ struct AppRootView: View {
                 }
         }
         .environment(router)
-        .environmentObject(onboarding) 
-        .environment(tabController)
-        .environment(weadyboardBridge)
+       // .environmentObject(router)
+//        .environmentObject(weadyboardBridge)
         .environmentObject(toastCenter)
     }
 }

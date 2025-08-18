@@ -19,8 +19,6 @@ extension StartView {
 }
 
 struct StartView: View {
-    @Environment(\.router) private var router
-    @EnvironmentObject private var onboarding: OnboardingStore
     @StateObject private var vm: StartViewModel
     @State private var showHome = false
     
@@ -78,13 +76,13 @@ struct StartView: View {
             .padding(.top, 39)
             
             Spacer().frame(height: 78)
-            
+
             Spacer()
             
             // 4) 다음 버튼
             
             Button{
-                vm.startTapped()
+                vm.startTapped() // 여기서만 POST
             } label: {
                 Text("웨디 시작하기")
                     .fontName(.bodyMedium16)
@@ -102,10 +100,12 @@ struct StartView: View {
         .alert(item: $vm.alert) { a in
             Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
         }
-        .onChange(of: vm.navigateHome) { _, go in
-            guard go else { return }
-            router.reset(to: .basetab)
-            onboarding.reset()
+        // 성공 시 Home 
+        .fullScreenCover(isPresented: $vm.navigateHome) {
+            BaseTabHost(
+                selectedTab: $selectedTab,
+                isTabBarHidden: $isTabBarHidden
+            )
         }
     }
 }
@@ -132,15 +132,4 @@ private struct BaseTabHost: View {
             }
         }
     }
-}
-
-#Preview("StartView – Onboarding") {
-    let router = NavigationRouter()
-    StartView.onboarding(
-        nickname: "영택",
-        gender: nil,
-        styleIds: nil,
-        agreements: nil
-    )
-    .environment(router)                   
 }
