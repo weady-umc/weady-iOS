@@ -123,7 +123,7 @@ final class WeadychiveViewModel: ObservableObject {
         service.postScrapCuration(dto: dto) { result in
             switch result {
             case .success(let response):
-                print("✅ 큐레이션 스크랩 추가 성공: \(response.isScraped)")
+                print("✅ 큐레이션 스크랩 추가 성공: \(response.isScrapped)")
                 self.fetchScrappedCurations()
             case .failure(let error):
                 print("!!!큐레이션 추가됌요!!!")
@@ -137,7 +137,7 @@ final class WeadychiveViewModel: ObservableObject {
         service.deleteScrapCuration(dto: dto) { result in
             switch result {
             case .success(let response):
-                print("✅ 큐레이션 스크랩 삭제 성공: \(response.isScraped)")
+                print("✅ 큐레이션 스크랩 삭제 성공: \(response.isScrapped)")
                 self.fetchScrappedCurations()
             case .failure(let error):
                 print("!!!큐레이션 삭제됌요!!!")
@@ -158,8 +158,8 @@ final class WeadychiveViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let response):
-                    print("✅ 웨디보드 스크랩 성공: \(response.isScraped)")
-                    if response.isScraped {
+                    print("✅ 웨디보드 스크랩 성공: \(response.isScrapped)")
+                    if response.isScrapped {
                         self?.scrappedBoardIds.insert(boardId)
                     }
                     self?.fetchScrappedBoards()
@@ -202,7 +202,7 @@ final class WeadychiveViewModel: ObservableObject {
             service.deleteScrapCuration(dto: dto) { result in
                 switch result {
                 case .success(let response):
-                    print("✅ 서버 큐레이션 스크랩 삭제 성공: \(response.isScraped)")
+                    print("✅ 서버 큐레이션 스크랩 삭제 성공: \(response.isScrapped)")
                 case .failure(let error):
                     print("❌ 서버 큐레이션 스크랩 삭제 실패: \(error.localizedDescription)")
                 }
@@ -217,7 +217,7 @@ final class WeadychiveViewModel: ObservableObject {
             service.deleteScrapBoard(dto: dto) { result in
                 switch result {
                 case .success(let response):
-                    print("✅ 서버 웨디보드 스크랩 삭제 성공: \(response.isScraped)")
+                    print("✅ 서버 웨디보드 스크랩 삭제 성공: \(response.isScrapped)")
                 case .failure(let error):
                     print("❌ 서버 웨디보드 스크랩 삭제 실패: \(error.localizedDescription)")
                 }
