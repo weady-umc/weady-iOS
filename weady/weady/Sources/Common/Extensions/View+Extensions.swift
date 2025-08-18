@@ -63,7 +63,7 @@ extension UIApplication {
 ///
 
 // 기준 스케일 값 
-private extension CGFloat {
+extension CGFloat {
     static var baseScale: CGFloat {
         UIScreen.main.bounds.width / 375.0
     }
