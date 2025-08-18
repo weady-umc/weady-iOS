@@ -144,9 +144,19 @@ struct WeadyboardPostView: View {
             isTabBarHidden = false
         }
         .sheet(isPresented: $showCommentSheet) {
-            WeadyboardPostCommentSheet(boardId: boardId)
-                .presentationDetents([.height(594 * .deviceScale)])
-                .presentationDragIndicator(.visible)
+            // 댓글/대댓글 작성·삭제 시, 부모 화면의 댓글 수 즉시 반영
+            WeadyboardPostCommentSheet(
+                boardId: boardId,
+                onCountChange: { delta in
+                    guard delta != 0 else { return }
+                    guard var post = viewModel.post else { return }
+                    let newCount = max(0, (post.commentCount) + delta)
+                    post.commentCount = newCount
+                    viewModel.post = post
+                }
+            )
+            .presentationDetents([.height(594 * .deviceScale)])
+            .presentationDragIndicator(.visible)
         }
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
