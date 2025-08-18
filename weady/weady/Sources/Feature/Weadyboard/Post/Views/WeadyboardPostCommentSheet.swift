@@ -36,7 +36,8 @@ struct WeadyboardPostCommentSheet: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Spacer().frame(height: 20)
+            Spacer()
+                .frame(height: 20 * .deviceScale)
 
             if viewModel.isLoading {
                 ProgressView().padding(.top, 24)
@@ -45,7 +46,7 @@ struct WeadyboardPostCommentSheet: View {
                 Text("댓글을 남겨서 의견을 공유해보세요.")
                     .fontName(.metaRegular12)
                     .foregroundColor(.black)
-                    .padding(.top, 50)
+                    .padding(.top, 50 * .deviceScale)
                 Spacer()
             } else {
                 List {
@@ -112,10 +113,10 @@ struct WeadyboardPostCommentSheet: View {
                     }
                     .buttonStyle(.plain)
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 16 * .deviceScale)
             }
             
-            HStack(spacing: 8) {
+            HStack(spacing: 8 * .deviceScale) {
                 // 프로필
                 Group {
                     if let urlStr = userProfileImageUrl,
@@ -134,7 +135,7 @@ struct WeadyboardPostCommentSheet: View {
                 
                 // 입력 + 전송
                 ZStack {
-                    HStack(spacing: 8) {
+                    HStack(spacing: 8 * .deviceScale) {
                         TextField(replyPlaceholder, text: $inputText)
                             .fontName(.captionRegular14)
                             .focused($isFocused)
