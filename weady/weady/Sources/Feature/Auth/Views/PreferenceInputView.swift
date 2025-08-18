@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+func nameWithHonorific(_ nickname: String) -> Text {
+    // "님"이 다음 줄로 떨어지는 걸 방지 (WORD JOINER)
+    let safe = nickname + "\u{2060}님"
+    return Text(verbatim: safe)
+}
+
 struct PreferenceInputView: View {
     @StateObject private var vm: PreferenceInputViewModel
     @Environment(\.router) private var router
@@ -34,14 +40,17 @@ struct PreferenceInputView: View {
             
             // 2) 타이틀: 언더라인된 닉네임 + 나머지 텍스트
             VStack(alignment: .leading, spacing: 18) {
-                HStack(spacing: 0) {
-                    Text(vm.nickname)
-                        .fontName(.titleBold24)
-                        .foregroundStyle(Color.black100)
-                    Text("님의 취향을 알고싶어요!")
-                        .fontName(.titleBold24)
-                        .foregroundStyle(Color.black100)
-                }
+                (
+                    Text(verbatim: vm.nickname)
+                    + Text("\u{2060}님")
+                    + Text("의 취향을 알고싶어요!")
+                )
+                .fontName(.titleBold24)
+                .foregroundStyle(Color.black100)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .allowsTightening(true)
                 Text("내 정보를 입력하면\n웨디가 조금 더 맞춤형 추천을 드릴 수 있어요 :)")
                     .fontName(.metaMedium12)
                     .foregroundStyle(Color.gray900)
@@ -101,7 +110,7 @@ struct PreferenceInputView: View {
     let store = OnboardingStore()
     NavigationStack {
         PreferenceInputView(
-            nickname: "영택",
+            nickname: "닉네임",
             agreements: PreviewAgreements.requiredAllAgreed
         )
     }
