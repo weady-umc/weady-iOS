@@ -73,19 +73,19 @@ extension WeadychiveEndpoints: TargetType {
         }
     }
 
-    var headers: [String : String]? {
-        guard let accessToken = KeychainSwift().get("serverAccessToken") else {
-            return ["Content-Type": "application/json"]
-        }
-        return [
-            "Authorization": "Bearer \(accessToken)",
-            "Content-Type": "application/json"
-        ]
-    }
-//    var headers: [String: String]? {
+//    var headers: [String : String]? {
+//        guard let accessToken = KeychainSwift().get("serverAccessToken") else {
+//            return ["Content-Type": "application/json"]
+//        }
 //        return [
-//            "Content-Type": "application/json",
-//            "Authorization": "Bearer 테스트용 토큰 여기 넣기"
+//            "Authorization": "Bearer \(accessToken)",
+//            "Content-Type": "application/json"
 //        ]
 //    }
+    var headers: [String: String]? {
+        return [
+            "Content-Type": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTQ5NzE5OH0.fOrS4pisCopPOkFAL-KPK5x06hSRh4dZXe8sDpHU7KceI3BpAT7V7wmROgWMFQMv3LDfe2e6PLWlYhK0S9bk7Q"
+        ]
+    }
 }

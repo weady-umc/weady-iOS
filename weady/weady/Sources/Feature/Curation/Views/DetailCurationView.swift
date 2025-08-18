@@ -82,7 +82,23 @@ struct DetailCurationView: View {
 
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { toggleScrap() }) {
-                    Image(isScrapped ? "scrapfilled" : "scrap")
+                    ZStack {
+                        Image("scrap")
+                            .resizable()
+                            .frame(width: 44, height: 44)
+                            .scaledToFit()
+                            .opacity(isScrapped ? 0 : 1)
+                        Image("scrapfilled")
+                            .resizable()
+                            .frame(width: 44, height: 44)
+                          
+                            .scaledToFit()
+                            .opacity(isScrapped ? 1 : 0)
+                    }
+                   
+                    .padding(10)
+                  
+                    .contentShape(Rectangle())
                 }
             }
         }
@@ -107,7 +123,7 @@ final class DetailCurationViewModel: ObservableObject {
                 self.isLoading = false
                 switch result {
                 case .success(let dto):
-                    // 서버 응답 → 도메인 매핑 (imgOrder 기준 정렬 포함)
+                    // 서버 응답 → 도메인 매핑! (imgOrder 기준 정렬 포함)
                     self.detail = CurationMapper.toDetail(from: dto)
                 case .failure(let error):
                     self.errorMessage = String(describing: error)
@@ -130,22 +146,37 @@ private struct DetailCurationImageCarousel: View {
                     AsyncImage(url: url) { phase in
                         switch phase {
                         case .empty:
-                            Color.gray.opacity(0.15)
-                                .frame(width: UIScreen.main.bounds.width, height: 600)
-                                .clipped()
+                            VStack(spacing: 10) {
+                                ProgressView()
+                                    .controlSize(.large)
+                                Text("로딩중이에요. 잠시 기다려주세요:)")
+                                    .font(.system(size: 13, weight: .medium))
+                                    .multilineTextAlignment(.center)
+                                Text("회원님이 선택한 장소와 날씨를 조합해서 추천 장소를 만들고 있어요!")
+                                    .font(.system(size: 13, weight: .medium))
+                                    .multilineTextAlignment(.center)
+                                    
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 600)
+                            .background(Color.gray.opacity(0.12))
+                            .cornerRadius(12)
                         case .success(let image):
                             image
                                 .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: UIScreen.main.bounds.width, height: 600)
+                                .scaledToFit()
+                                .frame(maxWidth:.infinity)
+                                .frame(height : 600)
                                 .clipped()
                         case .failure:
                             Color.gray.opacity(0.25)
-                                .frame(width: UIScreen.main.bounds.width, height: 600)
+                                .frame(maxWidth:.infinity)
+                                .frame(height : 600)
                                 .clipped()
                         @unknown default:
                             Color.gray.opacity(0.2)
-                                .frame(width: UIScreen.main.bounds.width, height: 600)
+                                .frame(maxWidth:.infinity)
+                                .frame(height : 600)
                                 .clipped()
                         }
                     }
@@ -203,15 +234,10 @@ extension DetailCurationView {
         let id = Int(curationId)
         if isScrapped {
             scrapVm.removeCurationScrap(curationId: id)
-           
-            isScrapped = true
-           
-            self.isScrapped = false
+            withAnimation { isScrapped = false }
         } else {
             scrapVm.postCurationScrap(curationId: id)
-           
-            isScrapped = false
-            self.isScrapped = true
+            withAnimation { isScrapped = true }
         }
     }
     
@@ -407,10 +433,10 @@ private struct DetailCurationToolbarPreviewHarness: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            // Dummy root; we immediately push to show a back button in the toolbar
+         
             Color.clear
                 .onAppear {
-                    // Push once so DetailCurationView is not the root
+                 
                     if path.isEmpty { path.append(1) }
                 }
                 .navigationDestination(for: Int.self) { _ in

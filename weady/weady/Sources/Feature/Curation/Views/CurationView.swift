@@ -125,7 +125,7 @@ private struct TagChip: View {
         .background(
             ZStack {
                 Circle().fill(Color.white)
-                Circle().stroke(isSelected ? accent : Color.black.opacity(0.85), lineWidth: 5)
+                Circle().stroke(isSelected ? accent : Color.black.opacity(0.85), lineWidth: 1.5)
             }
         )
         .frame(width: 63, height: 63)
@@ -153,7 +153,7 @@ private struct CardRow: View {
         .frame(width: 350, height: 100)
         .clipped()
         .frame(maxWidth: .infinity, alignment: .center)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: 4))
        
     }
 }
