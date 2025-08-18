@@ -83,24 +83,28 @@ struct PreferenceInputView: View {
                         .foregroundStyle(Color.white100)
                         .cornerRadius(10)
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 22)
             }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 22)
             .onAppear {
                 // 디버그: View가 들고 있는 약관을 확인
                 print("DEBUG Preference →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
             }
         }
+        .toolbar(.hidden, for: .navigationBar)
+        .navigationBarBackButtonHidden(true)
     }
 }
 
-
 #Preview {
+    let router = NavigationRouter()
+    let store = OnboardingStore()
     NavigationStack {
         PreferenceInputView(
             nickname: "영택",
             agreements: PreviewAgreements.requiredAllAgreed
         )
     }
+    .environment(router)
+    .environmentObject(store)
 }
-

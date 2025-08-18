@@ -163,5 +163,11 @@ enum PreviewAgreements {
 
 
 #Preview {
-    NavigationStack { TermsAgreementView() }
+    let router = NavigationRouter()
+    let store = OnboardingStore()
+    NavigationStack {
+        TermsAgreementView()
+    }
+    .environment(router)
+    .environmentObject(store)
 }
