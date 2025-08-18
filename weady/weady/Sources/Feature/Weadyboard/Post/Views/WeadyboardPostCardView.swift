@@ -106,7 +106,7 @@ struct WeadyboardPostCardView: View {
                     if !places.isEmpty {
                         VStack(alignment: .leading, spacing: 8 * .deviceScale) {
                             ForEach(Array(places.enumerated()), id: \.offset) { _, place in
-                                HStack(spacing: 6 * .deviceScale) {
+                                HStack(spacing: 4 * .deviceScale) {
                                     Image("placeicon")
                                         .resizable()
                                         .frame(width: 8.75 * .deviceScale, height: 12.5 * .deviceScale)
@@ -118,12 +118,12 @@ struct WeadyboardPostCardView: View {
                             }
                         }
                         .frame(height: 85 * .deviceScale)
-                        .padding(12 * .deviceScale)
+                        .padding(.horizontal, 14.5 * .deviceScale)
                         .background(Color.white100)
                         .cornerRadius(10)
                     } else {
                         // UPDATED: 장소 없을 때 기본 아이콘 + 문구
-                        HStack(spacing: 6) {
+                        HStack(spacing: 4 * .deviceScale) {
                             Image("placeicon")
                                 .resizable()
                                 .frame(width: 8.75 * .deviceScale, height: 12.5 * .deviceScale)
@@ -134,7 +134,7 @@ struct WeadyboardPostCardView: View {
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         .frame(height: 85 * .deviceScale)
-                        .padding(12 * .deviceScale)
+                        .padding(.horizontal, 14.5 * .deviceScale)
                         .background(Color.white100)
                         .cornerRadius(10)
                     }
@@ -143,7 +143,7 @@ struct WeadyboardPostCardView: View {
                     if !styles.isEmpty {
                         VStack(alignment: .leading, spacing: 8 * .deviceScale) {
                             ForEach(styles, id: \.self) { style in
-                                HStack(spacing: 6 * .deviceScale) {
+                                HStack(spacing: 4 * .deviceScale) {
                                     Image("brandicon")
                                         .resizable()
                                         .frame(width: 12.81 * .deviceScale, height: 12.81 * .deviceScale)
@@ -156,12 +156,12 @@ struct WeadyboardPostCardView: View {
                             }
                         }
                         .frame(height: 85 * .deviceScale)
-                        .padding(12 * .deviceScale)
+                        .padding(.horizontal, 14.5 * .deviceScale)
                         .background(Color.white100)
                         .cornerRadius(10)
                     } else {
                         // UPDATED: 스타일 없을 때 기본 아이콘 + 문구
-                        HStack(spacing: 6 * .deviceScale) {
+                        HStack(spacing: 4 * .deviceScale) {
                             Image("brandicon")
                                 .resizable()
                                 .frame(width: 12.81 * .deviceScale, height: 12.81 * .deviceScale)
@@ -172,7 +172,7 @@ struct WeadyboardPostCardView: View {
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         .frame(height: 85 * .deviceScale)
-                        .padding(12 * .deviceScale)
+                        .padding(.horizontal, 14.5 * .deviceScale)
                         .background(Color.white100)
                         .cornerRadius(10)
                     }
