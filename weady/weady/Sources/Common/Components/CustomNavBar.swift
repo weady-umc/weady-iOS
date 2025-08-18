@@ -43,7 +43,7 @@ struct CustomNavBar: View {
                             Image(logoImageName)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(height: 25)
+                                .frame(width: 59.37 * .deviceScale, height: 25 * .deviceScale)
                                 // 44영역의 leading 정렬
                                 .frame(width: 44, height: 44, alignment: .leading)
                                 .contentShape(Rectangle())
@@ -60,7 +60,7 @@ struct CustomNavBar: View {
                         Button(action: { alarmAction?() }) {
                             Image("alarmicon")
                                 .resizable()
-                                .frame(width: 20, height: 22)
+                                .frame(width: 20 * .deviceScale, height: 22 * .deviceScale)
                                 .frame(width: 44, height: 44, alignment: .trailing)
                                 .contentShape(Rectangle())
                         }
