@@ -14,6 +14,13 @@ import SwiftUI
 
 enum AppRoute: Hashable {
     case login
-    case onboarding
+    case onboarding     
+    case terms
+    case nickname
+    case preference
+    case gender
+    case style
+    case start
     case basetab
 }
+
