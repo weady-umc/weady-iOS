@@ -73,6 +73,6 @@ struct GradientSliderView: View {
                     )
             }
         }
-        .frame(height: 30)
+        .frame(height: 30 * .deviceScale)
     }
 }
