@@ -115,7 +115,7 @@ struct WeatherHeaderText: Equatable {
     /// ex) "맑고 따듯한 봄날"
     let leading: String
     /// 고정 텍스트
-    let trailing: String = "이런 코스들을 추천해드려요"
+    let trailing: String = "이런 코스들을 추천해 드려요"
 }
 
 
