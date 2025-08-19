@@ -42,7 +42,7 @@ struct DetailCurationView: View {
                 Spacer()
             }
             .padding(.horizontal, 16)
-            .padding(.top, 16)
+            .padding(.top, 10)
 
             if vm.isLoading {
                 ProgressView().controlSize(.large)
@@ -56,11 +56,13 @@ struct DetailCurationView: View {
                 isScrapped: isScrapped,
                 onToggleScrap: { toggleScrap() }
             )
+            .padding(.top, 36)
+            
         }
         .task { await vm.load(curationId: curationId) }
         .onChange(of: scrapVm.scrappedCurationItems, initial: true) { _, newList in
             // WeadychiveViewModel.init()에서 fetchScrappedCurations()가 호출되어
-            // scrappedCurationItems가 채워진다고 가정. 목록에 현재 curationId가 있으면 채운 북마크로 동기화.
+            // scrappedCurationItems 채움. 목록에 현재 curationId가 있으면 꽉채워지 북마크로 동기화.
             let ids = Set(newList.map { Int64($0.id) })  // CurationItem(id:title:firstImgUrl:)
             withAnimation(.easeInOut(duration: 0.2)) {
                 isScrapped = ids.contains(curationId)
@@ -94,7 +96,7 @@ private struct DetailTopBar: View {
                     Image("backicon")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 10, height: 24)
+                        .frame(width: 15, height: 20)
                         .padding(10)
                         .contentShape(Rectangle())
                 }
@@ -106,12 +108,12 @@ private struct DetailTopBar: View {
                         Image("scrap")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 44, height: 44)
+                            .frame(width: 44, height: 60)
                             .opacity(isScrapped ? 0 : 1)
                         Image("scrapfilled")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 44, height: 44)
+                            .frame(width: 44, height: 60)
                             .opacity(isScrapped ? 1 : 0)
                     }
                     .padding(10)
@@ -218,7 +220,7 @@ private struct DetailCurationImageCarousel: View {
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .frame(width: 350, height: 556)
+            .frame(width: 370, height: 556)
             .cornerRadius(10)
             .ignoresSafeArea(.all, edges: .horizontal)
 
