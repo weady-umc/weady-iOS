@@ -16,11 +16,11 @@ struct ClothingRecommendationView: View {
     //@State private var showLocationPicker = false
     //private enum Route: Hashable { case weadyboard }
     @Environment(HomeRouter.self) private var router
+
     
     enum HelpStep: Hashable { case intro, details }
     @State private var showHelp = false
     @State private var helpStep: HelpStep = .intro
-    
     
     let same = Date()
     // 기본 init: 내부에서 VM 생성
@@ -40,22 +40,28 @@ struct ClothingRecommendationView: View {
     
     var body: some View {
         
-        ZStack{
+        ZStack(alignment: .top) {
             Image("backgroundImage")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
             
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .center, spacing: 0) {
                 // 주소
                 HStack {
                     Image("mapIcon")
                         .resizable()
                         .frame(width: 12, height: 17)
+                        .padding(.trailing, 3)
+                    
                     Text(vm.addressText)
                         .fontName(.bodySemibold16)
                         .foregroundStyle(.appwhite100)
-                    //지역 선택 화면으로 가는 버튼
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .layoutPriority(1)
+                        .padding(.trailing, 3)
+                    
                     Button {
                         router.push(.weatherlocation)
                     } label: {
@@ -65,27 +71,29 @@ struct ClothingRecommendationView: View {
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    
-                    Spacer()
                 }
-                .padding(.horizontal, 120)
-                .padding(.top, 41)
+                .frame(height: 24)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 144)
+
                 
                 // 추천 옷 이미지
 #if DEBUG
                 // Preview에서는 네트워크 호출 없이 바로 에셋 이미지를 보여주기
                 Image("teeShirt")
                     .resizable()
-                    .frame(width: 191, height: 173)
+                    .frame(width: 187, height: 187)
                     .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, -10)
 #else
                 AsyncImage(url: vm.clothingImageUrl) { image in
                     image.resizable().aspectRatio(contentMode: .fit)
                 } placeholder: {
                     ProgressView()
                 }
-                .frame(width: 191, height: 173)
+                .frame(width: 187, height: 187)
                 .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, -10)
 #endif
                 
                 // 추천 문구
@@ -101,7 +109,7 @@ struct ClothingRecommendationView: View {
                     Text("딱 좋은 날이에요.")
                         .fontName(.titleMedium24)
                 }
-                .padding(.top, 1)
+                .padding(.top, -10)
                 .frame(maxWidth: .infinity, alignment: .center)
                 .foregroundStyle(.appwhite100)
                 
@@ -114,16 +122,16 @@ struct ClothingRecommendationView: View {
                         .fontName(.captionRegular14)
                         .foregroundStyle(.appwhite100)
                 }
-                .padding(.horizontal, 165)
-                .padding(.top, 14)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 15)
                 
-                Spacer().frame(height: 21)
+                Spacer().frame(height: 23)
                 
                 // 기온 차트
                 TemperatureChartView(chartItems: vm.chartItems)
-                    .frame(width: 337, height: 138)
-                    .padding(.top, 21)
-                    .padding(.horizontal, 20)
+                    .frame(width: 310, height: 133)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.trailing, 20)
                 
                 // 체감온도 기준
                 Button {
@@ -141,7 +149,8 @@ struct ClothingRecommendationView: View {
                             .foregroundColor(.appwhite100)
                     }
                 }
-                .padding(.leading, 312)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.horizontal, 20)
                 .padding(.top, 13)
                 
                 WeadyboardCTA(
@@ -186,6 +195,11 @@ extension ClothingRecommendationViewModel {
 
 struct ClothingRecommendationView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationStack {ClothingRecommendationView(vm: .preview)}
+        let router = HomeRouter()
+        NavigationStack {
+            ClothingRecommendationView(vm: .preview)
+        }
+        .environment(router)
+        // .environment(\.router, router)
     }
 }

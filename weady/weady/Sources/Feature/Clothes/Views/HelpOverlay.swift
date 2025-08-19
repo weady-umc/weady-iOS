@@ -25,13 +25,13 @@ struct HelpOverlay: View {
                             onClose: onClose,
                             onNext:  { withAnimation(.easeInOut) { step = .details } }
                         )
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
+                        .transition(.move(edge: .leading).combined(with: .opacity))
                     } else {
                         HelpGuideCardView2(
                             onClose: onClose,
                             onBack:  { withAnimation(.easeInOut) { step = .intro } }
                         )
-                        .transition(.move(edge: .leading).combined(with: .opacity))
+                        .transition(.move(edge: .trailing).combined(with: .opacity))
                     }
                 }
                 .zIndex(3)
