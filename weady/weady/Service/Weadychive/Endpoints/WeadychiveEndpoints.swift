@@ -73,19 +73,19 @@ extension WeadychiveEndpoints: TargetType {
         }
     }
 
-//    var headers: [String : String]? {
-//        guard let accessToken = KeychainSwift().get("serverAccessToken") else {
-//            return ["Content-Type": "application/json"]
-//        }
-//        return [
-//            "Authorization": "Bearer \(accessToken)",
-//            "Content-Type": "application/json"
-//        ]
-//    }
-    var headers: [String: String]? {
+    var headers: [String : String]? {
+        guard let accessToken = KeychainSwift().get("serverAccessToken") else {
+            return ["Content-Type": "application/json"]
+        }
         return [
-            "Content-Type": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTU3MTEwMH0.H9ao9ATMEikWNvHAvzVfOAUqWX-uzfsJxHaRnTQi3FP-4Y4_86Qxk0SdHuJyRimfXlQ8uXk4N60dsgF5nVyqdA"
+            "Authorization": "Bearer \(accessToken)",
+            "Content-Type": "application/json"
         ]
     }
+//    var headers: [String: String]? {
+//        return [
+//            "Content-Type": "application/json",
+//            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTU3MTEwMH0.H9ao9ATMEikWNvHAvzVfOAUqWX-uzfsJxHaRnTQi3FP-4Y4_86Qxk0SdHuJyRimfXlQ8uXk4N60dsgF5nVyqdA"
+//        ]
+//    }
 }
