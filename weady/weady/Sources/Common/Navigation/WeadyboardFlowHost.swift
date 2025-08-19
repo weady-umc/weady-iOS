@@ -38,7 +38,8 @@ struct WeadyboardFlowHost: View {
     @State private var router = WeadyboardRouter()
     @StateObject private var reportVM = WeadyboardReportViewModel()
     @Environment(WeadyboardRouteBridge.self) private var weadyboardBridge
-    
+    @Binding var isTabBarHidden: Bool
+
     // MARK: Body
     var body: some View {
         NavigationStack(path: $router.path) {
@@ -48,7 +49,7 @@ struct WeadyboardFlowHost: View {
                     case .weadyboard:
                         WeadyboardView()
                     case .weadyboardPost(let boardId):
-                        WeadyboardPostView(boardId: boardId, isTabBarHidden: .constant(true))
+                        WeadyboardPostView(boardId: boardId, isTabBarHidden: $isTabBarHidden)
                     case .weadyboardPostReportDetail(let reason, let boardId):
                         WeadyboardPostReportDetailView(
                             reason: reason,

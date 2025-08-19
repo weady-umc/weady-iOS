@@ -6,12 +6,15 @@
 
 import SwiftUI
 import Moya
+import KeychainSwift
 
 struct HomeView: View {
     
     // MARK: - Router / Location 환경 주입
     @Environment(HomeRouter.self) var router                         // 화면 전환용 커스텀 라우터
     @StateObject private var locationService = LocationService()     // 현재 위치 획득용 서비스 (CLLocationManager 래핑 가정)
+    
+    @AppStorage("nickname") private var nickname: String = ""
     
     // MARK: - 날씨 카드 상태 (Home 상단 카드)
     @State private var addData: WeatherAddData?                      // 상단 날씨 카드에 뿌릴 변환된 도메인 데이터
@@ -33,7 +36,7 @@ struct HomeView: View {
         VStack {
             
             // MARK: - 상단 여백 (디자인 스펙)
-            Spacer().frame(height: 105)
+            Spacer().frame(height: 20)
             
             // MARK: - 인사/타이틀
             TopView
@@ -49,7 +52,7 @@ struct HomeView: View {
                 
                 // MARK: - 상단 날씨 카드 3단계 상태 렌더링
                 if let data = addData {
-                    // ✅ 정상 데이터 있을 때: 실 카드
+                    //  정상 데이터 있을 때: 실 카드
                     WeatherHeaderCard(data: data)
                 } else if isLoading {
                     // ⏳ 로딩 중일 때: 스켈레톤/프로그레스
@@ -89,12 +92,53 @@ struct HomeView: View {
             
             // MARK: - [네비 버튼] 큐레이션 카드 (누르면 .curation 로 이동)
             // [네비] 큐레이션 가로 섹션 (어디 눌러도 .curation 이동)
-            CurationStripView(vm: curationVM)
-            {
-                router.push(.curation)
+            // [네비 버튼] 큐레이션 섹션 (실패/빈 ⇒ PlaceView 대체)
+            Group {
+                switch curationVM.listState {
+                case .idle, .loading:
+                    // 로딩 중엔 스켈레톤처럼 보이게 (원하면 ProgressView로)
+                    PlaceView
+                        .redacted(reason: .placeholder)
+                        .contentShape(Rectangle())
+                        .onTapGesture { router.push(.curation) }
+
+                case .success:
+                    if curationVM.cards.isEmpty {
+                        // 성공인데 카드가 0개면 기본 PlaceView 노출
+                        PlaceView
+                            .contentShape(Rectangle())
+                            .onTapGesture { router.push(.curation) }
+                    } else {
+                        // 정상 데이터
+                        CurationStripView(vm: curationVM) {
+                            router.push(.curation)
+                        }
+                    }
+
+                case .failure(_):
+                    // 실패 ⇒ 기본 PlaceView 노출
+                    PlaceView
+                        .contentShape(Rectangle())
+                        .onTapGesture { router.push(.curation) }
+                }
             }
+
         }
         .padding(.bottom, 70)
+        
+        .toolbar(.hidden, for: .navigationBar)        // 시스템 네비바 숨김
+                .safeAreaInset(edge: .top) {
+                    CustomNavBar(
+                        viewTitle: "",
+                        showLogoButton: true,                  // ← 왼쪽 로고
+                        showAlarmButton: true,                 // ← 오른쪽 알림
+                        showBottomDivider: true,
+                        alarmAction: { router.push(.alarm) }   // 알림 화면으로 이동 등
+                    )
+                    // 상단(노치)까지 흰색
+                    .background(Color.white100.ignoresSafeArea(edges: .top))
+                }
+                .zIndex(999)
         
         // MARK: - 라이프사이클: 화면 진입 시 위치 요청
         .onAppear {
@@ -108,11 +152,14 @@ struct HomeView: View {
 
         // onAppear: 토큰 세팅 + 플래그 초기화 + 위치 요청
         .onAppear {
-            UserDefaults.standard.set("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNCIsImVtYWlsIjoieWFuZ3lzMDYzMEBuYXZlci5jb20iLCJwcm92aWRlciI6IktBS0FPIiwiZXhwIjoxNzU1MjA5OTY2fQ.RoRcKwT1e1Iq7btHyKcq67LwipFwq8vCJbrpQ57jW0mxF45JUDwtmAT8j3XT9EIN-7Ep6OqZqORH1W0iHgwq4A", forKey: "accessToken")
+            if let t = KeychainSwift().get("serverAccessToken") {
+                    UserDefaults.standard.set(t, forKey: "accessToken")
+                }
             didSendNowLocation = false            // 매 진입마다 다시 보내도록 초기화
             didPatchNowLocation = false
             locationService.requestCurrentLocation()
         }
+        
 
         // 3) 좌표 수신부: 그대로 (guard !didSendNowLocation 유지)
         .onReceive(locationService.$coordinate.compactMap { $0 }) { coord in
@@ -153,15 +200,16 @@ struct HomeView: View {
     
     // MARK: - 상단 타이틀 뷰
     private var TopView: some View {
-        Text("키코님, \n오늘은 이런 하루 어때요?")
+        let name = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+        return Text( (name.isEmpty ? "안녕하세요 👋" : "\(name)님,") + "\n오늘은 이런 하루 어때요?")
             .foregroundStyle(Color.black100)
             .fontName(.titleSemibold24)
-            .lineLimit(2)                 // 줄바꿈 방지
+            .lineLimit(2)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.leading, 24)
     }
-    
+
     
     // MARK: - 옷차림 카드 뷰 (상태별 분기)
     private var ClothesView: some View {
@@ -194,7 +242,7 @@ struct HomeView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                         .padding(.leading, 25)
                         
-                    Text("오늘은 \(s.recommendation)가 \n딱 좋은 날이에요")
+                    Text(s.recommendation)
                         .fontName(.bodyLight16)
                         .foregroundStyle(Color.black100)
                         .multilineTextAlignment(.leading)
@@ -237,10 +285,11 @@ struct HomeView: View {
                     Text("오늘의 옷차림을 불러오는 중…")
                         .fontName(.bodyLight16)
                         .foregroundStyle(Color.black100)
-                        .padding(.leading, 25)
+                        .padding(.leading, 15)
                     Spacer()
                     Image("rightArrow")
                         .padding(.trailing, 20)
+                        .padding(.leading, 10)
                 }
             }
         }
@@ -263,6 +312,7 @@ struct HomeView: View {
                     .padding(.trailing, 20)
             }
             .padding(.leading, 25)
+            .padding(.bottom, 10)
             
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 16) {
@@ -447,8 +497,11 @@ struct CurationStripView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 10, height: 16)
+                    .padding(.leading, 25)
+                    .padding(.bottom, 10)
             }
             .padding(.horizontal, 16)
+            .padding(.bottom, 10)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 12) {
@@ -480,9 +533,10 @@ private struct CardTile: View {
                 case .success(let image): image
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 270, height: 128, alignment: .leading)
+                        .scaleEffect(0.97)
+                        .frame(width: 320, height: 128, alignment: .leading)
                         .clipped()
-                default: Color.white200
+                default: Image("homeplacedata1")
                 }
             }
             .frame(width: 270, height: 128)

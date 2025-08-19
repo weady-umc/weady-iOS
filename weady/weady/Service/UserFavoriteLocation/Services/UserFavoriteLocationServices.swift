@@ -11,9 +11,21 @@ import Moya
 // MARK: - 사용자 즐겨찾기 위치 서비스
 // MoyaProvider로 즐겨찾기 관련 API 호출/디코딩을 담당
 final class UserFavoriteLocationServices {
-    // MARK: Dependencies
-    private let provider = MoyaProvider<UserFavoriteLocationEndpoints>() // 엔드포인트 바운드된 프로바이더
-    
+    typealias Endpoint = UserFavoriteLocationEndpoints
+        
+        // MARK: - Provider 설정
+        let provider: MoyaProvider<UserFavoriteLocationEndpoints>
+        
+        public init(provider: MoyaProvider<UserFavoriteLocationEndpoints>? = nil) {
+            // 플러그인 추가
+            let plugins: [PluginType] = [
+                NetworkLoggerPlugin(configuration: .init(logOptions: .verbose)) // 로그 플러그인
+            ]
+            // provider 초기화
+            self.provider = provider ?? MoyaProvider<UserFavoriteLocationEndpoints>(plugins: plugins)
+            // 만약 토큰 자동 주입/401 자동 리프레시를 쓰고 싶으면:
+            // self.provider = provider ?? MoyaProvider<UserFavoriteLocationEndpoints>(session: Providers.session, plugins: plugins)
+        }
     // MARK: - 즐겨찾기 목록 조회
     // 성공(2xx)일 때만 디코딩 시도. 실패 시 상태/본문 로그 출력.
     func fetchFavoriteLocations(completion: @escaping (Result<[UserFavoriteLocation], Error>) -> Void) {
@@ -76,11 +88,19 @@ final class UserFavoriteLocationServices {
 
     // MARK: - 대표 즐겨찾기 설정
     // 요청 성공/실패만 콜백으로 전달(본문 파싱 없이 처리)
-    func updateDefaultFavoriteLocation(locationID: Int, completion: @escaping (Result<Void, Error>) -> Void) {
-        provider.request(.patchDefaultFavoriteLocation(locationID: locationID)) {
+    func updateDefaultFavoriteLocation(favoriteId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+        provider.request(.patchDefaultFavoriteLocation(favoriteId: favoriteId)) {
              result in
             switch result {
             case .success(let response):
+                guard (200...299).contains(response.statusCode) else {
+                        let body = String(data: response.data, encoding: .utf8) ?? "nil"
+                        return completion(.failure(NSError(
+                            domain: "API",
+                            code: response.statusCode,
+                            userInfo: [NSLocalizedDescriptionKey: body]
+                        )))
+                    }
                 completion(.success(()))
             case .failure(let error):
                 completion(.failure(error))
@@ -91,7 +111,7 @@ final class UserFavoriteLocationServices {
     // MARK: - 즐겨찾기 삭제
     // 성공 시 Void, 실패 시 에러. 낙관적 업데이트는 ViewModel/뷰 레벨에서 처리.
     func deleteFavoriteLocation(favoriteId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
-        provider.request(.deleteFavoriteLocation(favoriteID: favoriteId)) { result in
+        provider.request(.deleteFavoriteLocation(favoriteId: favoriteId)) { result in
             switch result {
             case .success:
                 completion(.success(()))

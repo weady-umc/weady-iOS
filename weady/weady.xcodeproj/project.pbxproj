@@ -24,6 +24,7 @@
 /* Begin PBXFileReference section */
 		808ED0FB2E1D9EFF00442DA8 /* weady.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = weady.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDC1AB1F2E4CBC6200F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CDC1B6A42E4E468200F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDE727542E4C94AC005F67E7 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDF98D1B2E29549500446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -89,6 +90,11 @@
 			sourceTree = "<group>";
 		};
 		CDC1AB212E4CBC6200F8629F /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CDC1B6A62E4E468200F8629F /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -185,6 +191,10 @@
 					ProjectRef = CDF98D1B2E29549500446374 /* weady.xcodeproj */;
 				},
 				{
+					ProductGroup = CDC1B6A62E4E468200F8629F /* Products */;
+					ProjectRef = CDC1B6A42E4E468200F8629F /* weady.xcodeproj */;
+				},
+				{
 					ProductGroup = CDC1AB212E4CBC6200F8629F /* Products */;
 					ProjectRef = CDC1AB1F2E4CBC6200F8629F /* weady.xcodeproj */;
 				},
@@ -220,7 +230,7 @@
 		808ED1042E1D9F0100442DA8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 808ED0FD2E1D9EFF00442DA8 /* weady */;
-			baseConfigurationReferenceRelativePath = Resources/Config/Config.xcconfig;
+			baseConfigurationReferenceRelativePath = Sources/Common/Utilities/Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -286,7 +296,7 @@
 		808ED1052E1D9F0100442DA8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 808ED0FD2E1D9EFF00442DA8 /* weady */;
-			baseConfigurationReferenceRelativePath = Resources/Config/Config.xcconfig;
+			baseConfigurationReferenceRelativePath = Sources/Common/Utilities/Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -360,6 +370,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -397,6 +408,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

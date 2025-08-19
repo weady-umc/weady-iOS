@@ -6,6 +6,7 @@ struct MyPageDateFilter: View {
     @Binding var showPicker: Bool
     
     var body: some View {
+        // MARK: - 선택된 월, 년도
         Button {
             showPicker.toggle()
         } label: {
@@ -33,7 +34,7 @@ struct PickerOverlayView: View {
             Spacer().frame(height: 280)
             
             HStack(spacing: 0) {
-                // 월 Picker
+                //MARK: - 월 Picker
                 ZStack {
                     Rectangle()
                         .fill(Color.gray500)
@@ -51,7 +52,7 @@ struct PickerOverlayView: View {
                     .pickerStyle(WheelPickerStyle())
                 }
                 
-                // 년 Picker
+                //MARK: - 년 Picker
                 ZStack {
                     Rectangle()
                         .fill(Color.gray500)

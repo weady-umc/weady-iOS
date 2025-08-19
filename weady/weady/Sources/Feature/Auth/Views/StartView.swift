@@ -19,9 +19,13 @@ extension StartView {
 }
 
 struct StartView: View {
+    @Environment(\.router) private var router
+    @EnvironmentObject private var onboarding: OnboardingStore
     @StateObject private var vm: StartViewModel
     @State private var showHome = false
     
+    @State private var selectedTab: TabType = .home
+    @State private var isTabBarHidden: Bool = false
 
     // 전체 데이터 전달용 (POST에 쓰일 값)
     init(
@@ -74,13 +78,13 @@ struct StartView: View {
             .padding(.top, 39)
             
             Spacer().frame(height: 78)
-
+            
             Spacer()
             
             // 4) 다음 버튼
             
             Button{
-                vm.startTapped() // 여기서만 POST
+                vm.startTapped()
             } label: {
                 Text("웨디 시작하기")
                     .fontName(.bodyMedium16)
@@ -98,14 +102,45 @@ struct StartView: View {
         .alert(item: $vm.alert) { a in
             Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
         }
-        // 성공 시 Home 
-        .fullScreenCover(isPresented: $vm.navigateHome) {
-            BaseTabContainerView()
+        .onChange(of: vm.navigateHome) { _, go in
+            guard go else { return }
+            router.reset(to: .basetab)
+            onboarding.reset()
         }
     }
 }
 
-#Preview {
-    StartView(nickname: "테스트")
-        .environment(NavigationRouter())
+// MARK: - BaseTabHost
+private struct BaseTabHost: View {
+    @Binding var selectedTab: TabType
+    @Binding var isTabBarHidden: Bool
+    
+    @State private var router = NavigationRouter()
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // 콘텐츠 영역
+            BaseTabScreen(selectedTab: $selectedTab,  isTabBarHidden: $isTabBarHidden)
+                .environment(router)
+            
+            // 탭바
+            if !isTabBarHidden {
+                BaseTabView(
+                    selectedTab: $selectedTab,
+                    isTabBarHidden: $isTabBarHidden
+                )
+            }
+        }
+    }
+}
+
+#Preview("StartView – Onboarding") {
+    let router = NavigationRouter()
+    StartView.onboarding(
+        nickname: "영택",
+        gender: nil,
+        styleIds: nil,
+        agreements: nil
+    )
+    .environment(router)                   
 }

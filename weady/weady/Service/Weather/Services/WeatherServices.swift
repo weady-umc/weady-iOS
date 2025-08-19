@@ -46,11 +46,21 @@ struct MidTermContainer: Decodable {
 
 // MARK: - WeatherServices
 // Moya 기반 날씨 API 클라이언트
-final class WeatherServices {
-    static let shared = WeatherServices()                       // 싱글톤 인스턴스
-    private let provider = MoyaProvider<WeatherEndpoints>()     // 엔드포인트 바인딩된 MoyaProvider
+final class WeatherServices: NetworkManager {
+    typealias Endpoint = WeatherEndpoints
     
-    init() {}
+    // MARK: - Provider 설정
+    let provider: MoyaProvider<WeatherEndpoints>
+    static let shared = WeatherServices()
+    
+    public init(provider: MoyaProvider<WeatherEndpoints>? = nil) {
+        // 플러그인 추가
+        let plugins: [PluginType] = [
+            NetworkLoggerPlugin(configuration: .init(logOptions: .verbose)) // 로그 플러그인
+        ]
+        // provider 초기화
+        self.provider = provider ?? MoyaProvider<WeatherEndpoints>(plugins: plugins)
+    }
 
     // MARK: - 단기예보 조회
     // 1) 정상 상태코드 확인 → 2) 다양한 응답 포맷을 디코딩 (래퍼/바로본문)

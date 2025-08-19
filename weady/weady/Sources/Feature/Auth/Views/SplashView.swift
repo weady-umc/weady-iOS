@@ -16,11 +16,11 @@ struct SplashView: View {
         ZStack {
             Color(hex: "000000").ignoresSafeArea()
             
-            VStack(spacing: 8) {
+            VStack(spacing: 8 * .deviceScale) {
                 Spacer()
-                Image("weady_logo")
+                Image("weady_newlogo")
                     .resizable()
-                    .frame(width: 185.3, height: 58.25)
+                    .frame(width: 150 * .deviceScale, height: 58 * .deviceScale)
 
                 Text("날씨에 딱 맞는 당신의 하루를 위하여")
                     .fontName(.metaRegular12)

@@ -8,14 +8,16 @@
 import SwiftUI
 
 struct WeadyboardPostMoreActionSheet: View {
-    @Binding var showReportSheet: Bool
     let boardId: Int
     @ObservedObject var reportViewModel: WeadyboardReportViewModel
     @EnvironmentObject private var toast: ToastCenter
 
     @State private var showUnhideBanner: Bool = false
     @State private var unhideDismissWorkItem: DispatchWorkItem?
-    
+
+    var onClose: () -> Void
+    var onReportTap: () -> Void
+
     var body: some View {
         VStack(spacing: 0) {
             
@@ -48,13 +50,14 @@ struct WeadyboardPostMoreActionSheet: View {
                     title: "게시물 신고하기",
                     titleColor: Color(UIColor.systemRed), 
                     action: {
-                        showReportSheet = true
+                        reportViewModel.selectedReasonIndex = nil
+                        onReportTap()
                     }
                 )
             }
-            .padding(.top, 24)
+            .padding(.top, 24 * .deviceScale)
         }
-        .frame(width: 375, height: 255)
+        .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.white100)
@@ -84,7 +87,7 @@ struct WeadyboardPostMoreActionSheet: View {
                     }
                 )
                 .transition(.move(edge: .bottom).combined(with: .opacity))
-                .padding(.bottom, 12)
+                .padding(.bottom, 10 * .deviceScale)
             }
         }
     }
@@ -126,10 +129,10 @@ struct MoreActionButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 12) {
+            HStack(spacing: 12 * .deviceScale) {
                 Image(iconName)
                     .resizable()
-                    .frame(width: 20, height: 20)
+                    .frame(width: 20 * .deviceScale, height: 20 * .deviceScale)
 
                 Text(title)
                     .fontName(.captionRegular14)
@@ -137,8 +140,8 @@ struct MoreActionButton: View {
 
                 Spacer()
             }
-            .padding(.horizontal, 24)
-            .frame(height: 56)
+            .padding(.horizontal, 24 * .deviceScale)
+            .frame(height: 56 * .deviceScale)
         }
     }
 }
@@ -149,7 +152,7 @@ private struct UndoHideBanner: View {
     let onTimeout: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 12 * .deviceScale) {
             Text("게시물이 숨겨졌습니다.")
                 .fontName(.captionRegular14)
                 .foregroundStyle(.appwhite100)
@@ -160,8 +163,8 @@ private struct UndoHideBanner: View {
                 Text("숨기기 취소")
                     .fontName(.captionSemibold14)
                     .foregroundStyle(.appwhite100)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8 * .deviceScale)
+                    .padding(.horizontal, 12 * .deviceScale)
                     .background(
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color.white.opacity(0.15))
@@ -169,12 +172,12 @@ private struct UndoHideBanner: View {
             }
             .buttonStyle(.plain)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 16 * .deviceScale)
+        .padding(.vertical, 12 * .deviceScale)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color.black.opacity(0.9))
         )
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 16 * .deviceScale)
     }
 }

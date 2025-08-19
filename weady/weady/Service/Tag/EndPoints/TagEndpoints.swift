@@ -17,18 +17,24 @@ enum TagEndpoints {
 }
 
 extension TagEndpoints: TargetType {
-    var baseURL: URL { URL(string: "https://weadyapi.pro")! }
+    public var baseURL: URL {
+        guard let url = URL(string: Domain.tagsURL)
+        else {
+            fatalError("잘못된 URL")
+        }
+        return url
+    }
 
     var path: String {
         switch self {
         case .getWeatherTags:
-            return "/api/v1/tags/weather-tags"
+            return "/weather-tags"
         case .getTemperatureTags:
-            return "/api/v1/tags/temperature-tags"
+            return "/temperature-tags"
         case .getSeasonTags:
-            return "/api/v1/tags/season-tags"
+            return "/season-tags"
         case .getClothesStyleCategories:
-            return "/api/v1/tags/clothes-style-categories"
+            return "/clothes-style-categories"
         }
     }
     

@@ -22,20 +22,26 @@ enum BoardEndpoints {
 }
 
 extension BoardEndpoints: TargetType {
-    var baseURL: URL { return URL(string: "https://weadyapi.pro/api/v1")! }
-
+    public var baseURL: URL {
+        guard let url = URL(string: Domain.boardURL)
+        else {
+            fatalError("잘못된 URL")
+        }
+        return url
+    }
+    
     var path: String {
         switch self {
-        case .getBoards: return "/board"
-        case .getBoardDetail(let boardId): return "/board/\(boardId)"
-        case .createBoard: return "/board/create"
-        case .updateBoard(let boardId, _): return "/board/\(boardId)"
-        case .deleteBoard(let boardId): return "/board/\(boardId)"
-        case .reportBoard(let boardId, _): return "/board/\(boardId)/report"
-        case .hideBoard(let boardId): return "/board/\(boardId)/hide"
-        case .unhideBoard(let boardId): return "/board/\(boardId)/hide"
-        case .likeBoard(let boardId): return "/board/\(boardId)/good"
-        case .unlikeBoard(let boardId): return "/board/\(boardId)/good"
+        case .getBoards: return ""
+        case .getBoardDetail(let boardId): return "/\(boardId)"
+        case .createBoard: return "/create"
+        case .updateBoard(let boardId, _): return "/\(boardId)"
+        case .deleteBoard(let boardId): return "/\(boardId)"
+        case .reportBoard(let boardId, _): return "/\(boardId)/report"
+        case .hideBoard(let boardId): return "/\(boardId)/hide"
+        case .unhideBoard(let boardId): return "/\(boardId)/hide"
+        case .likeBoard(let boardId): return "/\(boardId)/good"
+        case .unlikeBoard(let boardId): return "/\(boardId)/good"
         }
     }
 

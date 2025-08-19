@@ -21,17 +21,17 @@ struct BaseTabView: View {
                 .fill(Color.gray700)
                 .frame(height: 1)
 
-            HStack(spacing: 43) {
+            HStack(spacing: 43 * .deviceScale) {
                 ForEach(TabType.allCases) { tab in
                     Button(action: {
                         selectedTab = tab
                     }) {
-                        VStack(spacing: 4) {
+                        VStack(spacing: 4 * .deviceScale) {
                             Image(tab == selectedTab ? tab.selectedImageName : tab.imageName)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(height: 24)
-                                .frame(width: 44, height: 44)
+                                .frame(height: 24 * .deviceScale)
+                                .frame(width: 44 * .deviceScale, height: 44 * .deviceScale)
                                 .frame(maxHeight: .infinity, alignment: .top)
                         }
                     }
@@ -39,8 +39,8 @@ struct BaseTabView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 50)
-            .padding(.horizontal, 20)
+            .frame(height: 50 * .deviceScale)
+            .padding(.horizontal, 20 * .deviceScale) 
             .background(Color.white100)
         }
     }

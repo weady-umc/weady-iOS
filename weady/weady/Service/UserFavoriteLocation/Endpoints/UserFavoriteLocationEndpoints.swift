@@ -14,16 +14,16 @@ import KeychainSwift
 enum UserFavoriteLocationEndpoints {
     case getUserFavoriteLocation                                  // 즐겨찾기 목록 조회
     case postUserFavoriteLocation(bCode: String)                   // 즐겨찾기 추가
-    case patchDefaultFavoriteLocation(locationID: Int)             // 대표 즐겨찾기 설정
-    case deleteFavoriteLocation(favoriteID: Int)                   // 즐겨찾기 삭제
+    case patchDefaultFavoriteLocation(favoriteId: Int)             // 대표 즐겨찾기 설정
+    case deleteFavoriteLocation(favoriteId: Int)                   // 즐겨찾기 삭제
 }
 
 extension UserFavoriteLocationEndpoints: TargetType {
     
     // MARK: Base URL
-    // 공통 베이스 경로: https://weadyapi.pro/api/v1
     public var baseURL: URL {
-        guard let url = URL(string: "https://weadyapi.pro/api/v1") else {
+        guard let url = URL(string: Domain.userfavoriteURL)
+        else {
             fatalError("잘못된 URL")
         }
         return url
@@ -34,11 +34,11 @@ extension UserFavoriteLocationEndpoints: TargetType {
     var path: String {
         switch self{
         case .getUserFavoriteLocation, .postUserFavoriteLocation:
-            return "/users/favorites"
+            return ""
         case .patchDefaultFavoriteLocation:
-            return "/users/favorites/default"
+            return "/default"
         case .deleteFavoriteLocation(let favoriteId):
-            return "/users/favorites/\(favoriteId)"
+            return "/\(favoriteId)"
         }
     }
     
@@ -70,9 +70,9 @@ extension UserFavoriteLocationEndpoints: TargetType {
                 parameters: ["bCode": bCode],
                 encoding: JSONEncoding.default
             )
-        case .patchDefaultFavoriteLocation(let locationID):
+        case .patchDefaultFavoriteLocation(let favoriteId):
             // 대표 즐겨찾기 설정: JSONEncodable 바디
-            let body = PatchDefaultFavoriteLocationRequest(userFavoriteLocationId: locationID)
+            let body = PatchDefaultFavoriteLocationRequest(userFavoriteLocationId: favoriteId)
             return .requestJSONEncodable(body)
         case .deleteFavoriteLocation:
             // 삭제는 바디 없이 경로 파라미터로 처리

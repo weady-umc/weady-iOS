@@ -15,6 +15,9 @@ import Observation
 // - 서버 API(조회/추가/삭제/대표설정) 래핑
 class WeatherLocationViewModel: ObservableObject {
     
+    private let userFavoriteLocationServices = UserFavoriteLocationServices()
+    @Published var isSettingDefault = false
+    
     // MARK: - 샘플 카드(현재 위치 카드에 쓰는 예시 데이터)
     static let example = WeatherData(
         favoriteId: nil,
@@ -149,16 +152,22 @@ extension WeatherLocationViewModel {
     }
 
     // MARK: - 대표 즐겨찾기 설정
-    // - locationID는 서버 스펙에 맞는 식별자 사용
-    func setDefaultFavorite(locationID: Int, completion: @escaping (Bool) -> Void) {
-        UserFavoriteLocationServices().updateDefaultFavoriteLocation(locationID: locationID) { result in
+    // WeatherLocationViewModel.swift
+    func setDefaultFavoriteOnServer(favoriteId: Int, completion: @escaping (Bool) -> Void) {
+        
+        guard !isSettingDefault else { completion(false); return }
+                isSettingDefault = true
+        
+        userFavoriteLocationServices.updateDefaultFavoriteLocation(favoriteId: favoriteId) { result in
             switch result {
             case .success:
+                // 로컬 state를 쓰면 여기서 isDefault 토글 업데이트 해도 됨
                 completion(true)
             case .failure(let err):
-                print("⭐️ 대표 설정 실패:", err)
+                print("❌ 기본 위치 설정 실패:", err.localizedDescription)
                 completion(false)
             }
         }
     }
+
 }

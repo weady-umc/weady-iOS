@@ -1,77 +1,115 @@
 import SwiftUI
+import PhotosUI
 
 struct ProfileEditView: View {
+    @State var viewModel: ProfileEditViewModel
     @Environment(\.dismiss) private var dismiss
-    @State private var nickname: String = "현재 닉네임"
-    @State private var profileImage: Image? = Image(systemName: "person.circle.fill")
-    @State private var showImagePicker = false
+
+    @State private var showImagePickerMenu = false
+    @State private var showPhotoPicker = false
+    @State private var selectedItem: PhotosPickerItem?
 
     var body: some View {
-        VStack {
-            HStack {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
-                        .font(.title3)
-                }
-                Spacer()
-                Text("프로필 편집")
-                    .font(.headline)
-                Spacer()
-                Button("완료") {
-                }
-                .foregroundColor(.black)
-            }
-            .padding()
-            
-            Spacer().frame(height: 20)
-            
-            //MARK: - 프로필 이미지
-            ZStack(alignment: .bottomTrailing) {
-                if let image = profileImage {
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 100, height: 100)
-                        .clipShape(Circle())
-                        .foregroundColor(.gray.opacity(0.5))
-                }
+        NavigationStack {
+            VStack(spacing: 20) {
                 
-                Button(action: { showImagePicker = true }) {
-                    Image(systemName: "camera.fill")
-                        .foregroundColor(.white)
-                        .padding(6)
-                        .background(Color.gray)
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                // MARK: - 프로필 이미지
+                ZStack {
+                    if let selectedImage = viewModel.selectedImage {
+                        Image(uiImage: selectedImage)
+                            .resizable()
+                            .scaledToFill()
+                    } else if let profileImageUrl = viewModel.profileImageUrl,
+                              profileImageUrl.starts(with: "http"),
+                              let url = URL(string: profileImageUrl) {
+                        AsyncImage(url: url) { image in
+                            image.resizable().scaledToFill()
+                        } placeholder: {
+                            Image("basicProfileImg").resizable().scaledToFill()
+                        }
+                    } else {
+                        Image("basicProfileImg")
+                            .resizable().scaledToFill()
+                    }
                 }
-                .offset(x: 5, y: 5)
+                .frame(width: 80, height: 80)
+                .clipShape(Circle())
+                .onTapGesture { showImagePickerMenu = true }
+
+                // MARK: - 닉네임 입력
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("닉네임")
+                        .fontName(.captionSemibold14)
+                    TextField("닉네임", text: $viewModel.nickname)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                }
+                .padding(.horizontal)
+
+                Spacer()
             }
-            .frame(width: 100, height: 100)
-            .padding(.bottom, 32)
-            
-            // 닉네임 입력
-            VStack(alignment: .leading, spacing: 8) {
-                Text("닉네임")
-                    .font(.subheadline)
-                    .foregroundColor(.black)
+            .padding(.top, 20)
+            .navigationTitle("프로필 편집")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                // MARK: - 뒤로가기 버튼
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image("backicon")
+                            .resizable()
+                            .frame(width: 9, height: 16)
+                    }
+                }
+
+                // MARK: - 완료 버튼
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("완료") {
+                        viewModel.saveProfile { success in
+                            if success { dismiss() }
+                        }
+                    }
+                    .fontName(.captionMedium14)
+                    .foregroundStyle(Color.black100)
+                }
+            }
+
+            // MARK: - 이미지 선택 액션시트
+            .actionSheet(isPresented: $showImagePickerMenu) {
+                ActionSheet(title: Text("프로필 사진 설정"),
+                            buttons: [
+                                .default(Text("앨범에서 사진 선택")) { showPhotoPicker = true },
+                                .default(Text("기본 이미지 적용")) { viewModel.setDefaultProfileImage() },
+                                .cancel(Text("취소"))
+                            ])
+            }
+            .photosPicker(isPresented: $showPhotoPicker, selection: $selectedItem, matching: .images)
+            .onChange(of: selectedItem) { oldItem, newItem in
+                guard let newItem else { return }
                 
-                TextField("현재 닉네임", text: $nickname)
-                    .padding()
-                    .background(RoundedRectangle(cornerRadius: 6)
-                        .stroke(Color.gray.opacity(0.4)))
+                Task {
+                    do {
+                        if let imageData = try await newItem.loadTransferable(type: Data.self),
+                           let image = UIImage(data: imageData) {
+                            await MainActor.run {
+                                viewModel.setProfileImage(image)
+                            }
+                        }
+                    } catch {
+                        print("이미지 선택 실패: \(error)")
+                    }
+                }
             }
-            .padding(.horizontal)
-            
-            Spacer()
-        }
-        .sheet(isPresented: $showImagePicker) {
-            // 이미지 선택 뷰 연결
-            Text("이미지 선택 뷰")
         }
     }
 }
 
+// MARK: - Preview
 #Preview {
-    ProfileEditView()
+    let dummyProfile = MypageProfileModel(id: 1, name: "유저1", profileImageUrl: nil)
+    let dummyMypageVM = MypageViewModel()
+    dummyMypageVM.updateProfile(dummyProfile)
+    
+    return ProfileEditView(viewModel: ProfileEditViewModel(mypageViewModel: dummyMypageVM))
 }
