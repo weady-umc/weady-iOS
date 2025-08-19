@@ -21,7 +21,7 @@ struct BaseTabScreen: View {
             Group {
                 switch selectedTab {
                 case .home:
-                    HomeFlowHost() // 홈 플로우 스택
+                    HomeFlowHost(isTabBarHidden: $isTabBarHidden) // 홈 플로우 스택
                 case .weadyboard:
                     WeadyboardFlowHost(isTabBarHidden: $isTabBarHidden) // 웨디보드 플로우 스택
                 case .weadychive:

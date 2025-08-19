@@ -12,13 +12,16 @@ import SwiftUI
 
 struct DetailCurationView: View {
     @Environment(\.dismiss) private var dismiss
+    @Binding var isTabBarHidden: Bool
+    
     
 
     let curationId: Int64
 
-    init(curationId: Int64) {
+    init(curationId: Int64, isTabBarHidden: Binding<Bool>) {
         self.curationId = curationId
-      
+        self._isTabBarHidden = isTabBarHidden
+
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .white
@@ -68,8 +71,10 @@ struct DetailCurationView: View {
                 isScrapped = ids.contains(curationId)
             }
         }
-        .preference(key: TabBarHiddenPreferenceKey.self, value: true)
+        .onAppear { isTabBarHidden = true }
+        .onDisappear { isTabBarHidden = false }
     }
+       
 }
 
 // MARK: - Custom Top Bar (replaces Toolbar)
@@ -81,7 +86,7 @@ private struct DetailTopBar: View {
 
     var body: some View {
         ZStack {
-            // Centered two-line title
+           
             Text(title)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
@@ -460,7 +465,7 @@ extension DetailCurationView {
 
 //MARK: -일반 프릐뷰
 #Preview {
-    DetailCurationView(curationId: 8)
+    DetailCurationView(curationId: 8, isTabBarHidden: .constant(true))
 }
 
 // MARK: - 푸시용 프리뷰 (툴바까지 보게해줌!)
@@ -476,7 +481,7 @@ private struct DetailCurationToolbarPreviewHarness: View {
                     if path.isEmpty { path.append(1) }
                 }
                 .navigationDestination(for: Int.self) { _ in
-                    DetailCurationView(curationId: 11)
+                    DetailCurationView(curationId:11, isTabBarHidden: .constant(false))
                         .toolbarTitleDisplayMode(.inline)
                         .toolbarBackground(.visible, for: .navigationBar)
                 }
