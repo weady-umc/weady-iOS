@@ -16,6 +16,8 @@ enum UserFavoriteLocationEndpoints {
     case postUserFavoriteLocation(bCode: String)                   // 즐겨찾기 추가
     case patchDefaultFavoriteLocation(favoriteId: Int)             // 대표 즐겨찾기 설정
     case deleteFavoriteLocation(favoriteId: Int)                   // 즐겨찾기 삭제
+    case getNowLocation
+    case deleteDefaultFavoriteLocation
 }
 
 extension UserFavoriteLocationEndpoints: TargetType {
@@ -39,6 +41,10 @@ extension UserFavoriteLocationEndpoints: TargetType {
             return "/default"
         case .deleteFavoriteLocation(let favoriteId):
             return "/\(favoriteId)"
+        case .getNowLocation:
+            return "/nowLocations"
+        case .deleteDefaultFavoriteLocation:
+            return "/favorites/default"
         }
     }
     
@@ -46,13 +52,13 @@ extension UserFavoriteLocationEndpoints: TargetType {
     // HTTP 메서드 매핑
     var method: Moya.Method {
         switch self {
-        case .getUserFavoriteLocation:
+        case .getUserFavoriteLocation, .getNowLocation:
             return .get
         case .postUserFavoriteLocation:
             return .post
         case .patchDefaultFavoriteLocation:
             return .patch
-        case .deleteFavoriteLocation:
+        case .deleteFavoriteLocation, .deleteDefaultFavoriteLocation:
             return .delete
         }
     }
@@ -61,7 +67,7 @@ extension UserFavoriteLocationEndpoints: TargetType {
     // 요청 본문/쿼리 및 인코딩 정의
     var task: Task {
         switch self {
-        case .getUserFavoriteLocation:
+        case .getUserFavoriteLocation, .getNowLocation, .deleteDefaultFavoriteLocation:
             // 파라미터 없는 GET
             return .requestPlain
         case let .postUserFavoriteLocation(bCode):

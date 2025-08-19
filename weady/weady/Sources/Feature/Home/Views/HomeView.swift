@@ -30,6 +30,7 @@ struct HomeView: View {
     @State private var didPatchNowLocation = false
     
     @StateObject private var curationVM = CurationViewModel()
+
     
     
     var body: some View {
@@ -37,7 +38,7 @@ struct HomeView: View {
         VStack {
             
             // MARK: - 상단 여백 (디자인 스펙)
-            Spacer().frame(height: 20)
+            Spacer().frame(height: 17)
             
             // MARK: - 인사/타이틀
             TopView
@@ -92,11 +93,10 @@ struct HomeView: View {
             // MARK: - [네비 버튼] 큐레이션 카드 (누르면 .curation 로 이동)
             // [네비] 큐레이션 가로 섹션 (어디 눌러도 .curation 이동)
             
-            CurationStripView(vm: curationVM){
-                router.push(.weatherhome(initial: .third))
-            }
+            CurationStripView(vm: curationVM) {
+                    router.push(.weatherhome(initial: .third))
+                }
             
-
         }
         .padding(.bottom, 70)
         
@@ -106,7 +106,7 @@ struct HomeView: View {
                         viewTitle: "",
                         showLogoButton: true,                  // ← 왼쪽 로고
                         showAlarmButton: true,                 // ← 오른쪽 알림
-                        showBottomDivider: true,
+                        showBottomDivider: false,
                         alarmAction: { router.push(.alarm) }   // 알림 화면으로 이동 등
                     )
                     // 상단(노치)까지 흰색
@@ -119,7 +119,7 @@ struct HomeView: View {
             locationService.requestCurrentLocation() // 권한 요청 + 현재 좌표 1회/지속 업데이트 트리거
         }
         
-        .task { await curationVM.boot() }
+        .task { await curationVM.loadLocationRaw(locationId: 64) }
 
         
         // MARK: - 위치 좌표 스트림 수신 → 서버 now-location PATCH
@@ -277,32 +277,37 @@ struct HomeView: View {
         return HStack {
             RemoteThumb(urlString: model.imageUrl)
                 .frame(width: 100, height: 90)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
                 .padding(.leading, 24)
             
             VStack(alignment: .leading, spacing: 3){
-                HStack{
-                    Text("오늘은 ")
+                
+                HStack(spacing: 0){
+                    Text("오늘은")
                         .fontName(.bodyLight16)
                         .foregroundStyle(Color.black100)
+                        .padding(.trailing, 4)
                     Text(model.recommendation)
                         .fontName(.bodySemibold16)
                         .foregroundStyle(Color.black100)
+                    
+                    Text("\(subjectparticle(for: model.recommendation))")
+                        .fontName(.bodyLight16)
+                        .foregroundStyle(Color.black100)
+                        .lineLimit(1)
                 }
-                
-                Text("\(subjectparticle(for: model.recommendation)) 딱 좋은 날이에요")
+                Text("딱 좋은 날이에요")
                     .fontName(.bodyLight16)
                     .foregroundStyle(Color.black100)
             }
-            .padding(.leading, 5)
+            .padding(.leading, 13)
             
 
             Spacer()
             Image("rightArrow")
                 .resizable()
                 .frame(width: 10, height: 16)
-                .padding(.trailing, 16)
-                .padding(.leading, 19)
+                .padding(.trailing, 14)
+                .padding(.leading, 13)
         }
         .frame(width: 335, height: 100)
         .background(RoundedRectangle(cornerRadius: 6).fill(Color.white200))
@@ -388,10 +393,14 @@ struct HomeView: View {
     }
         
 }
+
+
+
 struct CurationStripView: View {
     @ObservedObject var vm: CurationViewModel
     var onTapAll: () -> Void      // 전체를 탭했을 때 실행
 
+    
     // 로컬 더미 에셋 이름
         private let dummyImages = [
             "homeplacedata1", "homeplacedata2", "homeplacedata3",
@@ -417,7 +426,7 @@ struct CurationStripView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 13){
-                    if vm.cards.isEmpty {
+                    if vm.items.isEmpty {
                         // 더미 카드
                         ForEach(dummyImages, id: \.self) { name in
                             Image(name)
@@ -428,11 +437,33 @@ struct CurationStripView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 6))
                         }
                     } else {
-                        // 서버 카드
-                        ForEach(vm.cards) { card in
-                            CardTile(title: card.title, imageURL: card.thumbnailURL)
-                                .frame(width: 259, height: 128)
+                        ForEach(vm.items, id: \.id) { it in
+                            VStack(alignment: .leading, spacing: 8) {
+                                AsyncImage(url: it.thumb) { phase in
+                                    switch phase {
+                                    case .success(let img): img
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 259, height: 128, alignment: .leading)
+                                            .clipped()
+                                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                                    default:
+                                        Rectangle()
+                                            .fill(.gray.opacity(0.1))
+                                            .frame(width: 259, height: 128)
+                                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                                    }
+                                }
+                                Text(it.title)
+                                    .fontName(.bodyBold16)          // ← 여기서 폰트 변경
+                                    .foregroundStyle(Color.white100)
+                                    .lineLimit(2)
+                                    .multilineTextAlignment(.leading)
+                                    .padding(.bottom, 12)
+                                    .padding(.leading, 13)
+                            }
                         }
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
                     }
                 }
                 
@@ -447,7 +478,7 @@ struct CurationStripView: View {
         
     }
 }
-
+/*
 // 홈용 타일
 private struct CardTile: View {
     let title: String
@@ -468,19 +499,24 @@ private struct CardTile: View {
             }
             .frame(width: 259, height: 128)
             .clipped()
+            .frame(maxWidth: .infinity, alignment: .bottom)
 
-            LinearGradient(colors: [.clear, .black.opacity(0.55)],
-                           startPoint: .center, endPoint: .bottom)
-                .frame(height: 50)
-                .frame(maxWidth: .infinity, alignment: .bottom)
-
-            
+            if style.showsTileTitle {
+                Text(title)
+                    .fontName(.bodyBold16)          // ← 여기서 폰트 변경
+                    .foregroundStyle(Color.white100)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .padding(.bottom, 12)
+                    .padding(.leading, 13)    // ← 여기서 위치/패딩 변경
+            }
         }
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }
+ 
 }
 
-
+*/
 
 #Preview {
     HomeFlowHost()

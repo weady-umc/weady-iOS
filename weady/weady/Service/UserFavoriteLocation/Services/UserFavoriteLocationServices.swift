@@ -120,5 +120,63 @@ final class UserFavoriteLocationServices {
             }
         }
     }
+    // MARK: - 현재 위치 지역 조회
+    func fetchFavoriteNowLocation(completion: @escaping (Result<FavoriteNowLocationData, Error>) -> Void) {
+        provider.request(.getNowLocation) { result in
+            switch result {
+            case .success(let response):
+                guard (200...299).contains(response.statusCode) else {
+                    let raw = String(data: response.data, encoding: .utf8) ?? ""
+                    completion(.failure(ServerError(status: response.statusCode, body: raw)))
+                    return
+                }
+                do {
+                    let decoder = JSONDecoder()
+                    decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+                    // ① {code,message,data:{...}}
+                    if let env = try? decoder.decode(FavoriteNowLocationEnvelope.self, from: response.data) {
+                        completion(.success(env.data))
+                        return
+                    }
+                    // ② {...} (바로 본문만 내려올 수도 있으니 대비)
+                    let payload = try decoder.decode(FavoriteNowLocationData.self, from: response.data)
+                    completion(.success(payload))
+                } catch {
+                    let raw = String(data: response.data, encoding: .utf8) ?? "nil"
+                    print("⛔️ favorite-nowLocations decode fail:", error, "\nRAW =>\n\(raw)")
+                    completion(.failure(error))
+                }
+            case .failure(let err):
+                completion(.failure(err))
+            }
+        }
+    }
+
+    func unsetDefaultFavoriteLocation(completion: @escaping (Result<String, Error>) -> Void) {
+        provider.request(.deleteDefaultFavoriteLocation) { result in
+            switch result {
+            case .success(let response):
+                guard (200...299).contains(response.statusCode) else {
+                    let body = String(data: response.data, encoding: .utf8) ?? "nil"
+                    return completion(.failure(NSError(
+                        domain: "API",
+                        code: response.statusCode,
+                        userInfo: [NSLocalizedDescriptionKey: body]
+                    )))
+                }
+                do {
+                    // {code, message, data:{}} 파싱
+                    let ack = try JSONDecoder().decode(AckEnvelope.self, from: response.data)
+                    completion(.success(ack.message))  // "기본 위치가 해제되었습니다" 같은 문구 사용 가능
+                } catch {
+                    // 혹시 포맷 달라도 성공은 성공 처리
+                    completion(.success("기본 위치가 해제되었습니다."))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
 
 }

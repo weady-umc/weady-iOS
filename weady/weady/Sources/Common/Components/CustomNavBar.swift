@@ -38,7 +38,8 @@ struct CustomNavBar: View {
                         Image(logoImageName)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 59, height: 25) 
+                            .frame(width: 59, height: 25)
+                            
                     }
                         
                 } else {

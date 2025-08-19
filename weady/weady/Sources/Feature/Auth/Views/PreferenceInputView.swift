@@ -101,7 +101,17 @@ struct PreferenceInputView: View {
     }
 }
 
+
 /*#Preview {
     PreferenceInputView(nickname: "테스트")
+=======
+#Preview {
+    NavigationStack {
+        PreferenceInputView(
+            nickname: "영택",
+            agreements: PreviewAgreements.requiredAllAgreed
+        )
+    }
+
 }
 */

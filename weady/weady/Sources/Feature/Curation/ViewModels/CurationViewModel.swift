@@ -41,6 +41,8 @@ final class CurationViewModel: ObservableObject {
     // MARK: - 서비스파일 연결
   
     private let service = CurationServices.shared
+    
+    
 
     // MARK: - 에러 매핑 !!
     // 에러 객체에서 HTTP 상태 코드를 안전하게 추출하는 함수
@@ -229,5 +231,48 @@ final class CurationViewModel: ObservableObject {
             }
         }
     }
+    
+    @Published var items: [(id: Int64, title: String, thumb: URL?)] = []
+
+    func loadLocationRaw(locationId: Int64) async {
+            do {
+                let dto: ApiResponseCurationByLocationResponseDto = try await requestAsync { cont in
+                    self.service.getCurationsByLocation(locationId: locationId, completion: cont)
+                }
+                self.items = dto.data.curations.map {
+                    (id: $0.curationId,
+                     title: $0.curationTitle,
+                     thumb: URL(string: $0.backgroundImgUrl))
+                }
+                print("✅ location feed count:", items.count)
+            } catch { print("❌ location feed error:", error) }
+        }
+    
+    func loadDetailImages(_ curationId: Int64) async -> [URL] {
+        do {
+            let dto: ApiResponseCurationByCurationIdResponseDto = try await requestAsync { cont in
+                self.service.getCurationDetail(curationId: curationId, completion: cont)
+            }
+            return dto.data.imgs
+                .sorted { $0.imgOrder < $1.imgOrder }
+                .compactMap { URL(string: $0.imgUrl) } // <- compactMap: 실패(nil) 버리고 [URL]만
+        } catch {
+            return []
+        }
+    }
+    private func normalizeURL(_ raw: String) -> URL? {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        // 한번 디코드 (있으면)
+        let onceDecoded = trimmed.removingPercentEncoding ?? trimmed
+        // 그대로 시도
+        if let u = URL(string: onceDecoded) { return u }
+        // 재인코드
+        let allowed = CharacterSet.urlFragmentAllowed
+            .union(.urlPathAllowed).union(.urlQueryAllowed).union(.urlHostAllowed)
+        return onceDecoded.addingPercentEncoding(withAllowedCharacters: allowed)
+            .flatMap(URL.init(string:))
+    }
+
+
 }
 

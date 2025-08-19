@@ -91,7 +91,7 @@ struct ClothingRecommendationView: View {
                     
                     // 추천 문구
                     VStack(){
-                        HStack(spacing: 0){
+                        HStack{
                             Text("오늘은 ")
                                 .fontName(.titleMedium24)
                             Text(vm.clothingName)

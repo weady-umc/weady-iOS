@@ -19,29 +19,33 @@ extension StartView {
 }
 
 struct StartView: View {
+    
+    
+    @Environment(\.router) private var router
+    
     @StateObject private var vm: StartViewModel
     @State private var showHome = false
     
     @State private var selectedTab: TabType = .home
     @State private var isTabBarHidden: Bool = false
-
+    
     // 전체 데이터 전달용 (POST에 쓰일 값)
     init(
-          nickname: String,
-          gender: GenderCode? = nil,
-          styleIds: [Int64]? = nil,
-          agreements: [OnboardingAgreement]? = nil
-      ) {
-          _vm = StateObject(
-              wrappedValue: StartViewModel(
-                  nickname: nickname,
-                  gender: gender,
-                  styleIds: styleIds,
-                  agreements: agreements
-              )
-          )
-      }
-        
+        nickname: String,
+        gender: GenderCode? = nil,
+        styleIds: [Int64]? = nil,
+        agreements: [OnboardingAgreement]? = nil
+    ) {
+        _vm = StateObject(
+            wrappedValue: StartViewModel(
+                nickname: nickname,
+                gender: gender,
+                styleIds: styleIds,
+                agreements: agreements
+            )
+        )
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // 1) 프로그레스 인디케이터 (5번째 스텝)
@@ -76,7 +80,7 @@ struct StartView: View {
             .padding(.top, 39)
             
             Spacer().frame(height: 78)
-
+            
             Spacer()
             
             // 4) 다음 버튼
@@ -100,35 +104,43 @@ struct StartView: View {
         .alert(item: $vm.alert) { a in
             Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
         }
-        // 성공 시 Home 
+        
+        // 성공 시 Home
         .fullScreenCover(isPresented: $vm.navigateHome) {
             BaseTabHost(
                 selectedTab: $selectedTab,
                 isTabBarHidden: $isTabBarHidden
             )
+            
+            // 성공 시 Home
+            .onChange(of: vm.navigateHome) { oldValue, newValue in
+                guard newValue else { return }
+                router.reset(to: .basetab)
+                
+            }
         }
     }
-}
-
-// MARK: - BaseTabHost
-private struct BaseTabHost: View {
-    @Binding var selectedTab: TabType
-    @Binding var isTabBarHidden: Bool
     
-    @State private var router = NavigationRouter()
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // 콘텐츠 영역
-            BaseTabScreen(selectedTab: $selectedTab,  isTabBarHidden: $isTabBarHidden)
-                .environment(router)
-            
-            // 탭바
-            if !isTabBarHidden {
-                BaseTabView(
-                    selectedTab: $selectedTab,
-                    isTabBarHidden: $isTabBarHidden
-                )
+    // MARK: - BaseTabHost
+    private struct BaseTabHost: View {
+        @Binding var selectedTab: TabType
+        @Binding var isTabBarHidden: Bool
+        
+        @State private var router = NavigationRouter()
+        
+        var body: some View {
+            VStack(spacing: 0) {
+                // 콘텐츠 영역
+                BaseTabScreen(selectedTab: $selectedTab,  isTabBarHidden: $isTabBarHidden)
+                    .environment(router)
+                
+                // 탭바
+                if !isTabBarHidden {
+                    BaseTabView(
+                        selectedTab: $selectedTab,
+                        isTabBarHidden: $isTabBarHidden
+                    )
+                }
             }
         }
     }

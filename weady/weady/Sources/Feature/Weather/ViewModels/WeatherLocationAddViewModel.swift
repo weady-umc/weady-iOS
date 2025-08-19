@@ -71,7 +71,7 @@ class WeatherLocationAddViewModel: ObservableObject {
         return WeatherAddData(
             weatherBackground: mapSkyStatusToBackground(data.skyStatus),                     // 상세 배경
             homeBackground: mapSkyStatusToHomeBackground(data.skyStatus),                    // 홈 카드 배경
-            place: "\(data.address1) \(data.address2) \(data.address3)",                    // 전체 주소 문자열
+            place: "\(data.address2) \(data.address3)",                    // 전체 주소 문자열
             temperature: Int(data.currentTmp),                                               // 현재 온도
             weatherIcon: mapSkyStatusToBigIcon(data.skyStatus),                              // 상단 대형 아이콘
             description: mapSkyStatusToKorean(data.skyStatus),                               // 한글 설명

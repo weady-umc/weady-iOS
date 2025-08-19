@@ -52,7 +52,7 @@ struct WeatherHomeView: View {
             }
         .safeAreaInset(edge: .top) {
             VStack(spacing: 0) {
-                Spacer().frame(height: 0)
+                Spacer().frame(height: 20)
 
                 UnderlineSegmentedControl(
                     items: WeatherHomeModel.allCases,
@@ -225,7 +225,7 @@ struct WeatherHomeView: View {
                         Image(windDir.imageName)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 30, height: 21)
+                            .frame(width: 40, height: 40)
                             
                             
                         
@@ -253,10 +253,10 @@ struct WeatherHomeView: View {
         
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text("일별예보")
+                Text("일별 예보")
                     .fontName(.captionRegular14)
                     .foregroundStyle(Color.white100)
-                    .padding(.leading, 84)
+                    .padding(.leading, 78)
                     .padding(.bottom, 12)
                 
                 VStack(spacing: 0) {

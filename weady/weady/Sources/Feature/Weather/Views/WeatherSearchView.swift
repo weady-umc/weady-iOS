@@ -25,10 +25,7 @@ struct WeatherSearchView: View {
     var body: some View {
         // MARK: - Root Layout
         VStack {
-            Spacer().frame(height: 13)
-            
-            Divider()
-                .frame(height: 1)
+
             
             // MARK: - Search Bar
             searchBar
@@ -52,22 +49,21 @@ struct WeatherSearchView: View {
             Spacer()
         }
         // MARK: - Navigation Bar
-        .navigationTitle("위치")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
         .edgeSwipeBack(topExclusion: 100) {
-                router.pop()
-            }
-        .toolbar {
-            // 좌측 상단 뒤로가기
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    Image("backicon")
-                        .foregroundColor(.black)
-                }
-            }
+            router.pop()
+        }
+        .toolbar(.hidden, for: .navigationBar) // 시스템 네비바 숨김
+        .safeAreaInset(edge: .top) {
+            CustomNavBar(
+                viewTitle: "위치",
+                showBackButton: true,
+                showBottomDivider: true,
+                backAction: { router.pop() }     // 혹은 dismiss() 사용 중이면 { dismiss() }
+            )
+            .padding(.top, -15)
+            .background(Color.white100.ignoresSafeArea(edges: .top))
+            
+            
         }
         // MARK: - Token Setup
         .onAppear {
@@ -130,7 +126,7 @@ struct WeatherSearchView: View {
             if viewModel.searchResults.isEmpty {
                 Spacer().frame(height: 40)
                 Text("🔍 검색 결과가 없습니다.")
-                    .foregroundColor(.gray300)
+                    .foregroundColor(.clear)
             } else {
                 // 필터링된 결과 목록
                 List(viewModel.filteredResults, id: \.id) { place in
@@ -159,8 +155,15 @@ struct WeatherSearchView: View {
                         }
                         .padding(.vertical, 6)
                     }
+                    
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.white)
+                    
+                    
                 }
-                
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .background(Color.white)
                 .frame(width: 335)
             }
         }
