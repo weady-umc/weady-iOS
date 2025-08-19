@@ -15,9 +15,19 @@ struct WeadyboardPostCommentSheet: View {
 
     @State private var inputText: String = ""
     @State private var isPosting: Bool = false
-
-    init(boardId: Int) {
+    @State private var replyingTo: (Int, String)? = nil
+    
+    /// 게시물 화면에 댓글 수 바로 반영
+    var onCountChange: ((Int) -> Void)? = nil
+    
+    private let userProfileImageUrl: String?
+    
+    init(boardId: Int,
+         userProfileImageUrl: String? = nil,
+         onCountChange: ((Int) -> Void)? = nil) {
         _viewModel = StateObject(wrappedValue: CommentViewModel(boardId: boardId))
+        self.userProfileImageUrl = userProfileImageUrl
+        self.onCountChange = onCountChange
     }
 
     private var canSend: Bool {
@@ -26,7 +36,8 @@ struct WeadyboardPostCommentSheet: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Spacer().frame(height: 20)
+            Spacer()
+                .frame(height: 20 * .deviceScale)
 
             if viewModel.isLoading {
                 ProgressView().padding(.top, 24)
@@ -35,19 +46,37 @@ struct WeadyboardPostCommentSheet: View {
                 Text("댓글을 남겨서 의견을 공유해보세요.")
                     .fontName(.metaRegular12)
                     .foregroundColor(.black)
-                    .padding(.top, 50)
+                    .padding(.top, 50 * .deviceScale)
                 Spacer()
             } else {
                 List {
-                    ForEach(viewModel.comments) { comment in
-                        CommentCell(comment: comment) { id in
-                            viewModel.delete(commentId: id)
-                        }
+                    ForEach(viewModel.comments.flattenedRows()) { row in
+                        CommentRowView(
+                            row: row,
+                            now: viewModel.now,
+                            onTapReply: { parentId, username in
+                                replyingTo = (parentId, username)
+                                isFocused = true
+                            }
+                        )
                         .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                         .listRowSeparator(.hidden)
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
-                                viewModel.delete(commentId: comment.commentId)
+                                // 삭제 전 카운트 계산
+                                let delta: Int
+                                if row.isParent {
+                                    if let p = viewModel.comments.first(where: { $0.commentId == row.id }) {
+                                        delta = -(1 + p.childCommentsList.count)
+                                    } else {
+                                        delta = -1
+                                    }
+                                } else {
+                                    delta = -1
+                                }
+                                // UI 즉시 반영
+                                onCountChange?(delta)
+                                viewModel.delete(commentId: row.id)
                             } label: {
                                 Label("삭제", systemImage: "trash")
                             }
@@ -68,37 +97,96 @@ struct WeadyboardPostCommentSheet: View {
     }
 
     private var inputBar: some View {
-        HStack(spacing: 8) {
-            TextField("댓글을 남겨서 의견을 공유해보세요.", text: $inputText)
-                .fontName(.captionRegular14)
-                .padding(.horizontal, 12)
-                .frame(height: 44)
-                .background(Color.white)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10).stroke(Color.gray500, lineWidth: 1)
-                )
-                .focused($isFocused)
-
-            Button {
-                sendTapped()
-            } label: {
-                Image(canSend ? "sendicon_activated" : "sendicon")
+        VStack(spacing: 6) {
+            if let target = replyingTo {
+                HStack(spacing: 8) {
+                    Text("\(target.1)님에게 답글 작성 중")
+                        .fontName(.metaRegular10)
+                        .foregroundColor(.gray900)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    Spacer()
+                    Button { cancelReply() } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(.gray500)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, 16 * .deviceScale)
             }
-            .disabled(!canSend || isPosting)
-            .frame(width: 44, height: 44)
+            
+            HStack(spacing: 8 * .deviceScale) {
+                // 프로필
+                Group {
+                    if let urlStr = userProfileImageUrl,
+                       let url = URL(string: urlStr), !urlStr.isEmpty {
+                        AsyncImage(url: url) { img in
+                            img.resizable().scaledToFill()
+                        } placeholder: {
+                            Image("profileimage").resizable().scaledToFill()
+                        }
+                    } else {
+                        Image("profileimage").resizable().scaledToFill()
+                    }
+                }
+                .frame(width: 35 * .deviceScale, height: 35 * .deviceScale)
+                .clipShape(Circle())
+                
+                // 입력 + 전송
+                ZStack {
+                    HStack(spacing: 8 * .deviceScale) {
+                        TextField(replyPlaceholder, text: $inputText)
+                            .fontName(.captionRegular14)
+                            .focused($isFocused)
+                            .padding(.leading, 12 * .deviceScale)
+                            .submitLabel(.send)
+                            .onSubmit { sendTapped() }
+                        
+                        Spacer(minLength: 0)
+                        
+                        Button { sendTapped() } label: {
+                            Image(canSend ? "sendicon_activated" : "sendicon")
+                        }
+                        .disabled(!canSend || isPosting)
+                        .frame(width: 44 * .deviceScale, height: 44 * .deviceScale)
+                        .contentShape(Rectangle())
+                        .padding(.trailing, 4)
+                    }
+                    .frame(height: 44 * .deviceScale)
+                    .background(Color.white)
+                }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.gray500, lineWidth: 1)
+                )
+            }
+            .padding(.horizontal, 16 * .deviceScale)
+            .padding(.top, 6 * .deviceScale)
+            .padding(.bottom, 10 * .deviceScale)
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 6)
-        .padding(.bottom, 10)
     }
-
+    
+    private var replyPlaceholder: String {
+        if let target = replyingTo {
+            return "\(target.1)님에게 답글을 남겨보세요."
+        } else {
+            return "댓글을 남겨서 의견을 공유해보세요."
+        }
+    }
+    
+    private func cancelReply() { replyingTo = nil }
+    
     private func sendTapped() {
         guard canSend, !isPosting else { return }
         isFocused = false
         isPosting = true
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-        viewModel.post(content: text, parentId: nil)
+        let parentId = replyingTo?.0
+        viewModel.post(content: text, parentId: parentId)
+        onCountChange?(+1)
         inputText = ""
         isPosting = false
+        replyingTo = nil
     }
 }

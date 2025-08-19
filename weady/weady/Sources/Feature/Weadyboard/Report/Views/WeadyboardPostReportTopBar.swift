@@ -20,7 +20,7 @@ struct WeadyboardPostReportTopBar: View {
 //                .frame(width: 48, height: 4)
 //                .padding(.top, 30)
             
-            Spacer().frame(height: 17)
+            Spacer().frame(height: 17 * .deviceScale)
 
             CustomNavBar(
                 viewTitle: "게시물 신고",

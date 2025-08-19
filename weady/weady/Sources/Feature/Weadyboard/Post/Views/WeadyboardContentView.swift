@@ -12,17 +12,17 @@ struct WeadyboardContentView: View {
     let content: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 1) {
+        VStack(alignment: .leading, spacing: 1 * .deviceScale) {
             Text(createdAt.dateFormat)
                 .fontName(.metaMedium10)
                 .foregroundStyle(.appgray400)
-                .padding(.leading, 12)
+                .padding(.leading, 12 * .deviceScale)
             
             Text(content)
                 .fontName(.metaRegular12)
                 .foregroundStyle(.appblack100)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 12)
+                .padding(.horizontal, 12 * .deviceScale)
         }
     }
 }

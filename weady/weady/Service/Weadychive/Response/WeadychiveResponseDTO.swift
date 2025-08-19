@@ -42,7 +42,7 @@ struct CurationDto: Codable {
 }
 
 struct ScrapBoardResponseDto: Codable {
-    let isScraped: Bool
+    let isScrapped: Bool
 }
 
 struct ScrappedCurationByUserResponseDto: Codable {

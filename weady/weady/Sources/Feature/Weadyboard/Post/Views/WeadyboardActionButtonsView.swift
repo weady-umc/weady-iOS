@@ -22,7 +22,7 @@ struct WeadyboardActionButtonsView: View {
             Button(action: onLikeTap) {   
                 Image(goodStatus ? "likes_fill" : "likes")
             }
-            .padding(.leading, 12)
+            .padding(.leading, 12 * .deviceScale)
             
             Text("\(goodCount)")
                 .fontName(.metaRegular12)
@@ -38,7 +38,7 @@ struct WeadyboardActionButtonsView: View {
             Button(action: onBookmarkTap) {
                 Image(isScraped ? "bookmark_fill" : "bookmark")
             }
-            .padding(.trailing, 15)
+            .padding(.trailing, 15 * .deviceScale)
         }
     }
 }

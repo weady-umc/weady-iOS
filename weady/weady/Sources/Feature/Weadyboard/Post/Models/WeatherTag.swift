@@ -38,24 +38,24 @@ enum WeatherTag: Int {
     }
 }
 
-enum StyleTag: Int, CaseIterable {
-    case style1 = 1
-    case style2 = 2
-    case style3 = 3
-    case style4 = 4
-    case style5 = 5
-    case style6 = 6
-    case style7 = 7
-
-    var name: String {
-        switch self {
-        case .style1: return "999HUMANITY"
-        case .style2: return "UNIQLO"
-        case .style3: return "On Running"
-        case .style4: return "ADER"
-        case .style5: return "Mardi Mercredi"
-        case .style6: return "Nike"
-        case .style7: return "New Balance"
-        }
-    }
-}
+//enum StyleTag: Int, CaseIterable {
+//    case style1 = 1
+//    case style2 = 2
+//    case style3 = 3
+//    case style4 = 4
+//    case style5 = 5
+//    case style6 = 6
+//    case style7 = 7
+//
+//    var name: String {
+//        switch self {
+//        case .style1: return "999HUMANITY"
+//        case .style2: return "UNIQLO"
+//        case .style3: return "On Running"
+//        case .style4: return "ADER"
+//        case .style5: return "Mardi Mercredi"
+//        case .style6: return "Nike"
+//        case .style7: return "New Balance"
+//        }
+//    }
+//}
