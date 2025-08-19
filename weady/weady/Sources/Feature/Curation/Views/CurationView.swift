@@ -91,11 +91,11 @@ private struct HeaderView: View {
                     .fontName(.headingBold20)
                     .foregroundColor(accent) // 계절별 컬러칩 적용
                 Text("에는")
-                    .fontName(.headingBold20)
+                    .fontName(.headingMedium20)
                     .foregroundColor(.primary)
             }
             Text(trailing)
-                .fontName(.headingBold20)
+                .fontName(.headingMedium20)
         }
     }
 }
@@ -125,7 +125,10 @@ private struct TagChip: View {
         .background(
             ZStack {
                 Circle().fill(Color.white)
-                Circle().stroke(isSelected ? accent : Color.black.opacity(0.85), lineWidth: 1.5)
+                Circle().stroke(
+                    isSelected ? accent : Color.black.opacity(0.85),
+                    lineWidth: isSelected ? 5 : 1.5
+                )
             }
         )
         .frame(width: 63, height: 63)

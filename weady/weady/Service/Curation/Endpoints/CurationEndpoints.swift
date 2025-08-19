@@ -80,7 +80,7 @@ extension CurationEndpoints: TargetType {
     var headers: [String: String]? {
         return [
             "Content-Type": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTQ5NzE5OH0.fOrS4pisCopPOkFAL-KPK5x06hSRh4dZXe8sDpHU7KceI3BpAT7V7wmROgWMFQMv3LDfe2e6PLWlYhK0S9bk7Q"
+            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTU3MTEwMH0.H9ao9ATMEikWNvHAvzVfOAUqWX-uzfsJxHaRnTQi3FP-4Y4_86Qxk0SdHuJyRimfXlQ8uXk4N60dsgF5nVyqdA"
         ]
     }
     

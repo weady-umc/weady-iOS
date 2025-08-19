@@ -5,6 +5,8 @@
 //  Created by 고석현 on 7/31/25.
 //
 
+
+
 import SwiftUI
 
 
@@ -16,7 +18,7 @@ struct DetailCurationView: View {
 
     init(curationId: Int64) {
         self.curationId = curationId
-        // iOS 16 이하에서도 네비게이션 바 밑 선 제거
+      
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .white
@@ -34,78 +36,99 @@ struct DetailCurationView: View {
     var body: some View {
         ZStack(alignment: .top) {
             VStack(spacing: 25) {
-
                 DetailCurationImageCarousel(currentIndex: $currentIndex,
                                             imageURLs: vm.detail?.imageURLs ?? [])
-
                 DetailCurationMapButton()
                 Spacer()
             }
             .padding(.horizontal, 16)
-            .padding(.top, 60)
+            .padding(.top, 16)
 
             if vm.isLoading {
                 ProgressView().controlSize(.large)
             }
         }
-        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
+        .safeAreaInset(edge: .top) {
+            DetailTopBar(
+                title: titleTwoLinesAuto(vm.detail?.title ?? ""),
+                onBack: { dismiss() },
+                isScrapped: isScrapped,
+                onToggleScrap: { toggleScrap() }
+            )
+        }
+        .task { await vm.load(curationId: curationId) }
+        .onChange(of: scrapVm.scrappedCurationItems, initial: true) { _, newList in
+            // WeadychiveViewModel.init()에서 fetchScrappedCurations()가 호출되어
+            // scrappedCurationItems가 채워진다고 가정. 목록에 현재 curationId가 있으면 채운 북마크로 동기화.
+            let ids = Set(newList.map { Int64($0.id) })  // CurationItem(id:title:firstImgUrl:)
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isScrapped = ids.contains(curationId)
+            }
+        }
+        .preference(key: TabBarHiddenPreferenceKey.self, value: true)
+    }
+}
 
-        .toolbarBackground(Color.white, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
-      
-       
-        
+// MARK: - Custom Top Bar (replaces Toolbar)
+private struct DetailTopBar: View {
+    let title: String
+    let onBack: () -> Void
+    let isScrapped: Bool
+    let onToggleScrap: () -> Void
 
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: { dismiss() }) {
+    var body: some View {
+        ZStack {
+            // Centered two-line title
+            Text(title)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.85)
+                .allowsTightening(true)
+                .fontName(.captionMedium14)
+                .frame(maxWidth: UIScreen.main.bounds.width * 0.68)
+
+          
+            HStack {
+                Button(action: onBack) {
                     Image("backicon")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 10, height: 24)
                         .padding(10)
-                        .frame(width: 44, height: 44, alignment: .center)
+                        .contentShape(Rectangle())
                 }
-            }
 
-           
-            ToolbarItem(placement: .principal) {
-                VStack(spacing: 0) {
-                    Text(titleTwoLinesAuto(vm.detail?.title ?? ""))
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.85)
-                        .allowsTightening(true)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .fontName(.captionMedium14)
-                        .frame(maxWidth: UIScreen.main.bounds.width * 0.68)
-                   
-                }
-            }
+                Spacer(minLength: 0)
 
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { toggleScrap() }) {
+                Button(action: onToggleScrap) {
                     ZStack {
                         Image("scrap")
                             .resizable()
-                            .frame(width: 44, height: 44)
                             .scaledToFit()
+                            .frame(width: 44, height: 44)
                             .opacity(isScrapped ? 0 : 1)
                         Image("scrapfilled")
                             .resizable()
-                            .frame(width: 44, height: 44)
-                          
                             .scaledToFit()
+                            .frame(width: 44, height: 44)
                             .opacity(isScrapped ? 1 : 0)
                     }
-                   
                     .padding(10)
-                  
                     .contentShape(Rectangle())
                 }
             }
         }
-        
-        .task { await vm.load(curationId: curationId) }
+        .frame(maxWidth: .infinity)
+        .frame(height: 56)
+        .padding(.horizontal, 8)
+        .background(Color.white)
+      
     }
+    
+    
 }
+
 
 // MARK: - ViewModel
 @MainActor
@@ -149,6 +172,7 @@ private struct DetailCurationImageCarousel: View {
                             VStack(spacing: 10) {
                                 ProgressView()
                                     .controlSize(.large)
+//MARK: - 로딩 오래 걸린다해서 로딩 중 표시 문구 만듬
                                 Text("로딩중이에요. 잠시 기다려주세요:)")
                                     .font(.system(size: 13, weight: .medium))
                                     .multilineTextAlignment(.center)
@@ -169,15 +193,25 @@ private struct DetailCurationImageCarousel: View {
                                 .frame(height : 600)
                                 .clipped()
                         case .failure:
-                            Color.gray.opacity(0.25)
-                                .frame(maxWidth:.infinity)
-                                .frame(height : 600)
-                                .clipped()
+                            ProgressView()
+                                .controlSize(.large)
+//MARK: - 로딩 오래 걸린다해서 로딩 중 표시 문구 만듬
+                            Text("로딩중이에요. 잠시 기다려주세요:)")
+                                .font(.system(size: 13, weight: .medium))
+                                .multilineTextAlignment(.center)
+                            Text("회원님이 선택한 장소와 날씨를 조합해서 추천 장소를 만들고 있어요!")
+                                .font(.system(size: 13, weight: .medium))
+                                .multilineTextAlignment(.center)
                         @unknown default:
-                            Color.gray.opacity(0.2)
-                                .frame(maxWidth:.infinity)
-                                .frame(height : 600)
-                                .clipped()
+                            ProgressView()
+                                .controlSize(.large)
+//MARK: - 로딩 오래 걸린다해서 로딩 중 표시 문구 만듬
+                            Text("로딩중이에요. 잠시 기다려주세요:)")
+                                .font(.system(size: 13, weight: .medium))
+                                .multilineTextAlignment(.center)
+                            Text("회원님이 선택한 장소와 날씨를 조합해서 추천 장소를 만들고 있어요!")
+                                .font(.system(size: 13, weight: .medium))
+                                .multilineTextAlignment(.center)
                         }
                     }
                     .tag(index)
@@ -440,7 +474,7 @@ private struct DetailCurationToolbarPreviewHarness: View {
                     if path.isEmpty { path.append(1) }
                 }
                 .navigationDestination(for: Int.self) { _ in
-                    DetailCurationView(curationId: 9)
+                    DetailCurationView(curationId: 11)
                         .toolbarTitleDisplayMode(.inline)
                         .toolbarBackground(.visible, for: .navigationBar)
                 }
