@@ -26,10 +26,10 @@ struct WeadyboardPostCardView: View {
     private func weatherText(for id: Int?) -> String {
         guard let id else { return "-" }
         switch id {
-        case 1: return "맑은 날"
-        case 2: return "구름 많은 날"
+        case 1: return "맑음"
+        case 2: return "구름 많음"
         case 3: return "비 오는 날"
-        case 4: return "흐린 날"
+        case 4: return "흐린날"
         case 5: return "눈 오는 날"
         case 6: return "바람 많은 날"
         default: return "-"
@@ -39,14 +39,14 @@ struct WeadyboardPostCardView: View {
     private func temperatureText(for id: Int?) -> String {
         guard let id else { return "-" }
         switch id {
-        case 1: return "한파 수준"
-        case 2: return "매우 추움"
-        case 3: return "쌀쌀하다"
-        case 4: return "선선하다"
-        case 5: return "보통"
-        case 6: return "약간 더움"
-        case 7: return "더움"
-        case 8: return "매우 더움"
+        case 1: return "~ -6℃"
+        case 2: return "-5℃ ~ 5℃"
+        case 3: return "6℃ ~ 11℃"
+        case 4: return "12℃ ~ 16℃"
+        case 5: return "17℃ ~ 22℃"
+        case 6: return "23℃ ~ 26℃"
+        case 7: return "27℃ ~ 30℃"
+        case 8: return "31℃ ~"
         default: return "-"
         }
     }
@@ -99,8 +99,8 @@ struct WeadyboardPostCardView: View {
                             .fontName(.metaRegular10)
                             .foregroundColor(.appblack100)
                     }
-                    .padding(.horizontal, 10 * .deviceScale)
-                    .padding(.top, 10 * .deviceScale)
+                    .padding(.horizontal, 15 * .deviceScale)
+                    .padding(.top, 12 * .deviceScale)
                     
                     // MARK: - 장소 박스
                     if !places.isEmpty {
