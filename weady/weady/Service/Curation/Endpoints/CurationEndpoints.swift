@@ -64,7 +64,6 @@ extension CurationEndpoints: TargetType {
         return .requestPlain
     }
 
-//        } else {
     var headers: [String: String]? {
         let keychain = KeychainSwift()
         if let token = keychain.get("serverAccessToken") {
