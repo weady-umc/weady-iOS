@@ -41,24 +41,7 @@ final class WeadychiveViewModel: ObservableObject {
          fetchScrappedCurations()
          fetchScrappedBoards()
         
-//        //MARK: -  Mock 데이터로 초기화 (테스트용) . 서버 통신 실패 시 대체용 mock 데이터.
-//        scrappedCurationItems = (0..<10).map {
-//            CurationItem(
-//                id: $0,
-//                title: "Mock Curation \($0)",
-//                firstImgUrl: $0 % 2 == 0 ? "curation1" : "curation2"
-//            )
-//        }
-//
-//        scrappedWeadyboardItems = (0..<18).map {
-//            WeadyboardItem(
-//                id: $0,
-//                username: "User \($0)",
-//                imgUrl: "weadyboard\(($0 % 7) + 1)",
-//                weatherTagId: $0 % 5
-//            )
-//        }
-//
+
      
     }
     
@@ -143,7 +126,7 @@ final class WeadychiveViewModel: ObservableObject {
             case .success(let response):
                 print("✅ 큐레이션 스크랩 추가 성공: \(response.isScrapped)")
                 self.fetchScrappedCurations()
-            case .failure(let error):
+            case .failure(_):
                 print("!!!큐레이션 추가됌요!!!")
             }
         }
@@ -157,7 +140,7 @@ final class WeadychiveViewModel: ObservableObject {
             case .success(let response):
                 print("✅ 큐레이션 스크랩 삭제 성공: \(response.isScrapped)")
                 self.fetchScrappedCurations()
-            case .failure(let error):
+            case .failure(_):
                 print("!!!큐레이션 삭제됌요!!!")
             }
         }

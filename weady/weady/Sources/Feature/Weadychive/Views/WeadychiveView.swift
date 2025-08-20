@@ -58,8 +58,8 @@ struct WeadychiveView: View {
                     viewModel.WeadyboardLogOutput(size: 18, page: 0)
                 }
             }
-            .onChange(of: navigateToDelete) { isPushing in
-                guard isPushing == false else { return }
+            .onChange(of: navigateToDelete, initial: false) { oldValue, newValue in
+                guard newValue == false else { return }
                 switch selectedTopTab {
                 case .curation:
                     viewModel.CurationLogOutput()
@@ -123,14 +123,14 @@ struct TopBar: View {
     }
 }
 
-// MARK: - Top Tab
+// MARK: - 탭
 
 enum TopTab: String, CaseIterable {
     case curation = "스크랩한 큐레이션"
     case weadyboard = "스크랩한 웨디보드"
 }
 
-// MARK: - TopTabIndicatorView
+// MARK: - 인디케이터뷰
 
 struct TopTabIndicatorView: View {
     
@@ -308,75 +308,6 @@ struct SheetView: View {
         }
     }
 }
-// MARK: - NoCurationView (스크랩된 큐레이션 없는 경우)
-struct NoCurationView: View {
-    var body: some View {
-        VStack {
-            VStack(spacing:20) {
-                Text("추천 큐레이션에서 마음에 드는 하루를 담아보세요!")
-                    .fontName(.metaMedium12)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-
-                Button(action: {
-                    // TODO: - 큐레이션 탐색 화면으로 이동
-                    //CurationView()
-                }) {
-                    Text("큐레이션 보러가기")
-                        .fontName(.captionSemibold14)
-                        .foregroundStyle(.white)
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 20)
-                        .background(Color.gray900)
-                        .cornerRadius(8)
-                }
-            }
-            .padding(.top, 141)
-            Spacer()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
-    }
-}
-
-
-// MARK: - NoWeadyboardView (스크랩된 웨디보드 없는 경우)
-struct NoWeadyboardView: View {
-    @Environment(WeadychiveRouter.self) private var router
-    // 일단 이런식으로 추가하면 연결되도록 해놨습니다 !
-    @Environment(AppTabController.self) private var tab
-    @Environment(WeadyboardRouteBridge.self) private var weadyboardBridge
-    
-    var body: some View {
-        VStack {
-            VStack(spacing: 20) {
-                Text("웨디보드에서는 다른 사람의 하루도 아카이빙할 수 있어요!")
-                    .fontName(.metaMedium12)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-
-                Button(action: {
-//                    router?.push(.weadyboard) // 웨디보드 탐색 화면으로 이동
-                    // 이런식으로 웨디보드로 연결될 듯합니다
-                    tab.switchTo(.weadyboard)
-                }) {
-                    Text("웨디보드 보러가기")
-                        .fontName(.captionSemibold14)
-                        .foregroundStyle(.white)
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 20)
-                        .background(Color.gray900)
-                        .cornerRadius(8)
-                }
-            }
-            .padding(.top, 141)
-            Spacer()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
-    }
-}
-
 
 
 
