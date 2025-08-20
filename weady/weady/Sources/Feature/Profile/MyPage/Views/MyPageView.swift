@@ -70,17 +70,21 @@ struct MyPageView: View {
                 .padding(.top, 8)
                 
                 // MARK: - 게시물 업로드 버튼
-                HStack {
+                VStack {
                     Spacer()
-                    Button {
-                        router.push(.weadyboardUpload)
-
-                    } label: {
-                        Image("boardUploadIcon")
-                            .frame(width: 40, height: 40)
-                            .shadow(color: .black.opacity(0.25), radius: 2)
+                    HStack {
+                        Spacer()
+                        Button {
+                            router.push(.weadyboardUpload)
+                        } label: {
+                            Image("boardUploadIcon")
+                                .resizable()
+                                .frame(width: 40, height: 40)
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 2)
+                        }
+                        .padding(.trailing, 16)
+                        .padding(.bottom, 16)
                     }
-                    .padding(.horizontal)
                 }
             }
             
@@ -110,7 +114,7 @@ struct MyPageView: View {
 }
 
 #Preview {
-    let router = MyPageRouter()
     MyPageView(viewModel: MypageViewModel())
-        .environment(router)
+        .environment(MyPageRouter())
+        .environment(WeadyboardRouteBridge())
 }

@@ -1,31 +1,32 @@
 import Foundation
 import Moya
+import UIKit
 
 final class UserService: NetworkManager {
     
     typealias Endpoint = UserEndpoints
     let provider: MoyaProvider<UserEndpoints>
     
-    public init(provider: MoyaProvider<UserEndpoints>? = nil) {
+    init(provider: MoyaProvider<UserEndpoints>? = nil) {
         let plugins: [PluginType] = [
             NetworkLoggerPlugin(configuration: .init(logOptions: .verbose))
         ]
         self.provider = provider ?? MoyaProvider<UserEndpoints>(plugins: plugins)
     }
     
-    // MARK: - 프로필 수정 (닉네임 + 이미지 URL)
-    func updateProfile(name: String, profileImageUrl: String?, completion: @escaping (Result<UpdateUserProfileResponse, Error>) -> Void) {
+    // MARK: - 프로필 수정 (닉네임 + 이미지)
+    func updateProfile(name: String, profileImage: UIImage?, completion: @escaping (Result<UpdateUserProfileResponse, Error>) -> Void) {
         let requestDTO = EditProfileRequestDTO(
-            profileData: ProfileData(name: name),
-            profileImage: profileImageUrl
+            profileData: .init(name: name),
+            profileImage: profileImage
         )
         
         provider.request(.updateProfile(data: requestDTO)) { result in
             switch result {
             case .success(let response):
                 do {
-                    let decoded = try JSONDecoder().decode(UpdateUserProfileResponse.self, from: response.data)
-                    completion(.success(decoded))
+                    let decoded = try JSONDecoder().decode(BaseResponse<UpdateUserProfileResponse>.self, from: response.data)
+                    completion(.success(decoded.data))
                 } catch {
                     completion(.failure(error))
                 }
@@ -41,8 +42,8 @@ final class UserService: NetworkManager {
             switch result {
             case .success(let response):
                 do {
-                    let decoded = try JSONDecoder().decode(GetMyPageResponse.self, from: response.data)
-                    completion(.success(decoded))
+                    let decoded = try JSONDecoder().decode(BaseResponse<GetMyPageResponse>.self, from: response.data)
+                    completion(.success(decoded.data))
                 } catch {
                     completion(.failure(error))
                 }
@@ -58,8 +59,8 @@ final class UserService: NetworkManager {
             switch result {
             case .success(let response):
                 do {
-                    let decoded = try JSONDecoder().decode(GetBoardInMyPageResponse.self, from: response.data)
-                    completion(.success(decoded))
+                    let decoded = try JSONDecoder().decode(BaseResponse<GetBoardInMyPageResponse>.self, from: response.data)
+                    completion(.success(decoded.data))
                 } catch {
                     completion(.failure(error))
                 }

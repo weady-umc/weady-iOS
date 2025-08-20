@@ -8,7 +8,7 @@ struct MyPageCalendarDayCard: View {
         Button(action: action) {
             GeometryReader { geo in
                 ZStack(alignment: .topLeading) {
-                    //MARK: - 카드 배경
+                    // MARK: - 카드 배경
                     Color.white300.cornerRadius(2)
                     
                     // 썸네일
@@ -26,7 +26,7 @@ struct MyPageCalendarDayCard: View {
                         .cornerRadius(2)
                     }
 
-                    //MARK: - 날짜
+                    // MARK: - 날짜
                     if let date = ISO8601DateFormatter().date(from: model.date) {
                         Text("\(Calendar.current.component(.day, from: date))")
                             .fontName(.metaMedium8)
@@ -34,17 +34,17 @@ struct MyPageCalendarDayCard: View {
                             .padding(4)
                     }
 
-                    //MARK: - 날씨 아이콘
-                    VStack {
-                        Spacer()
-                        HStack {
+                    // MARK: - 날씨 아이콘
+                    if model.weatherTagId != -1 {   // -1이면 아이콘 표시 안 함
+                        VStack {
                             Spacer()
-                            //if let icon = model.weatherIcon {
-                                Image(weatherIconName("sunny"))
+                            HStack {
+                                Spacer()
+                                Image(WeatherType.from(tagId: model.weatherTagId).imageName)
                                     .resizable()
                                     .frame(width: 17, height: 17)
                                     .padding(4)
-                            //}
+                            }
                         }
                     }
                 }
@@ -52,17 +52,5 @@ struct MyPageCalendarDayCard: View {
             .cornerRadius(2)
         }
         .frame(height: 65)
-    }
-
-    private func weatherIconName(_ icon: String) -> String {
-        switch icon {
-        case "sunny": return "filter_sunny"
-        case "cloudy": return "filter_cloudy"
-        case "rainy": return "filter_rainy"
-        case "partlycloudy": return "filter_partlycloudy"
-        case "snowy": return "filter_snowy"
-        case "windy": return "filter_windy"
-        default: return ""
-        }
     }
 }

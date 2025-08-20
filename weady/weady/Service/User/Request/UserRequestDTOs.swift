@@ -1,10 +1,11 @@
 import Foundation
+import UIKit
 
-struct EditProfileRequestDTO: Encodable {
+struct EditProfileRequestDTO {
     let profileData: ProfileData
-    let profileImage: String? // URL or Base64
-}
-
-struct ProfileData: Encodable {
-    let name: String
+    let profileImage: UIImage?
+    
+    struct ProfileData: Encodable {
+        let name: String
+    }
 }

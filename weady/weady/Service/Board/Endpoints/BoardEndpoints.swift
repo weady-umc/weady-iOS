@@ -7,11 +7,12 @@
 
 import Foundation
 import Moya
+import UIKit
 
 enum BoardEndpoints {
     case getBoards(seasonTagId: Int?, weatherTagId: Int?, temperatureTagId: Int?, size: Int)
     case getBoardDetail(boardId: Int)
-    case createBoard(data: CreateBoardRequestDTO)
+    case createBoard(data: CreateBoardRequestDTO, images: [UIImage])
     case updateBoard(boardId: Int, data: UpdateBoardRequestDTO)
     case deleteBoard(boardId: Int)
     case reportBoard(boardId: Int, data: ReportBoardRequestDTO)
@@ -67,8 +68,27 @@ extension BoardEndpoints: TargetType {
             if let temp = temperatureTagId { params["temperatureTagId"] = temp }
             return .requestParameters(parameters: params, encoding: URLEncoding.queryString)
 
-        case .createBoard(let data):
-            return .requestJSONEncodable(data)
+        case .createBoard(let data, let images):
+            var multipartData: [MultipartFormData] = []
+
+            // postData
+            if let jsonData = try? JSONEncoder().encode(data) {
+                multipartData.append(MultipartFormData(provider: .data(jsonData),
+                                                       name: "postData",
+                                                       mimeType: "application/json"))
+            }
+
+            // images
+            for (index, image) in images.enumerated() {
+                if let imageData = image.jpegData(compressionQuality: 0.8) {
+                    multipartData.append(MultipartFormData(provider: .data(imageData),
+                                                           name: "images",
+                                                           fileName: "image\(index).jpg",
+                                                           mimeType: "image/jpeg"))
+                }
+            }
+
+            return .uploadMultipart(multipartData)
 
         case .updateBoard(_, let data):
             return .requestJSONEncodable(data)

@@ -7,6 +7,7 @@
 
 import Foundation
 import Moya
+import UIKit
 
 final class BoardService: NetworkManager {
     
@@ -54,12 +55,20 @@ final class BoardService: NetworkManager {
     }
     
     // MARK: - 게시글 작성
-    func createBoard(data: CreateBoardRequestDTO, completion: @escaping (Result<BoardDetailResponseDTO, NetworkError>) -> Void) {
-        request(
-            target: .createBoard(data: data),
-            decodingType: BoardDetailResponseDTO.self,
-            completion: completion
-        )
+    func createBoard(data: CreateBoardRequestDTO, images: [UIImage] = []) async throws -> BoardDetailResponseDTO {
+        try await withCheckedThrowingContinuation { continuation in
+            self.request(
+                target: .createBoard(data: data, images: images),
+                decodingType: BoardDetailResponseDTO.self
+            ) { result in
+                switch result {
+                case .success(let responseDTO):
+                    continuation.resume(returning: responseDTO)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
     
     // MARK: - 게시글 수정
