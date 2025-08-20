@@ -22,8 +22,6 @@ extension View {
 
 struct NicknameInputView: View {
     @StateObject private var vm: NicknameInputViewModel
-    @Environment(\.router) private var router
-    @EnvironmentObject private var onboarding: OnboardingStore
     @FocusState private var isFocused: Bool
     @AppStorage("nickname") private var storedNickname: String = ""
     
@@ -106,7 +104,9 @@ struct NicknameInputView: View {
             
             // 다음버튼
             Button {
-                vm.next() 
+                let name = vm.nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+                storedNickname = name
+                vm.next()
             } label: {
                 Text("다음")
                     .fontName(.bodyMedium16)
@@ -118,21 +118,20 @@ struct NicknameInputView: View {
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
-            .onChange(of: vm.shouldNavigateNext) { _, newValue in
-                guard newValue else { return }
-                onboarding.nickname = vm.nickname
-                router.push(.preference)
-            }
         }//VStack End
         .onAppear {
             // 디버그: View가 보관한 agreements 확인
             print("DEBUG Nickname →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
         }
+        // 다음 화면으로 agreements를 "View에서" 전달
+        .fullScreenCover(isPresented: $vm.shouldNavigateNext) {
+            // agreements 릴레이
+            PreferenceInputView(nickname: vm.nickname, agreements: agreements)
+        }
     }
 }
 
-#Preview {
-    NavigationStack {
-        NicknameInputView(agreements: PreviewAgreements.requiredAllAgreed)
-    }
+/*#Preview {
+    NicknameInputView()
 }
+*/
