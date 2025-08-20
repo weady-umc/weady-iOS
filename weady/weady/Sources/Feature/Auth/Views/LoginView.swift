@@ -10,11 +10,13 @@ import KakaoSDKAuth
 import KakaoSDKUser
 import KakaoSDKCommon
 import GoogleSignIn
+import AuthenticationServices
 
 struct LoginView: View {
     @Environment(\.router) private var router
     @StateObject private var viewModel = LoginViewModel()
-
+    @State var appleviewModel: AppleLoginViewModel = .init()
+    
     @AppStorage("didCompleteOnboarding") private var didCompleteOnboarding = false
 
     @State private var didRoute = false
@@ -107,28 +109,23 @@ struct LoginView: View {
             }
             
             // MARK: - 애플 로그인 버튼
-            Button {
-                
-            } label: {
-                ZStack {
-                    HStack {
-                        Image("apple_icon")
-                            .resizable()
-                            .frame(width: 15.17, height: 18)
-                            .padding(.leading, 20)
-                        Spacer()
+            SignInWithAppleButton(
+                onRequest: { _ in },
+                onCompletion: { _ in }
+            )
+            .frame(width: 315, height: 44)
+            .signInWithAppleButtonStyle(.whiteOutline)
+            .cornerRadius(6)
+            .onTapGesture {
+                Task {
+                    if let window = UIApplication.shared.connectedScenes
+                        .compactMap({ $0 as? UIWindowScene })
+                        .first?.windows.first {
+                        await appleviewModel.loginWithApple(presentationAnchor: window)
                     }
-                    Text("애플로 시작")
-                        .fontName(.metaMedium12)
-                        .foregroundColor(.black)
                 }
-                .frame(width: 315, height: 44)
-                .background(Color.white)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(Color.gray800, lineWidth: 1)
-                )
             }
+            
             Spacer()
         }
         .padding(.horizontal, 24)
