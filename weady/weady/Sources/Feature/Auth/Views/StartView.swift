@@ -19,8 +19,6 @@ extension StartView {
 }
 
 struct StartView: View {
-    @Environment(\.router) private var router
-    @EnvironmentObject private var onboarding: OnboardingStore
     @StateObject private var vm: StartViewModel
     @State private var showHome = false
     
@@ -43,10 +41,55 @@ struct StartView: View {
               )
           )
       }
-        
+    
+    // 덩어리 텍스트: ‘닉네임+님’은 붙이고(줄바꿈 금지), 나머지는 자연스럽게 감기게
+    private var composedTitle: Text {
+        Text("앞으로 웨디가\n")
+        + Text(verbatim: vm.nickname).bold()
+        + Text("\u{2060}님").bold()
+        + Text("의 취향에 맞는 하루를 ")
+        + Text("추천해드릴게요.")
+    }
+    
+    // 닉네임이 짧으면 한 줄, 길면 자연스럽게 2줄
+    @ViewBuilder
+    private func titleBlock() -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("취향 입력이 완료되었어요 !")
+                .fontName(.titleBold24)
+                .foregroundStyle(Color.black100)
+
+            Spacer().frame(height: 25)
+
+            composedTitle
+                .fontName(.titleMedium24)      // ⬅️ 전체 기본 폰트 한 번만
+                .foregroundStyle(Color.black100)
+                .multilineTextAlignment(.leading)
+                .lineLimit(4)
+                .fixedSize(horizontal: false, vertical: true)
+                .allowsTightening(true)
+        }
+    }
+
+    @ViewBuilder
+    private func primaryButton() -> some View {
+        Button {
+            vm.startTapped()
+        } label: {
+            Text("웨디 시작하기")
+                .fontName(.bodyMedium16)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 11)
+                .background(Color.black100)
+                .foregroundStyle(Color.white100)
+                .cornerRadius(10)
+        }
+        .disabled(vm.isSubmitting)
+        .padding(.bottom, 22)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // 1) 프로그레스 인디케이터 (5번째 스텝)
             ProgressIndicator(currentStep: 4, totalSteps: 5)
             
             // 2) 타이틀: 언더라인된 닉네임 + 나머지 텍스트
@@ -78,13 +121,13 @@ struct StartView: View {
             .padding(.top, 39)
             
             Spacer().frame(height: 78)
-            
+
             Spacer()
             
             // 4) 다음 버튼
             
             Button{
-                vm.startTapped()
+                vm.startTapped() // 여기서만 POST
             } label: {
                 Text("웨디 시작하기")
                     .fontName(.bodyMedium16)
@@ -102,10 +145,12 @@ struct StartView: View {
         .alert(item: $vm.alert) { a in
             Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
         }
-        .onChange(of: vm.navigateHome) { _, go in
-            guard go else { return }
-            router.reset(to: .basetab)
-            onboarding.reset()
+        // 성공 시 Home 
+        .fullScreenCover(isPresented: $vm.navigateHome) {
+            BaseTabHost(
+                selectedTab: $selectedTab,
+                isTabBarHidden: $isTabBarHidden
+            )
         }
     }
 }
@@ -132,15 +177,4 @@ private struct BaseTabHost: View {
             }
         }
     }
-}
-
-#Preview("StartView – Onboarding") {
-    let router = NavigationRouter()
-    StartView.onboarding(
-        nickname: "영택",
-        gender: nil,
-        styleIds: nil,
-        agreements: nil
-    )
-    .environment(router)                   
 }

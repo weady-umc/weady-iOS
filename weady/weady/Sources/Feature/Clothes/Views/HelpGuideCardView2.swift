@@ -77,9 +77,9 @@ struct HelpGuideCardView2: View {
                         .resizable().frame(width: arrowSize.width, height: arrowSize.height)
                         .contentShape(Rectangle())
                 }
-                .padding(.trailing, 315)
+                .padding(.leading, 32)
                 .offset(y: -30)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                 
             }
             .frame(height: cardHeight)

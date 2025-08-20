@@ -9,9 +9,6 @@ import SwiftUI
 
 struct GenderSelectionView: View {
     @StateObject private var vm: GenderSelectionViewModel
-    @Environment(\.router) private var router
-    @EnvironmentObject private var onboarding: OnboardingStore
-
     
     private let agreements: [OnboardingAgreement]
     
@@ -51,7 +48,7 @@ struct GenderSelectionView: View {
             .padding(.horizontal, 32)
             
             // 옵션 버튼
-            HStack(spacing: 11) {
+            HStack(spacing: 9) {
                 ForEach(GenderOption.allCases) { option in
                     Button {
                         vm.select(option)
@@ -60,16 +57,16 @@ struct GenderSelectionView: View {
                             .fontName(.captionMedium14)
                             .foregroundStyle(Color.black100)
                             .padding(.vertical, 17)
-                            .padding(.leading, 23)
-                            .padding(.trailing, 28)
+                            .padding(.leading, 19)
+                            .padding(.trailing, 21)
                             .background(Color.white)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 10)
+                                RoundedRectangle(cornerRadius: 4)
                                     .stroke(
                                         vm.selected == option
                                         ? Color.black100
                                         : Color.gray800,
-                                        lineWidth: 2
+                                        lineWidth: 1.5
                                     )
                             )
                     }
@@ -82,10 +79,7 @@ struct GenderSelectionView: View {
             
             // 하단 버튼
             VStack(spacing: 20) {
-                Button{
-                    onboarding.gender = nil
-                    router.push(.start)
-                } label: {
+                Button(action: vm.skip) {
                     Text("건너뛰기")
                         .fontName(.bodyMedium16)
                         .foregroundStyle(Color.gray800)
@@ -97,10 +91,7 @@ struct GenderSelectionView: View {
                         )
                 }
                 
-                Button {
-                    onboarding.gender = selectedGenderCode
-                    router.push(.style)
-                } label: {
+                Button(action: vm.next) {
                     Text("다음")
                         .fontName(.bodyMedium16)
                         .frame(maxWidth: .infinity)
@@ -109,23 +100,39 @@ struct GenderSelectionView: View {
                         .foregroundStyle(Color.white100)
                         .cornerRadius(10)
                 }
+                .disabled(vm.selected == nil)
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
         }
+        .toolbar(.hidden, for: .navigationBar)
+        .navigationBarBackButtonHidden(true)
         .onAppear {
             print("DEBUG Gender →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
+        }
+        // 스킵 → StartView (성별 없음, agreements 전달)
+        .fullScreenCover(isPresented: $vm.didTapSkip) {
+            StartView(
+                nickname: vm.nickname,
+                gender: .NONE,          // 성별 건너뛰기 NONE 사용
+                styleIds: [],           // 건너뛰기이므로 빈 배열
+                agreements: agreements  // 약관 그대로 릴레이
+            )
+        }
+        // 다음 → StyleSelection (선택 성별/agreements 전달)
+        .fullScreenCover(isPresented: $vm.didTapNext) {
+            StyleSelectionView(
+                nickname: vm.nickname,
+                gender: selectedGenderCode,
+                agreements: agreements
+            )
         }
     }
 }
 
-#Preview {
-    NavigationStack {
-        GenderSelectionView(
-            nickname: "영택",
-            agreements: PreviewAgreements.requiredAllAgreed
-        )
-    }
-}
 
+/*#Preview {
+ GenderSelectionView(nickname: "테스트")
+ }
+ */
 
