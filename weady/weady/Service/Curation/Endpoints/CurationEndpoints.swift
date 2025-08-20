@@ -80,7 +80,7 @@ extension CurationEndpoints: TargetType {
 //    var headers: [String: String]? {
 //        return [
 //            "Content-Type": "application/json",
-//            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTU3MTEwMH0.H9ao9ATMEikWNvHAvzVfOAUqWX-uzfsJxHaRnTQi3FP-4Y4_86Qxk0SdHuJyRimfXlQ8uXk4N60dsgF5nVyqdA"
+//            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTYyNTQyOH0.hl8a4nyq9IfYnwDKEKGJnOHOIu5WYwRp5znIQDwvl4oCsmFjdVwSfErVXBXXnVYyGxto8UzK5k_rFsfAS3nwDA"
 //        ]
 //    }
     
