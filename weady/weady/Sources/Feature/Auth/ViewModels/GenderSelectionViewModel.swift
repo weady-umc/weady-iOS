@@ -19,7 +19,7 @@ enum GenderOption: String, CaseIterable, Identifiable {
         switch self {
         case .female:      return "👩   여성"
         case .male:        return "👨   남성"
-        case .unspecified: return "  선택 안함   "
+        case .unspecified: return "  선택 안함  "
         }
     }
 }

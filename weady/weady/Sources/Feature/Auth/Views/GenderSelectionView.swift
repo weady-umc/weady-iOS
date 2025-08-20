@@ -51,7 +51,7 @@ struct GenderSelectionView: View {
             .padding(.horizontal, 32)
             
             // 옵션 버튼
-            HStack(spacing: 11) {
+            HStack(spacing: 9) {
                 ForEach(GenderOption.allCases) { option in
                     Button {
                         vm.select(option)
@@ -60,16 +60,16 @@ struct GenderSelectionView: View {
                             .fontName(.captionMedium14)
                             .foregroundStyle(Color.black100)
                             .padding(.vertical, 17)
-                            .padding(.leading, 23)
-                            .padding(.trailing, 28)
+                            .padding(.leading, 19)
+                            .padding(.trailing, 21)
                             .background(Color.white)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 10)
+                                RoundedRectangle(cornerRadius: 4)
                                     .stroke(
                                         vm.selected == option
                                         ? Color.black100
                                         : Color.gray800,
-                                        lineWidth: 2
+                                        lineWidth: 1.5
                                     )
                             )
                     }
@@ -109,10 +109,13 @@ struct GenderSelectionView: View {
                         .foregroundStyle(Color.white100)
                         .cornerRadius(10)
                 }
+                .disabled(vm.selected == nil)
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
         }
+        .toolbar(.hidden, for: .navigationBar)
+        .navigationBarBackButtonHidden(true)
         .onAppear {
             print("DEBUG Gender →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
         }
@@ -120,12 +123,16 @@ struct GenderSelectionView: View {
 }
 
 #Preview {
+    let router = NavigationRouter()
+    let store = OnboardingStore()
     NavigationStack {
         GenderSelectionView(
             nickname: "영택",
             agreements: PreviewAgreements.requiredAllAgreed
         )
     }
+    .environment(router)
+    .environmentObject(store)
 }
 
 
