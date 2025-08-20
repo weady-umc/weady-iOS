@@ -62,7 +62,7 @@ struct StartView: View {
             Spacer().frame(height: 25)
 
             composedTitle
-                .fontName(.titleMedium24)      // ⬅️ 전체 기본 폰트 한 번만
+                .fontName(.titleMedium24)
                 .foregroundStyle(Color.black100)
                 .multilineTextAlignment(.leading)
                 .lineLimit(4)
@@ -90,56 +90,16 @@ struct StartView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            // 1) 프로그레스 인디케이터 (5번째 스텝)
             ProgressIndicator(currentStep: 4, totalSteps: 5)
             
-            // 2) 타이틀: 언더라인된 닉네임 + 나머지 텍스트
-            VStack(alignment: .leading, spacing: 4) {
-                Text("취향 입력이 완료되었어요 !")
-                    .fontName(.titleBold24)
-                    .foregroundStyle(Color.black100)
-                
-                Spacer().frame(height: 25)
-                
-                Text("앞으로 웨디가")
-                    .fontName(.titleMedium24)
-                    .foregroundStyle(Color.black100)
-                
-                HStack(spacing: 0) {
-                    Text("\(vm.nickname)님")
-                        .fontName(.titleBold24)
-                        .foregroundStyle(Color.black100)
-                    Text("의 취향에 맞는 하루를")
-                        .fontName(.titleMedium24)
-                        .foregroundStyle(Color.black100)
-                }
-                
-                Text("추천해드릴게요.")
-                    .fontName(.titleMedium24)
-                    .foregroundStyle(Color.black100)
-            }
-            .padding(.horizontal, 32)
-            .padding(.top, 39)
-            
-            Spacer().frame(height: 78)
-
+            Spacer().frame(height:39)
+                     titleBlock()
+                         .padding(.horizontal, 32)
             Spacer()
             
-            // 4) 다음 버튼
-            
-            Button{
-                vm.startTapped() // 여기서만 POST
-            } label: {
-                Text("웨디 시작하기")
-                    .fontName(.bodyMedium16)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 11)
-                    .background(Color.black100)
-                    .foregroundStyle(Color.white100)
-                    .cornerRadius(10)
-            }
-            .disabled(vm.isSubmitting)
-            .padding(.horizontal, 20)
-            .padding(.bottom, 22)
+            primaryButton()
+                      .padding(.horizontal, 20)
         }
         // 실패 시 경고
         .alert(item: $vm.alert) { a in

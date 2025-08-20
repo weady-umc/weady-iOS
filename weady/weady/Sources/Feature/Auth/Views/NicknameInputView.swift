@@ -120,13 +120,6 @@ struct NicknameInputView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
         }//VStack End
-        .toolbar(.hidden, for: .navigationBar)
-        .navigationBarBackButtonHidden(true)
-        .onChange(of: vm.shouldNavigateNext) { _, newValue in
-            guard newValue else { return }
-            onboarding.nickname = vm.nickname
-            router.push(.preference)
-        }
         .onAppear {
             // 디버그: View가 보관한 agreements 확인
             print("DEBUG Nickname →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
