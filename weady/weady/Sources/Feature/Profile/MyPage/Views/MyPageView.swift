@@ -3,6 +3,7 @@ import SwiftUI
 struct MyPageView: View {
     @Bindable var viewModel = MypageViewModel()
     @State private var showPicker = false
+    @State private var boardShowOverlay = false // 오버레이 상태
     
     private let months = Array(1...12)
     private let years = Array(2015...2025)
@@ -63,7 +64,7 @@ struct MyPageView: View {
                 
                 // MARK: - 달력
                 ScrollView {
-                    MyPageCalendar(viewModel: viewModel)
+                    MyPageCalendar(viewModel: viewModel, boardShowOverlay: $boardShowOverlay)
                         .padding(.horizontal, 10)
                 }
                 .frame(height: 400)
@@ -99,6 +100,14 @@ struct MyPageView: View {
                     )
                 }
                 .offset(x: -135)
+            }
+            
+            // MARK: - 캘린더 상세 화면 오버레이
+            if boardShowOverlay, let selectedBoard = viewModel.selectedBoard {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                
+                MypageBoardDetailView(board: selectedBoard, isPresented: $boardShowOverlay) // TODO: - (추후수정) 게시물 1개 전달
             }
         }
         .onChange(of: viewModel.year) { _, _ in
