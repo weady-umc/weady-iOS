@@ -132,11 +132,6 @@ struct LoginView: View {
         .onAppear {
             appearedAt = Date()
         }
-        .task {
-            if AuthManager.shared.hasValidSession {
-                routeAfterLoginOnce()
-            }
-        }
     }
 
     /// 로그인 이후/이미 로그인 상태에서의 분기를 "한 번만" 수행
