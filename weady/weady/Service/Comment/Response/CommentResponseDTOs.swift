@@ -31,7 +31,7 @@ struct CommentResponseDTO: Decodable, Identifiable {
     let username: String
     let profileImageUrl: String?
     let content: String
-    let childCommentsList: [ChildCommentResponseDTO]
+    var childCommentsList: [ChildCommentResponseDTO]
     let createdAt: String
 }
 

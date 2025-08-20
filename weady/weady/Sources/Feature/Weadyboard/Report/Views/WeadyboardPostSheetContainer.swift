@@ -15,16 +15,16 @@ struct WeadyboardPostSheetContainer: View {
     var onClose: () -> Void
 
     // 고정 디자인 기준값
-    private let moreHeight: CGFloat = 255
-    private let reportHeight: CGFloat = 759
+    private let moreHeight: CGFloat = 255 * .deviceScale
+    private let reportHeight: CGFloat = 759 * .deviceScale
 
     // 핸들(캡슐) 스타일
-    private let handleTopPadding: CGFloat = 18
-    private let handleBottomPadding: CGFloat = 6
+    private let handleTopPadding: CGFloat = 18 * .deviceScale
+    private let handleBottomPadding: CGFloat = 6 * .deviceScale
 
     // 드래그
     @State private var dragOffsetY: CGFloat = 0
-    private let closeThreshold: CGFloat = 120
+    private let closeThreshold: CGFloat = 120 * .deviceScale
 
     var body: some View {
         GeometryReader { proxy in
@@ -65,7 +65,7 @@ struct WeadyboardPostSheetContainer: View {
         switch state {
         case .reportList, .reportDetail:
             Capsule()
-                .frame(width: 36, height: 4)
+                .frame(width: 36 * .deviceScale, height: 4 * .deviceScale)
                 .opacity(0.2)
                 .padding(.top, handleTopPadding)
                 .padding(.bottom, handleBottomPadding)
@@ -91,7 +91,7 @@ struct WeadyboardPostSheetContainer: View {
                 }
             )
             .frame(height: moreHeight)
-            .padding(.bottom, 36)
+            .padding(.bottom, 36 * .deviceScale)
 
         case .reportList:
             WeadyboardPostReportSheet(

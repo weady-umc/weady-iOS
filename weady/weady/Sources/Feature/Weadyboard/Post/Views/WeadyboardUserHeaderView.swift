@@ -13,18 +13,18 @@ struct WeadyboardUserHeaderView: View {
     let onMoreTap: () -> Void
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 12 * .deviceScale) {
             AsyncImage(url: URL(string: userProfileImageUrl ?? "")) { img in
                 img.resizable()
             } placeholder: {
-                Image("profile") // 기본 프로필 이미지
+                Image("profileimage") // 기본 프로필 이미지
                     .resizable()
             }
-            .frame(width: 30, height: 30)
+            .frame(width: 30 * .deviceScale, height: 30 * .deviceScale)
             .clipShape(Circle())
             
             Text(userName)
-                .fontName(.metaSemibold12)
+                .fontName(.metaMedium12)
             
             Spacer()
             
@@ -32,6 +32,6 @@ struct WeadyboardUserHeaderView: View {
                 Image("more")
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 16 * .deviceScale)
     }
 }

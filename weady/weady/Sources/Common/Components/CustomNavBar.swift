@@ -23,59 +23,61 @@ struct CustomNavBar: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                if showBackButton {
-                    Button(action: {
-                        backAction?()
-                    }) {
-                        Image("backicon")
-                            .resizable()
-                            .frame(width: 9.5, height: 17)
-                            .frame(width: 44, height: 44)
-                    }
-                } else if showLogoButton {
-                    Button(action: { logoAction?() }) {
-                        Image(logoImageName)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 20)
-                            .frame(width: 44, height: 44) // 탭 영역 44 유지
-                    }
-                        
-                } else {
-                    Spacer().frame(width: 44, height: 44)
-                }
-
-                Spacer()
-
+            ZStack {
                 Text(viewTitle)
                     .fontName(.bodySemibold16)
 
-                Spacer()
+                // 좌우 컨트롤 레이어
+                HStack {
+                    // 왼쪽: Back / Logo / 빈 자리
+                    if showBackButton {
+                        Button(action: { backAction?() }) {
+                            Image("backicon")
+                                .resizable()
+                                .frame(width: 9.5, height: 17)
+                                .frame(width: 44, height: 44, alignment: .leading)
+                                .contentShape(Rectangle())
+                        }
+                    } else if showLogoButton {
+                        Button(action: { logoAction?() }) {
+                            Image(logoImageName)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 59.37 * .deviceScale, height: 25 * .deviceScale)
+                                // 44영역의 leading 정렬
+                                .frame(width: 44, height: 44, alignment: .leading)
+                                .contentShape(Rectangle())
+                        }
+                    } else {
+                        // 자리 유지용 투명 뷰
+                        Color.clear.frame(width: 44, height: 44)
+                    }
 
-                if showAlarmButton {
-                    Button(action: {
-                        alarmAction?()
-                    }) {
-                        Image("alarmicon")
-                            .resizable()
-                            .frame(width: 18, height: 20)
-                            .frame(width: 44, height: 44)
+                    Spacer()
+
+                    // 오른쪽: Alarm / Submit / 빈 자리
+                    if showAlarmButton {
+                        Button(action: { alarmAction?() }) {
+                            Image("alarmicon")
+                                .resizable()
+                                .frame(width: 20 * .deviceScale, height: 22 * .deviceScale)
+                                .frame(width: 44, height: 44, alignment: .trailing)
+                                .contentShape(Rectangle())
+                        }
+                    } else if showSubmitButton {
+                        Button(action: { submitAction?() }) {
+                            Text("완료")
+                                .fontName(.captionMedium14)
+                                .foregroundStyle(Color.black100)
+                                .frame(width: 44, height: 44, alignment: .trailing)
+                                .contentShape(Rectangle())
+                        }
+                    } else {
+                        Color.clear.frame(width: 44, height: 44)
                     }
-                } else if showSubmitButton {
-                    Button(action: {
-                        submitAction?()
-                    }) {
-                        Text("완료")
-                            .fontName(.captionMedium14)
-                            .foregroundStyle(Color.black100)
-                            .frame(width: 44, height: 44)
-                    }
-                } else {
-                    Spacer().frame(width: 44, height: 44)
                 }
             }
-            .padding(.horizontal, 15)
+            .padding(.horizontal, 20)
             .padding(.top, 15)
             
             // 네비게이션바 아래에 선 있으면 true로 설정

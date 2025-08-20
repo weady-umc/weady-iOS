@@ -40,7 +40,7 @@ struct LoginView: View {
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .frame(width: 375, height: 440)
+            .frame(width: 375 * .deviceScale, height: 440 * .deviceScale)
             
             Spacer().frame(height: 29)
             
@@ -48,7 +48,7 @@ struct LoginView: View {
                 ForEach(onboardingImages.indices, id: \.self) { index in
                     Circle()
                         .fill(currentPage == index ? Color.gray300 : Color.gray400)
-                        .frame(width: 11, height: 11)
+                        .frame(width: 11 * .deviceScale, height: 11 * .deviceScale)
                         .animation(.easeInOut, value: currentPage)
                 }
             }
