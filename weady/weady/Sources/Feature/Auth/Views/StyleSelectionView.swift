@@ -11,10 +11,7 @@ struct StyleSelectionView: View {
     // 외부 주입용 ViewModel
     @StateObject private var vm: StyleSelectionViewModel
     @State private var showNext = false
-    @Environment(\.router) private var router
-    @EnvironmentObject private var onboarding: OnboardingStore
-    
-    
+
     private let gender: GenderCode?
     private let agreements: [OnboardingAgreement]
     
@@ -40,10 +37,30 @@ struct StyleSelectionView: View {
             Spacer()
             footerView()
         }
-        .toolbar(.hidden, for: .navigationBar)
-        .navigationBarBackButtonHidden(true)
         .onAppear {
+            print("DEBUG Style →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
+
             vm.loadCategories()
+        }
+        // 다음 → StartView (스타일 포함)
+        .fullScreenCover(isPresented: $vm.didTapNext) {
+            let styleIds64: [Int64] = Array(vm.selectedIds).map { Int64($0) }.sorted()
+            StartView.onboarding(
+                nickname: vm.nickname,
+                gender: gender,
+                styleIds: styleIds64,
+                agreements: agreements
+            )
+        }
+        // 스킵 → StartView (스타일 없음)
+        .fullScreenCover(isPresented: $vm.didTapSkip) {
+            let styleIds64: [Int64] = []   // 스킵이면 빈 배열
+            StartView.onboarding(
+                nickname: vm.nickname,
+                gender: gender,
+                styleIds: styleIds64,
+                agreements: agreements
+            )
         }
     }
   
@@ -100,10 +117,7 @@ struct StyleSelectionView: View {
     @ViewBuilder
     private func footerView() -> some View {
         VStack(spacing: 20) {
-            Button {
-                onboarding.styleIds = []
-                router.push(.start)
-            } label: {
+            Button(action: vm.skip) {
                 Text("건너뛰기")
                     .fontName(.bodyMedium16)
                     .foregroundStyle(Color.gray800)
@@ -115,10 +129,7 @@ struct StyleSelectionView: View {
                     )
             }
             
-            Button {
-                onboarding.styleIds = vm.selectedStyleIds64
-                router.push(.start)
-            } label: {
+            Button(action: vm.next) {
                 Text("다음")
                     .fontName(.bodyMedium16)
                     .frame(maxWidth: .infinity)
@@ -156,16 +167,14 @@ struct CategoryButton: View {
         }
     }
 }
+/*
+struct StyleSelectionView_Previews: PreviewProvider {
+    static var previews: some View {
+        StyleSelectionView(nickname: "테스트")
 
-#Preview {
-    let router = NavigationRouter()
-    let store = OnboardingStore()
-    NavigationStack {
-        StyleSelectionView(
-            nickname: "영택",
-            agreements: PreviewAgreements.requiredAllAgreed
-        )
     }
     .environment(router)
     .environmentObject(store)
 }
+*/
+

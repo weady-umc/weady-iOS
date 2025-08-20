@@ -15,15 +15,13 @@ func nameWithHonorific(_ nickname: String) -> Text {
 
 struct PreferenceInputView: View {
     @StateObject private var vm: PreferenceInputViewModel
-    @Environment(\.router) private var router
-    @EnvironmentObject private var onboarding: OnboardingStore
-    
+
     private let agreements: [OnboardingAgreement]
     // 기본값 제공
     init(
-        nickname: String,
-        agreements: [OnboardingAgreement],
-        viewModel: PreferenceInputViewModel? = nil
+          nickname: String,
+          agreements: [OnboardingAgreement],
+          viewModel: PreferenceInputViewModel? = nil
     ) {
         self.agreements = agreements
         if let viewModel {
@@ -32,7 +30,7 @@ struct PreferenceInputView: View {
             _vm = StateObject(wrappedValue: PreferenceInputViewModel(nickname: nickname))
         }
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // 1) 프로그레스 인디케이터 (2번째 스텝)
@@ -62,14 +60,12 @@ struct PreferenceInputView: View {
             .padding(.top, 39)
             
             Spacer()
-            
+
             Spacer().frame(height: 146)
             
             // 4) 하단 버튼들
             VStack(spacing: 20) {
-                Button{
-                    router.push(.start)
-                } label: {
+                Button(action: vm.skip) {
                     Text("취향입력 건너뛰기")
                         .fontName(.bodyMedium16)
                         .foregroundStyle(Color.gray800)
@@ -81,9 +77,7 @@ struct PreferenceInputView: View {
                         )
                 }
                 
-                Button{
-                    router.push(.gender)
-                } label: {
+                Button(action: vm.next) {
                     Text("다음")
                         .fontName(.bodyMedium16)
                         .frame(maxWidth: .infinity)
@@ -92,28 +86,34 @@ struct PreferenceInputView: View {
                         .foregroundStyle(Color.white100)
                         .cornerRadius(10)
                 }
+
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
-            .onAppear {
-                // 디버그: View가 들고 있는 약관을 확인
-                print("DEBUG Preference →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
-            }
+        }
+        .onAppear {
+            // 디버그: View가 들고 있는 약관을 확인
+            print("DEBUG Preference →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
+        }
+        // 스킵 → StartView (agreements 그대로 전달)
+        .fullScreenCover(isPresented: $vm.didTapSkip) {
+            StartView(
+                nickname: vm.nickname,
+                gender: nil,                 // 아직 성별 없음
+                styleIds: [],                // 스킵이므로 빈 배열
+                agreements: agreements       // 약관 릴레이
+            )
+        }
+        // 다음 → GenderSelection (agreements 그대로 전달)
+        .fullScreenCover(isPresented: $vm.didTapNext) {
+            GenderSelectionView(nickname: vm.nickname, agreements: agreements)
         }
         .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden(true)
     }
 }
 
-#Preview {
-    let router = NavigationRouter()
-    let store = OnboardingStore()
-    NavigationStack {
-        PreferenceInputView(
-            nickname: "닉네임",
-            agreements: PreviewAgreements.requiredAllAgreed
-        )
-    }
-    .environment(router)
-    .environmentObject(store)
+/*#Preview {
+    PreferenceInputView(nickname: "테스트")
 }
+*/
