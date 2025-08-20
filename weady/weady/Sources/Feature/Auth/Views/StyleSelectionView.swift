@@ -14,7 +14,7 @@ struct StyleSelectionView: View {
 
     private let gender: GenderCode?
     private let agreements: [OnboardingAgreement]
-
+    
     init(
         nickname: String,
         gender: GenderCode? = nil,
@@ -27,8 +27,8 @@ struct StyleSelectionView: View {
     }
     
     private let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 15), count: 3)
-
-
+    
+    
     var body: some View {
         VStack(alignment: .leading) {
             headerView()
@@ -39,6 +39,7 @@ struct StyleSelectionView: View {
         }
         .onAppear {
             print("DEBUG Style →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
+
             vm.loadCategories()
         }
         // 다음 → StartView (스타일 포함)
@@ -62,8 +63,9 @@ struct StyleSelectionView: View {
             )
         }
     }
+  
     
-
+    
     @ViewBuilder
     private func headerView() -> some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -83,20 +85,20 @@ struct StyleSelectionView: View {
                 .padding(.top, 17)
         }
     }
-
+    
     @ViewBuilder
     private func contentView() -> some View {
         if vm.isLoading {
             Spacer()
             ProgressView("불러오는 중…")
             Spacer()
-
+            
         } else if let err = vm.errorMessage {
             Spacer()
             Text("에러: \(err)")
                 .foregroundColor(.red)
             Spacer()
-
+            
         } else {
             LazyVGrid(columns: columns, spacing: 20) {
                 ForEach(vm.categories, id: \.id) { cat in
@@ -111,7 +113,7 @@ struct StyleSelectionView: View {
             .padding(.horizontal, 30)
         }
     }
-
+    
     @ViewBuilder
     private func footerView() -> some View {
         VStack(spacing: 20) {
@@ -155,13 +157,13 @@ struct CategoryButton: View {
                 .frame(maxWidth: 314, minHeight: 40)
                 .background(isSelected ? Color.white200 : Color.white)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: 4)
                         .stroke(
                             isSelected ? Color.black100 : Color.gray700,
                             lineWidth: isSelected ? 3 : 2
                         )
                 )
-                .cornerRadius(8)
+                .cornerRadius(4)
         }
     }
 }
@@ -169,7 +171,10 @@ struct CategoryButton: View {
 struct StyleSelectionView_Previews: PreviewProvider {
     static var previews: some View {
         StyleSelectionView(nickname: "테스트")
-    }
-}
 
+    }
+    .environment(router)
+    .environmentObject(store)
+}
 */
+
