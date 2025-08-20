@@ -18,6 +18,11 @@ struct CalendarThumbnailModel: Identifiable, Codable {
     var weatherType: WeatherType {
         WeatherType.allCases.first { $0.tagId == weatherTagId } ?? .sunny
     }
+    
+    // 날짜 객체 미리 계산
+    var dateObj: Date {
+        ISO8601DateFormatter().date(from: date) ?? Date()
+    }
 }
 
 // MARK: - 특정 게시물 이미지 전체 리스트
@@ -31,7 +36,7 @@ struct BoardImageModel: Identifiable, Codable {
 struct MypageBoardDetailModel: Identifiable, Codable {
     var id: Int { boardId }
     let boardId: Int
-    let createdAt: String       // ISO8601 date-time
+    let createdAt: String       
     let isPublic: Bool
     let weatherTagId: Int
     let imageList: [BoardImageModel]
