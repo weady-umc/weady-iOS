@@ -2,21 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-
 	<key>API_URL</key>
 	<string>$(API_URL)</string>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>LSHandlerRank</key>
-			<string>None</string>
-		</dict>
-		<dict>
-			<key>LSHandlerRank</key>
-			<string>None</string>
-		</dict>
-	</array>
-
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
