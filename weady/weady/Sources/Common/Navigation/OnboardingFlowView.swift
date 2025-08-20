@@ -1,99 +1,136 @@
-////
-////  OnboardingFlowView.swift
-////  weady
-////
-////  Created by 엄민서 on 8/20/25.
-////
-////
+//
+//  OnboardingFlowView.swift
+//  weady
+//
+//  Created by 엄민서 on 8/21/25.
+//
 
-//
-//import SwiftUI
-//
-///// 온보딩 단계 라우트
-//private enum OnboardingRoute: Hashable {
-//    case terms
-//    case nickname(agreements: [OnboardingAgreement])
-//    case preference(nickname: String, agreements: [OnboardingAgreement])
-//    case gender(nickname: String, agreements: [OnboardingAgreement])
-//    case style(nickname: String, gender: GenderCode?, agreements: [OnboardingAgreement])
-//    case start(nickname: String, gender: GenderCode?, styleIds: [Int64]?, agreements: [OnboardingAgreement])
-//}
-//
-///// 온보딩 전체 플로우 컨테이너 (NavigationStack 기반)
-//struct OnboardingFlowView: View {
-//    @State private var path: [OnboardingRoute] = [.terms]
-//
-//    /// 온보딩이 끝났을 때(탭 화면으로) 전환 콜백
-//    var onFinished: (() -> Void)?
-//
-//    var body: some View {
-//        NavigationStack(path: $path) {
-//            // 첫 화면
-//            TermsAgreementView { agreements in
-//                path.append(.nickname(agreements: agreements))
-//            }
-//            .navigationDestination(for: OnboardingRoute.self) { route in
-//                switch route {
-//                case .terms:
-//                    TermsAgreementView { agreements in
-//                        path.append(.nickname(agreements: agreements))
-//                    }
-//
-//                case let .nickname(agreements):
-//                    NicknameInputView(agreements: agreements, embeddedInFlow: true) { nickname in
-//                        path.append(.preference(nickname: nickname, agreements: agreements))
-//                    }
-//
-//                case let .preference(nickname, agreements):
-//                    PreferenceInputView(
-//                        nickname: nickname,
-//                        agreements: agreements,
-//                        embeddedInFlow: true,
-//                        onSkip: {
-//                            // 취향 입력 스킵 → 성별/스타일 모두 없이 Start
-//                            path.append(.start(nickname: nickname, gender: nil, styleIds: [], agreements: agreements))
-//                        },
-//                        onNext: {
-//                            path.append(.gender(nickname: nickname, agreements: agreements))
-//                        }
-//                    )
-//
-//                case let .gender(nickname, agreements):
-//                    GenderSelectionView(
-//                        nickname: nickname,
-//                        agreements: agreements,
-//                        embeddedInFlow: true
-//                    ) { gender in
-//                        // 선택 안함(nil) 포함해서 전달
-//                        path.append(.style(nickname: nickname, gender: gender, agreements: agreements))
-//                    }
-//
-//                case let .style(nickname, gender, agreements):
-//                    StyleSelectionView(
-//                        nickname: nickname,
-//                        gender: gender,
-//                        agreements: agreements,
-//                        embeddedInFlow: true,
-//                        onSkip: {
-//                            path.append(.start(nickname: nickname, gender: gender, styleIds: [], agreements: agreements))
-//                        },
-//                        onNext: { styleIds64 in
-//                            path.append(.start(nickname: nickname, gender: gender, styleIds: styleIds64, agreements: agreements))
-//                        }
-//                    )
-//
-//                case let .start(nickname, gender, styleIds, agreements):
-//                    StartView(
-//                        nickname: nickname,
-//                        gender: gender,
-//                        styleIds: styleIds,
-//                        agreements: agreements
-//                    ) {
-//                        // 온보딩 종료: 컨테이너 밖에서 탭 화면으로 전환 처리
-//                        onFinished?()
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
+import SwiftUI
+
+private enum Step {
+    case terms
+    case nickname
+    case preference
+    case gender
+    case style
+    case start
+}
+
+struct OnboardingFlowView: View {
+    @State private var step: Step = .terms
+
+    @State private var agreements: [OnboardingAgreement] = []
+    @State private var nickname: String = ""
+    @State private var gender: GenderCode? = nil
+    @State private var styleIds: [Int64] = []
+
+    var onFinished: (() -> Void)? = nil
+
+    private let visibleTotalSteps = 5
+    private var visibleIndex: Int? {
+        switch step {
+        case .terms: return nil
+        case .nickname: return 0
+        case .preference: return 1
+        case .gender: return 2
+        case .style: return 3
+        case .start: return 4
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if let idx = visibleIndex {
+                ProgressIndicator(currentStep: idx, totalSteps: visibleTotalSteps)
+            }
+
+            ZStack {
+                content
+                    .id(step)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .leading).combined(with: .opacity)
+                    ))
+            }
+            .animation(.easeInOut, value: step)
+        }
+        .navigationBarBackButtonHidden(true)
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch step {
+        case .terms:
+            TermsAgreementView { payload in
+                agreements = payload
+                step = .nickname
+            }
+
+        case .nickname:
+            NicknameInputView(
+                agreements: agreements,
+                embeddedInFlow: true
+            ) { name in
+                nickname = name
+                step = .preference
+            }
+
+        case .preference:
+            PreferenceInputView(
+                nickname: nickname,
+                agreements: agreements,
+                embeddedInFlow: true,
+                onSkip: {
+                    gender = nil
+                    styleIds = []
+                    step = .start
+                },
+                onNext: {
+                    step = .gender
+                }
+            )
+
+        case .gender:
+            GenderSelectionView(
+                nickname: nickname,
+                agreements: agreements,
+                embeddedInFlow: true,
+                onSkip: {
+                    gender = .NONE
+                    styleIds = []
+                    step = .style
+                },
+                onNext: { g in
+                    gender = g
+                    step = .style
+                }
+            )
+
+        case .style:
+            StyleSelectionView(
+                nickname: nickname,
+                gender: gender,
+                agreements: agreements,
+                embeddedInFlow: true,
+                onSkip: {
+                    styleIds = []
+                    step = .start
+                },
+                onNext: { ids in
+                    styleIds = ids
+                    step = .start
+                }
+            )
+
+        case .start:
+            StartView(
+                nickname: nickname,
+                gender: gender,
+                styleIds: styleIds,
+                agreements: agreements
+            ) {
+                onFinished?()
+            }
+        }
+    }
+}

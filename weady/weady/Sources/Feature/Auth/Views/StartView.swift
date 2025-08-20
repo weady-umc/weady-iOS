@@ -7,42 +7,31 @@
 
 import SwiftUI
 
-extension StartView {
-    static func onboarding(
-        nickname: String,
-        gender: GenderCode?,
-        styleIds: [Int64]?,
-        agreements: [OnboardingAgreement]?
-    ) -> StartView {
-        StartView(nickname: nickname, gender: gender, styleIds: styleIds, agreements: agreements)
-    }
-}
-
 struct StartView: View {
     @StateObject private var vm: StartViewModel
-    @State private var showHome = false
-    
-    @State private var selectedTab: TabType = .home
-    @State private var isTabBarHidden: Bool = false
 
-    // 전체 데이터 전달용 (POST에 쓰일 값)
+    var onFinish: (() -> Void)? = nil
+
+    @State private var didFinish = false
+
     init(
-          nickname: String,
-          gender: GenderCode? = nil,
-          styleIds: [Int64]? = nil,
-          agreements: [OnboardingAgreement]? = nil
-      ) {
-          _vm = StateObject(
-              wrappedValue: StartViewModel(
-                  nickname: nickname,
-                  gender: gender,
-                  styleIds: styleIds,
-                  agreements: agreements
-              )
-          )
-      }
-    
-    // 덩어리 텍스트: ‘닉네임+님’은 붙이고(줄바꿈 금지), 나머지는 자연스럽게 감기게
+        nickname: String,
+        gender: GenderCode? = nil,
+        styleIds: [Int64]? = nil,
+        agreements: [OnboardingAgreement]? = nil,
+        onFinish: (() -> Void)? = nil
+    ) {
+        _vm = StateObject(
+            wrappedValue: StartViewModel(
+                nickname: nickname,
+                gender: gender,
+                styleIds: styleIds,
+                agreements: agreements
+            )
+        )
+        self.onFinish = onFinish
+    }
+
     private var composedTitle: Text {
         Text("앞으로 웨디가\n")
         + Text(verbatim: vm.nickname).bold()
@@ -50,17 +39,14 @@ struct StartView: View {
         + Text("의 취향에 맞는 하루를 ")
         + Text("추천해드릴게요.")
     }
-    
-    // 닉네임이 짧으면 한 줄, 길면 자연스럽게 2줄
+
     @ViewBuilder
     private func titleBlock() -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("취향 입력이 완료되었어요 !")
                 .fontName(.titleBold24)
                 .foregroundStyle(Color.black100)
-
             Spacer().frame(height: 25)
-
             composedTitle
                 .fontName(.titleMedium24)
                 .foregroundStyle(Color.black100)
@@ -90,51 +76,20 @@ struct StartView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // 1) 프로그레스 인디케이터 (5번째 스텝)
-            ProgressIndicator(currentStep: 4, totalSteps: 5)
-            
-            Spacer().frame(height:39)
-                     titleBlock()
-                         .padding(.horizontal, 32)
+            Spacer().frame(height: 39)
+            titleBlock()
+                .padding(.horizontal, 32)
             Spacer()
-            
             primaryButton()
-                      .padding(.horizontal, 20)
+                .padding(.horizontal, 20)
         }
-        // 실패 시 경고
         .alert(item: $vm.alert) { a in
             Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
         }
-        // 성공 시 Home 
-        .fullScreenCover(isPresented: $vm.navigateHome) {
-            BaseTabHost(
-                selectedTab: $selectedTab,
-                isTabBarHidden: $isTabBarHidden
-            )
-        }
-    }
-}
-
-// MARK: - BaseTabHost
-private struct BaseTabHost: View {
-    @Binding var selectedTab: TabType
-    @Binding var isTabBarHidden: Bool
-    
-    @State private var router = NavigationRouter()
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // 콘텐츠 영역
-            BaseTabScreen(selectedTab: $selectedTab,  isTabBarHidden: $isTabBarHidden)
-                .environment(router)
-            
-            // 탭바
-            if !isTabBarHidden {
-                BaseTabView(
-                    selectedTab: $selectedTab,
-                    isTabBarHidden: $isTabBarHidden
-                )
-            }
+        .onChange(of: vm.navigateHome) { _, newValue in
+            guard newValue, !didFinish else { return }
+            didFinish = true
+            onFinish?()    // 컨테이너가 스택 교체 수행
         }
     }
 }

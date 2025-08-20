@@ -8,24 +8,13 @@
 import SwiftUI
 
 struct AppRootView: View {
-    
-    // MARK: - AppRootView
-    /// 앱의 전역 네비게이션 스택
-    /// SplashView → LoginView → OnboardingView → BaseTab 까지만 연결
-    
-    // MARK: Properties
     /// 전역 네비게이션 경로
     @EnvironmentObject private var router: NavigationRouter
-    
-    /// 탭 전환 및 현재 탭 상태 보관
+
+    /// 탭 컨트롤러/브리지/토스트
     @State private var tabController = AppTabController()
-    
-    /// 보드 플로우 딥링크 브리지 (타 플로우 → Weadyboard 라우팅 연결)
     @State private var weadyboardBridge = WeadyboardRouteBridge()
-    
-    /// 탭바 표시/숨김 (필요 시 상세 화면에서 제어 가능)
     @State private var isTabBarHidden = false
-    
     @State private var selectedTab: TabType = .home
     @StateObject private var toastCenter = ToastCenter.shared
     
@@ -50,10 +39,13 @@ struct AppRootView: View {
                             .navigationBarHidden(true)
                         
                     case .onboarding:
-                        TermsAgreementView()
-                            .environment(router)
-                            .environmentObject(router)
-                        
+                        // 온보딩 컨테이너: 완료 시 스택을 탭으로 '교체'
+                        OnboardingFlowView {
+                            router.path = [.basetab]
+                        }
+                        .environment(router)
+                        .environmentObject(router)
+
                     case .basetab:
                         ZStack(alignment: .bottom) {
                             BaseTabScreen(selectedTab: $selectedTab,
@@ -82,8 +74,6 @@ struct AppRootView: View {
                 }
         }
         .environment(router)
-       // .environmentObject(router)
-//        .environmentObject(weadyboardBridge)
         .environmentObject(toastCenter)
     }
 }
