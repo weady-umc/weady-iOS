@@ -93,9 +93,15 @@ struct HomeView: View {
             // MARK: - [네비 버튼] 큐레이션 카드 (누르면 .curation 로 이동)
             // [네비] 큐레이션 가로 섹션 (어디 눌러도 .curation 이동)
             
-            CurationStripView(vm: curationVM) {
-                    router.push(.weatherhome(initial: .third))
-                }
+            // HomeView 내
+            CurationStripView(
+                vm: curationVM,
+                onTapAll: { router.push(.weatherhome(initial: .third)) },
+                tileSize: .init(width: 280, height: 140),                   // ← 이미지 크기 직접 지정
+                titleFont: .system(size: 17, weight: .bold),                // ← 폰트 직접 지정(또는 .fontName 사용)
+                titleColor: .white                                          // ← 색상도 원하는 대로
+            )
+
             
         }
         .padding(.bottom, 70)
@@ -119,9 +125,9 @@ struct HomeView: View {
             locationService.requestCurrentLocation() // 권한 요청 + 현재 좌표 1회/지속 업데이트 트리거
         }
         
-        .task { await curationVM.loadLocationRaw(locationId: 64) }
+       // .task { await curationVM.loadLocationRaw(locationId: 64) }
 
-        
+        .task { await curationVM.boot() }
         // MARK: - 위치 좌표 스트림 수신 → 서버 now-location PATCH
 
         // onAppear: 토큰 세팅 + 플래그 초기화 + 위치 요청
@@ -400,6 +406,10 @@ struct CurationStripView: View {
     @ObservedObject var vm: CurationViewModel
     var onTapAll: () -> Void      // 전체를 탭했을 때 실행
 
+    // 👉 원하는 크기/폰트로 조절할 수 있는 파라미터
+    var tileSize: CGSize = .init(width: 259, height: 128)
+    var titleFont: Font = .system(size: 16, weight: .semibold)
+    var titleColor: Color = .white
     
     // 로컬 더미 에셋 이름
         private let dummyImages = [
@@ -425,6 +435,66 @@ struct CurationStripView: View {
             .padding(.bottom, 19)
             
             ScrollView(.horizontal, showsIndicators: false) {
+                           LazyHStack(spacing: 13) {
+                               if vm.items.isEmpty {
+                                   ForEach(dummyImages, id: \.self) { name in
+                                       ZStack(alignment: .bottomLeading) {
+                                           Image(name)
+                                               .resizable()
+                                               .scaledToFill()
+                                               .frame(width: tileSize.width, height: tileSize.height)
+                                               .clipped()
+                                               .clipShape(RoundedRectangle(cornerRadius: 6))
+                                       }
+                                   }
+                               } else {
+                                   ForEach(vm.items) { it in
+                                       ZStack(alignment: .bottomLeading) {
+                                           // 👉 이미지 “크기/비율”은 여기서만 컨트롤
+                                           AsyncImage(url: it.thumb) { phase in
+                                               switch phase {
+                                               case .success(let img):
+                                                   img.resizable()
+                                                       .scaledToFill()
+                                               default:
+                                                   Rectangle().fill(.gray.opacity(0.1))
+                                               }
+                                           }
+                                           .frame(width: 259, height: 128, alignment: .leading)
+                                           .clipped()
+                                           .clipShape(RoundedRectangle(cornerRadius: 6))
+                                           
+                                           
+                                         /*  // 👉 텍스트는 폰트/색/라인수 자유 조절
+                                           Text(it.title)
+                                               .font(titleFont)
+                                                   .foregroundStyle(.white)
+                                                   .multilineTextAlignment(.leading)
+                                                   .lineLimit(2)
+                                                   .truncationMode(.tail)
+                                                   .frame(width: tileSize.width - 26, alignment: .leading) // 폭을 고정해야 줄바꿈 됨
+                                                   .padding(.bottom, 12)
+                                                   .padding(.leading, 13)              // 필요하면
+                                          */
+                                       }
+                                   }
+                               }
+                           }
+                           .padding(.leading, 20)
+                       }
+                     .scrollIndicators(.hidden)
+                     .overlay(alignment: .bottom) {
+                         Color.white.frame(height: 3)   // 테마에 맞게 배경색 사용
+                     }
+                   }
+                   .frame(height: tileSize.height + 43) // 타이틀/간격만큼 여유
+                   .contentShape(Rectangle())
+                   .onTapGesture(perform: onTapAll)
+               }
+           }
+
+            /*
+            ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 13){
                     if vm.items.isEmpty {
                         // 더미 카드
@@ -432,7 +502,7 @@ struct CurationStripView: View {
                             Image(name)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: 259, height: 128)
+                                .frame(width: tileSize.width, height: tileSize.height)
                                 .clipped()
                                 .clipShape(RoundedRectangle(cornerRadius: 6))
                         }
@@ -478,7 +548,7 @@ struct CurationStripView: View {
         
     }
 }
-/*
+
 // 홈용 타일
 private struct CardTile: View {
     let title: String

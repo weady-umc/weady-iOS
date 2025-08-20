@@ -67,8 +67,9 @@ struct WeatherLocationView: View {
                 viewModel.loadFavorites()
                 viewModel.loadNowLocationCard()
             }
-            .highPriorityGesture(DragGesture(minimumDistance: 15).onEnded { g in if g.startLocation.x < 24 && g.startLocation.y > 100 && g.translation.width > 60 && abs(g.translation.height) < 40 { router.pop() } })
-
+            .edgeSwipeBack(topExclusion: 100) {
+                    router.pop()
+                }
 
             .toolbar(.hidden, for: .navigationBar) // 시스템 네비바 숨김
             .safeAreaInset(edge: .top) {
@@ -176,7 +177,7 @@ struct WeatherLocationView: View {
                                 isCurrentLocation: false,
                                 editMode: editMode?.wrappedValue == .active
                             )
-                            
+                            .allowsHitTesting(editMode?.wrappedValue != .active) // 편집 중에는 탭 비활성화
                             .contentShape(Rectangle()) // 탭 영역 확장
                             .onTapGesture {
                                 guard editMode?.wrappedValue != .active else { return }
@@ -195,12 +196,10 @@ struct WeatherLocationView: View {
 
                         }
                         .frame(alignment: .leading)
-                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 44))      // 기본 여백 제거
+                        .listRowInsets(EdgeInsets())      // 기본 여백 제거
                         .listRowSeparator(.hidden)        // 구분선 숨김
                         .padding(.bottom, 8)
-                        
                     }
-                    
                     
                 }
                 .listStyle(.plain)
