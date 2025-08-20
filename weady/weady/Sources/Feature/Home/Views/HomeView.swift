@@ -588,7 +588,7 @@ private struct CardTile: View {
 
 */
 
-#Preview {
-    HomeFlowHost()
-        .environment(HomeRouter()) // 미리보기에서 라우터 주입
-}
+//#Preview {
+//    HomeFlowHost(isTabBarHidden: .constant(false))
+//        .environment(HomeRouter()) // 미리보기에서 라우터 주입
+//}

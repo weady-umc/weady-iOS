@@ -41,11 +41,11 @@ struct WeadyboardFilterSheet: View {
                 Spacer()
             } else {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: 24 * .deviceScale) {
 
                         // MARK: - 계절
                         sectionTitle("계절")
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)) {
+                        HStack(spacing: 8 * .deviceScale) {
                             ForEach(tagVM.seasons, id: \.id) { tag in
                                 FilterTag(
                                     text: tag.name,
@@ -62,54 +62,61 @@ struct WeadyboardFilterSheet: View {
                                     }
                                 }
                             }
+                            .padding(.leading, 7 * .deviceScale)
                         }
 
                         // MARK: - 기온
                         sectionTitle("기온")
-                        VStack(spacing: 8) {
+                        VStack(spacing: 8 * .deviceScale) {
                             Text(tagVM.temperatureRangeText(for: temperature))
                                 .fontName(.metaSemibold12)
                                 .foregroundColor(.black100)
 
                             Text(tagVM.temperatureStatusText(for: temperature))
-                                .fontName(.metaMedium10)
+                                .fontName(.metaSemibold12)
                                 .foregroundColor(.black100)
                         }
                         .frame(maxWidth: .infinity)
                         .multilineTextAlignment(.center)
 
                         GradientSliderView(value: $temperature, range: -6...31)
-                            .padding(.horizontal, 8)
+                            .padding(.horizontal, 8 * .deviceScale)
 
                         // MARK: - 날씨
                         sectionTitle("날씨")
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 15) {
-                            ForEach(tagVM.weathers, id: \.id) { tag in
-                                FilterIconTag(
-                                    label: tag.name,
-                                    imageName: weatherIconName(for: tag.id),
-                                    isSelected: tagVM.selectedWeatherIds.contains(tag.id),
-                                    selectedBackground: .black100,
-                                    selectedTextColor: .white100,
-                                    unselectedBackground: .white400,
-                                    unselectedTextColor: .black100
-                                ) {
-                                    if tagVM.selectedWeatherIds.contains(tag.id) {
-                                        tagVM.selectedWeatherIds.remove(tag.id)
-                                    } else {
-                                        tagVM.selectedWeatherIds.insert(tag.id)
+
+                        VStack(alignment: .leading, spacing: 15 * .deviceScale) {
+                            let rows = chunk(tagVM.weathers, by: 3)
+                            ForEach(rows.indices, id: \.self) { rowIndex in
+                                HStack(spacing: 12 * .deviceScale) {
+                                    ForEach(rows[rowIndex], id: \.id) { tag in
+                                        FilterIconTag(
+                                            label: tag.name,
+                                            imageName: weatherIconName(for: tag.id),
+                                            isSelected: tagVM.selectedWeatherIds.contains(tag.id),
+                                            selectedBackground: .black100,
+                                            selectedTextColor: .white100,
+                                            unselectedBackground: .white400,
+                                            unselectedTextColor: .black100
+                                        ) {
+                                            if tagVM.selectedWeatherIds.contains(tag.id) {
+                                                tagVM.selectedWeatherIds.remove(tag.id)
+                                            } else {
+                                                tagVM.selectedWeatherIds.insert(tag.id)
+                                            }
+                                        }
                                     }
                                 }
-                                .frame(height: 26)
                             }
                         }
+                        .padding(.trailing, 20 * .deviceScale)
                     }
-                    .padding(20)
+                    .padding(20 * .deviceScale)
                 }
             }
         }
         .background(Color.white)
-        .presentationDetents([.height(567)])
+        .presentationDetents([.height(567 * .deviceScale)])
         .presentationDragIndicator(.hidden)
         .onAppear {
             tagVM.loadAll(initialCriteria: initialCriteria)
@@ -125,7 +132,9 @@ struct WeadyboardFilterSheet: View {
     private var header: some View {
         HStack {
             Button { dismiss() } label: {
-                Image(systemName: "chevron.left").foregroundColor(.black)
+                Image(systemName: "chevron.left")
+                    .foregroundColor(.black)
+                    .frame(width: 9.5 * .deviceScale, height: 17 * .deviceScale)
             }
             Spacer()
             Text("필터")
@@ -141,20 +150,28 @@ struct WeadyboardFilterSheet: View {
                     .foregroundColor(.black)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 16 * .deviceScale)
+        .padding(.vertical, 12 * .deviceScale)
     }
 
     private func sectionTitle(_ title: String) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 12 * .deviceScale) {
             Text(title)
                 .fontName(.metaSemibold12)
                 .foregroundColor(.black100)
-                .padding(.leading, 10)
+                .padding(.leading, 10 * .deviceScale)
 
             Rectangle()
                 .fill(Color.gray600)
                 .frame(height: 1)
         }
+    }
+}
+
+// MARK: - Local helper: 배열을 N개씩 자르기
+private func chunk<T>(_ array: [T], by size: Int) -> [[T]] {
+    guard size > 0 else { return [] }
+    return stride(from: 0, to: array.count, by: size).map {
+        Array(array[$0 ..< min($0 + size, array.count)])
     }
 }

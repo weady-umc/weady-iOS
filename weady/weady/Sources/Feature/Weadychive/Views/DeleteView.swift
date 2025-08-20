@@ -19,7 +19,7 @@ struct DeleteView: View {
     }
 
     let type: DeleteType
-    // Removed @Binding var items: [DeleteItem]
+  
     @ObservedObject var viewModel: WeadychiveViewModel
 
     @Environment(\.dismiss) private var dismiss
@@ -169,9 +169,3 @@ struct DeleteView: View {
         }
     }
 }
-//
-//#Preview("DeleteView - Curation") {
-//    NavigationStack {
-//        DeleteView(type: .curation, viewModel: WeadychiveViewModel())
-//    }
-//}

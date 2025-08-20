@@ -15,7 +15,7 @@ struct WeadyboardView: View {
 
     @State private var currentCriteria: BoardFilterCriteria = .init()
 
-    private let cardWidth: CGFloat = 177
+    private var cardWidthScaled: CGFloat { 177 * .deviceScale }
 
     private var leftColumn: [BoardPreviewDTO] {
         viewModel.posts.enumerated().compactMap { $0.offset % 2 == 0 ? $0.element : nil }
@@ -29,7 +29,7 @@ struct WeadyboardView: View {
             VStack(spacing: 0) {
                 CustomNavBar(
                     viewTitle: "",
-                    showBackButton: false,
+                    showLogoButton: true,
                     showAlarmButton: true,
                     showBottomDivider: false
                 )
@@ -41,34 +41,34 @@ struct WeadyboardView: View {
                     } label: {
                         Image("filtericon")
                             .resizable()
-                            .frame(width: 14.63, height: 12.37)
-                            .padding(6)
+                            .frame(width: 18 * .deviceScale, height: 18 * .deviceScale)
+                            .padding(6 * .deviceScale)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 6)
+                                RoundedRectangle(cornerRadius: 6 * .deviceScale)
                                     .stroke(Color.gray500)
                             )
                     }
-                    .frame(width: 30, height: 30)
-                    .padding(.trailing, 8)
+                    .frame(width: 30 * .deviceScale, height: 30 * .deviceScale)
+                    .padding(.trailing, 8 * .deviceScale)
                 }
-                .padding(.trailing, 8)
-                .padding(.bottom, 6)
-
+                .padding(.trailing, 8 * .deviceScale)
+                .padding(.bottom, 5 * .deviceScale)
+                
                 ScrollView {
-                    HStack(alignment: .top, spacing: 8) {
-                        VStack(spacing: 8) {
+                    HStack(alignment: .top, spacing: 5 * .deviceScale) {
+                        VStack(spacing: 5 * .deviceScale) {
                             ForEach(leftColumn, id: \.boardId) { item in
                                 boardImageCard(item: item)
                             }
                         }
-                        VStack(spacing: 8) {
+                        VStack(spacing: 5 * .deviceScale) {
                             ForEach(rightColumn, id: \.boardId) { item in
                                 boardImageCard(item: item)
                             }
                         }
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
+                    .padding(.horizontal, 5 * .deviceScale)
+                    .padding(.top, 5 * .deviceScale)
                 }
             }
             
@@ -79,19 +79,19 @@ struct WeadyboardView: View {
                     Button(action: {
                         router.push(.weadyboardUpload)
                     }) {
-                        HStack(spacing: 6) {
+                        HStack(spacing: 6 * .deviceScale) {
                             Image("plusicon")
                             Text("업로드")
                                 .fontName(.bodySemibold16)
                                 .foregroundStyle(Color.white100)
                         }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
+                        .padding(.horizontal, 14 * .deviceScale)
+                        .padding(.vertical, 10 * .deviceScale)
                         .background(Color.black70)
-                        .clipShape(RoundedRectangle(cornerRadius: 30))
+                        .clipShape(RoundedRectangle(cornerRadius: 30 * .deviceScale))
                     }
-                    .padding(.bottom, 56)
-                    .padding(.trailing, 24)
+                    .padding(.bottom, 22 * .deviceScale)
+                    .padding(.trailing, 16 * .deviceScale)
                 }
             }
         }
@@ -113,7 +113,8 @@ struct WeadyboardView: View {
     @ViewBuilder
     private func boardImageCard(item: BoardPreviewDTO) -> some View {
         let url = URL(string: item.imgUrl ?? "")
-        let height = viewModel.heightFor(boardId: item.boardId, defaultHeight: 240)
+        let defaultHeight = 240 * .deviceScale
+        let height = viewModel.heightFor(boardId: item.boardId, defaultHeight: defaultHeight)
 
         Button {
             router.push(.weadyboardPost(boardId: item.boardId))
@@ -122,19 +123,19 @@ struct WeadyboardView: View {
                 KFImage(url)
                     .placeholder {
                         Color.gray100
-                            .frame(width: cardWidth, height: height)
+                            .frame(width: cardWidthScaled, height: height)
                             .cornerRadius(8)
                     }
                     .onSuccess { result in
                         viewModel.setHeight(
                             for: item.boardId,
                             imageSize: result.image.size,
-                            targetWidth: cardWidth
+                            targetWidth: cardWidthScaled
                         )
                     }
                     .resizable()
                     .scaledToFill()
-                    .frame(width: cardWidth, height: height)
+                    .frame(width: cardWidthScaled, height: height)
                     .clipped()
                     .cornerRadius(8)
                     .contentTransition(.opacity)
@@ -143,10 +144,10 @@ struct WeadyboardView: View {
                 Image(WeatherTag.imageName(for: item.weatherTagId))
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 20, height: 20)
-                    .frame(width: 40, height: 40)
+                    .frame(width: 21 * .deviceScale, height: 21 * .deviceScale)
+                    .frame(width: 40 * .deviceScale, height: 40 * .deviceScale)
                     .background(Color.clear)
-                    .padding(6)
+                    .padding(5 * .deviceScale)
             }
         }
         .buttonStyle(.plain)

@@ -46,6 +46,7 @@ final class HomeRouter {
 struct HomeFlowHost: View {
     // MARK: Properties
     @State private var router = HomeRouter()
+    @Binding var isTabBarHidden: Bool
 
     // MARK: Body
     var body: some View {
@@ -79,7 +80,7 @@ struct HomeFlowHost: View {
                         ClothingRecommendationView()
 
                     case .curationdetail(let curationId):
-                        DetailCurationView(curationId: curationId)
+                        DetailCurationView(curationId: curationId,isTabBarHidden: $isTabBarHidden)
                     case .curation:
                         CurationView()
                     case .alarm:

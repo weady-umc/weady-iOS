@@ -17,22 +17,42 @@ struct FilterIconTag: View {
     let unselectedBackground: Color
     let unselectedTextColor: Color
     let onTap: () -> Void
+    
+    private var iconSize: CGSize {
+        iconSizeMap[imageName] ?? CGSize(width: 16 * .deviceScale, height: 16 * .deviceScale)
+    }
+
+    // 아이콘 개별 사이즈 매핑
+    private let iconSizeMap: [String: CGSize] = [
+        "filter_sunny":        CGSize(width: 15 * .deviceScale,    height: 15 * .deviceScale),
+        "filter_cloudy":       CGSize(width: 16.79 * .deviceScale, height: 12.5 * .deviceScale),
+        "filter_rainy":        CGSize(width: 15.46 * .deviceScale, height: 16 * .deviceScale),
+        "filter_partlycloudy": CGSize(width: 20 * .deviceScale,    height: 14 * .deviceScale),
+        "filter_snowy":        CGSize(width: 15.14 * .deviceScale, height: 16 * .deviceScale),
+        "filter_windy":        CGSize(width: 14.74 * .deviceScale, height: 14 * .deviceScale),
+    ]
 
     var body: some View {
-        HStack(spacing: 6) {
-            Image(imageName)
-                .resizable()
-                .scaledToFit()
-            Text(label)
-                .fontName(.metaMedium12)
+        Button(action: onTap) {
+            HStack(spacing: 6 * .deviceScale) {
+                Image(imageName)
+                    .resizable()
+                    .renderingMode(.original)
+                    .frame(width: iconSize.width, height: iconSize.height)
+
+                Text(label)
+                    .fontName(.metaMedium12)
+                    .lineLimit(1)
+                    .foregroundColor(isSelected ? selectedTextColor : unselectedTextColor)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+            .padding(.horizontal, 12 * .deviceScale)
+            .padding(.vertical, 5 * .deviceScale)
+            .frame(height: 26 * .deviceHeightScale)
+            .background(isSelected ? selectedBackground : unselectedBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .contentShape(RoundedRectangle(cornerRadius: 20))
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 12)
-        .background(isSelected ? selectedBackground : unselectedBackground)
-        .foregroundColor(isSelected ? selectedTextColor : unselectedTextColor)
-        .cornerRadius(20)
-        .onTapGesture {
-            onTap()
-        }
+        .buttonStyle(.plain)
     }
 }

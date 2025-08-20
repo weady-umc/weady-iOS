@@ -13,7 +13,7 @@ struct MyPageDateFilter: View {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text("\(selectedMonth)월")
                     .fontName(.homeSemibold30)
-                Text("\(selectedYear)년")
+                Text("\(String(selectedYear))년")
                     .fontName(.metaRegular12)
             }
             .foregroundStyle(Color.black100)
@@ -61,7 +61,7 @@ struct PickerOverlayView: View {
                     
                     Picker(selection: $selectedYear, label: Text("")) {
                         ForEach(years, id: \.self) { year in
-                            Text("\(year)년")
+                            Text("\(String(year))년")
                                 .fontName(.metaMedium12)
                                 .frame(width: 52)
                                 .tag(year)

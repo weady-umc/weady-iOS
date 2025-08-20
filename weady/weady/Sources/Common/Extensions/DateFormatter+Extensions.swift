@@ -13,7 +13,8 @@ private enum _DateCache {
         let f = DateFormatter()
         f.calendar = Calendar(identifier: .gregorian)
         f.locale = Locale(identifier: "ko_KR")
-        f.timeZone = TimeZone(secondsFromGMT: 0)
+        // ✅ 핵심 수정: UTC → .current (KST 환경이라면 Asia/Seoul)
+        f.timeZone = .current
         f.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         return f
     }()
@@ -33,16 +34,21 @@ private enum _DateCache {
             let f = DateFormatter()
             f.calendar = Calendar(identifier: .gregorian)
             f.locale = Locale(identifier: "ko_KR")
-            f.timeZone = TimeZone(secondsFromGMT: 0)
+            f.timeZone = .current
             f.dateFormat = p
             return f
         }
     }()
 
     // 표준 ISO8601 (타임존 포함일 때만 기대)
-    static let iso8601: ISO8601DateFormatter = {
+    static let iso8601Frac: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return f
+    }()
+    static let iso8601: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withInternetDateTime]
         return f
     }()
 
@@ -61,46 +67,48 @@ private enum _DateCache {
 public extension String {
     /// yyyy-MM-dd'T'HH:mm:ss → yyyy-MM-dd 포맷 변환
     var dateFormat: String {
-        let inputFormatter = DateFormatter()
-        inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        inputFormatter.locale = Locale(identifier: "ko_KR")
+        let input = DateFormatter()
+        input.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        input.locale = Locale(identifier: "ko_KR")
+        // 서버 기본 포맷이 로컬 시간대이므로 input.timeZone도 맞춰주면 더 안전
+        input.timeZone = .current
 
-        guard let date = inputFormatter.date(from: self) else {
-            return self
-        }
-
-        let outputFormatter = DateFormatter()
-        outputFormatter.dateFormat = "yyyy-MM-dd"
-        return outputFormatter.string(from: date)
+        guard let date = input.date(from: self) else { return self }
+        let out = DateFormatter()
+        out.dateFormat = "yyyy-MM-dd"
+        out.timeZone = .current
+        return out.string(from: date)
     }
 
     /// 서버가 주는 날짜 문자열을 Date로 변환
     func asServerDate() -> Date? {
-        // 1) 타임존 포함 ISO8601 (예: ...Z, +09:00 등)
-        if self.contains("Z") || self.contains("+") || self.contains("-") && self.contains("T") {
-            if let d = _DateCache.iso8601.date(from: self) {
-                return d
-            }
+        let s = self.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // 1) 타임존 명시(Z 또는 +HH:mm)가 있으면 ISO8601로 정확히 파싱
+        if s.contains("Z") || s.contains("+") {
+            if let d = _DateCache.iso8601Frac.date(from: s) { return d }
+            if let d = _DateCache.iso8601.date(from: s) { return d }
         }
 
-        // 2) 가변 소수점(UTC 가정)
-        if self.contains(".") {
+        // 2) 가변 소수점(타임존 미표기 → 로컬 시간대)
+        if s.contains(".") {
             for f in _DateCache.serverFractionalFormats {
-                if let d = f.date(from: self) { return d }
+                if let d = f.date(from: s) { return d }
             }
-            // 소수점 버리고 기본 포맷 재시도 (예: split(".").first)
-            if let base = self.split(separator: ".").first, let d = _DateCache.serverBasic.date(from: String(base)) {
+            // 소수점 제거 후 기본 포맷
+            if let base = s.split(separator: ".").first,
+               let d = _DateCache.serverBasic.date(from: String(base)) {
                 return d
             }
         }
 
-        // 3) 기본 포맷(UTC 가정)
-        if let d = _DateCache.serverBasic.date(from: self) {
-            return d
-        }
-        if let d = _DateCache.iso8601.date(from: self) {
-            return d
-        }
+        // 3) 기본 포맷(타임존 미표기 → 로컬 시간대)
+        if let d = _DateCache.serverBasic.date(from: s) { return d }
+
+        // 4) 마지막 백업 (예외 케이스 대비)
+        if let d = _DateCache.iso8601Frac.date(from: s) { return d }
+        if let d = _DateCache.iso8601.date(from: s) { return d }
+
         return nil
     }
 
@@ -119,11 +127,14 @@ public extension String {
                             locale: Locale = Locale(identifier: "ko_KR")) -> String {
         guard let date = asServerDate() else { return self }
 
-        let interval = Int(now.timeIntervalSince(date))
-        if interval < 60 { return "방금 전" }
-        if interval < 3600 { return "\(interval / 60)분 전" }
-        if interval < 86400 { return "\(interval / 3600)시간 전" }
-        if interval < 86400 * 7 { return "\(interval / 86400)일 전" }
+        let seconds = Int(now.timeIntervalSince(date))
+        if seconds < 0 { // 미래 시각이면 절대값 말고, "방금 전"으로만 표시
+            return "방금 전"
+        }
+        if seconds < 60 { return "방금 전" }
+        if seconds < 3600 { return "\(seconds / 60)분 전" }
+        if seconds < 86400 { return "\(seconds / 3600)시간 전" }
+        if seconds < 86400 * 7 { return "\(seconds / 86400)일 전" }
 
         let out = _DateCache.custom("yyyy.MM.dd HH:mm", tz: timeZone, locale: locale)
         return out.string(from: date)
@@ -141,11 +152,12 @@ public extension Date {
     func relativeTimeString(now: Date = Date(),
                             timeZone: TimeZone = .current,
                             locale: Locale = Locale(identifier: "ko_KR")) -> String {
-        let interval = Int(now.timeIntervalSince(self))
-        if interval < 60 { return "방금 전" }
-        if interval < 3600 { return "\(interval / 60)분 전" }
-        if interval < 86400 { return "\(interval / 3600)시간 전" }
-        if interval < 86400 * 7 { return "\(interval / 86400)일 전" }
+        let seconds = Int(now.timeIntervalSince(self))
+        if seconds < 0 { return "방금 전" }
+        if seconds < 60 { return "방금 전" }
+        if seconds < 3600 { return "\(seconds / 60)분 전" }
+        if seconds < 86400 { return "\(seconds / 3600)시간 전" }
+        if seconds < 86400 * 7 { return "\(seconds / 86400)일 전" }
 
         let out = _DateCache.custom("yyyy.MM.dd HH:mm", tz: timeZone, locale: locale)
         return out.string(from: self)

@@ -34,20 +34,24 @@ struct MyPageCalendar: View {
                         let model = viewModel.filterCalendar.first(where: {
                             guard let modelDate = ISO8601DateFormatter().date(from: $0.date) else { return false }
                             return Calendar.current.isDate(modelDate, inSameDayAs: date)
-                        }) ?? CalendarThumbnailModel(
+                        })
+                        
+                        // MARK: - 게시물이 없는 경우 기본 모델 (thumbnailUrl, 날씨 X)
+                        let finalModel = model ?? CalendarThumbnailModel(
                             date: ISO8601DateFormatter().string(from: date),
                             thumbnailUrl: nil,
-                            isPublic: true
+                            weatherTagId: -1,
+                            isPublic: false
                         )
                         
                         VStack(spacing: 4) {
                             // MARK: - 날짜 카드
-                            MyPageCalendarDayCard(model: model) {
+                            MyPageCalendarDayCard(model: finalModel) {
                                 let formatter = DateFormatter()
                                 formatter.dateFormat = "yyyy-MM-dd"
                                 let dateString = formatter.string(from: date)
                                 
-                                // 선택된 날짜 게시물 불러오기
+                                // 게시물 조회
                                 viewModel.fetchBoard(date: dateString)
                                 withAnimation { showOverlay = true }
                             }
@@ -55,8 +59,8 @@ struct MyPageCalendar: View {
                             // MARK: - 게시물 오버레이
                             if showOverlay,
                                let selectedBoard = viewModel.selectedBoard,
-                               selectedBoard.createdAtDate != nil,
-                               Calendar.current.isDate(selectedBoard.createdAtDate!, inSameDayAs: date) {
+                               let boardDate = selectedBoard.createdAtDate,
+                               Calendar.current.isDate(boardDate, inSameDayAs: date) {
                                 MypageBoardView(board: selectedBoard, isPresented: $showOverlay)
                                     .transition(.move(edge: .top))
                             }
@@ -87,7 +91,7 @@ struct MyPageCalendar: View {
     }
 }
 
-// MARK: - MypageBoardDetailModel에 createdAtDate 계산 프로퍼티 추가
+// MARK: - 프리뷰
 extension MypageBoardDetailModel {
     var createdAtDate: Date? {
         let isoFormatter = ISO8601DateFormatter()

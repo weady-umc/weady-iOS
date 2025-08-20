@@ -20,8 +20,8 @@ struct FilterTag: View {
     var body: some View {
         Text(text)
             .fontName(.metaSemibold12)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 14)
+            .padding(.vertical, 5 * .deviceScale)
+            .padding(.horizontal, 15 * .deviceScale)
             .background(isSelected ? selectedBackground : unselectedBackground)
             .foregroundColor(isSelected ? selectedTextColor : unselectedTextColor)
             .cornerRadius(20)

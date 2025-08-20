@@ -30,7 +30,7 @@ public struct UploadModel: Codable {
     let brandDtoList: [UploadBrand]    // 제품 (브랜드 + 제품명)
 }
 
-// MARK: - DTO 변환
+// MARK: - DTO 변환 (이미지 제외한 postData)
 extension UploadModel {
     var toCreateBoardRequestDTO: CreateBoardRequestDTO {
         CreateBoardRequestDTO(
@@ -46,10 +46,6 @@ extension UploadModel {
             boardBrandRequestDtoList: self.brandDtoList.map {
                 BrandDTO(brand: $0.brand, product: $0.product)
             }
-//            imageDtoList: self.imageDtoList.map {
-//                ImageDTO(imgUrl: $0.imgUrl, imgOrder: $0.imgOrder)
-//            },
-//            imgCount: self.imgCount
         )
     }
 }

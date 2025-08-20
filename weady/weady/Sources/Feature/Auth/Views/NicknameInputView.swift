@@ -20,6 +20,7 @@ extension View {
     }
 }
 
+
 struct NicknameInputView: View {
     @StateObject private var vm: NicknameInputViewModel
     @FocusState private var isFocused: Bool

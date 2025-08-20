@@ -390,7 +390,7 @@ struct WeatherHomeView: View {
         .environment(HomeRouter()) // 단독 미리보기
 }
 
-#Preview {
-    HomeFlowHost()
-        .environment(HomeRouter()) // FlowHost에서의 미리보기
-}
+//#Preview {
+//    HomeFlowHost(isTabBarHidden: .constant(false))
+//        .environment(HomeRouter()) // FlowHost에서의 미리보기
+//}

@@ -3,6 +3,7 @@ import PhotosUI
 
 @Observable
 final class ProfileEditViewModel {
+    // MARK: - Properties
     var nickname: String
     var profileImageUrl: String?
     var selectedImage: UIImage?
@@ -13,21 +14,21 @@ final class ProfileEditViewModel {
     private let userService = UserService()
     private let mypageViewModel: MypageViewModel
     
-    // *기본 이미지 URL (서버에 반영되는 주소)*
     private let defaultImageUrl = "https://cdn.yourserver.com/basic-profile.png"
     
+    // MARK: - Init
     init(mypageViewModel: MypageViewModel) {
         self.mypageViewModel = mypageViewModel
         self.nickname = mypageViewModel.profile?.name ?? ""
         self.profileImageUrl = mypageViewModel.profile?.profileImageUrl
     }
     
-    // MARK: - 프로필 저장
+    // MARK: - 프로필 저장 (닉네임 + 이미지)
     func saveProfile(completion: @escaping (Bool) -> Void) {
         isSaving = true
         saveError = nil
         
-        userService.updateProfile(name: nickname, profileImageUrl: profileImageUrl) { [weak self] result in
+        userService.updateProfile(name: nickname, profileImage: selectedImage) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isSaving = false
                 switch result {
@@ -50,15 +51,12 @@ final class ProfileEditViewModel {
     // MARK: - 이미지 선택 (앨범)
     func setProfileImage(_ image: UIImage) {
         self.selectedImage = image
-        // *이미지 서버 업로드는 별도로 구현 필요*
-        if let imageData = image.jpegData(compressionQuality: 0.9) {
-            self.profileImageUrl = imageData.base64EncodedString()
-        }
+        self.profileImageUrl = nil // Base64 제거
     }
     
     // MARK: - 기본 이미지 적용
     func setDefaultProfileImage() {
-        self.selectedImage = UIImage(named: "basicProfileImg")
+        self.selectedImage = nil
         self.profileImageUrl = defaultImageUrl
     }
 }

@@ -35,7 +35,7 @@ struct WeadyboardPostReportDetailView: View {
                 if let onBack { onBack() } else { dismiss() }
             }
             
-            Spacer().frame(height: 24)
+            Spacer().frame(height: 24 * .deviceScale)
             
             Text(reason.detailTitle)
                 .fontName(.headingSemibold20)
@@ -45,21 +45,21 @@ struct WeadyboardPostReportDetailView: View {
                 ZStack(alignment: .topLeading) {
                     TextEditor(text: $customText)
                         .fontName(.captionRegular14)
-                        .frame(height: 155)
-                        .padding(10)
+                        .frame(height: 155 * .deviceScale)
+                        .padding(10 * .deviceScale)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color.gray500)
                         )
-                        .padding(.top, 32)
-                        .padding(.horizontal, 20)
+                        .padding(.top, 32 * .deviceScale)
+                        .padding(.horizontal, 20 * .deviceScale)
 
                     if customText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         Text("불편하셨던 이유를 남겨주세요.")
                             .fontName(.captionRegular14)
                             .foregroundColor(.gray200)
-                            .padding(.top, 48)
-                            .padding(.leading, 32)
+                            .padding(.top, 48 * .deviceScale)
+                            .padding(.leading, 32 * .deviceScale)
                     }
                 }
                     
@@ -67,22 +67,22 @@ struct WeadyboardPostReportDetailView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("해당되는 콘텐츠:")
                         .fontName(.bodyMedium16)
-                        .padding(.bottom, 10)
+                        .padding(.bottom, 10 * .deviceScale)
                     
                     ForEach(reason.details, id: \.self) { detail in
-                        HStack(alignment: .top, spacing: 6) {
+                        HStack(alignment: .top, spacing: 6 * .deviceScale) {
                             Text("•")
                                 .fontName(.captionMedium14)
-                                .padding(.top, 2)
+                                .padding(.top, 2 * .deviceScale)
                             Text(detail)
                                 .fontName(.captionMedium14)
                         }
-                        .padding(.leading, 10)
+                        .padding(.leading, 10 * .deviceScale)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, 35)
-                .padding(.leading, 20)
+                .padding(.top, 35 * .deviceScale)
+                .padding(.leading, 20 * .deviceScale)
             }
             
             Spacer()
@@ -94,11 +94,11 @@ struct WeadyboardPostReportDetailView: View {
                     .fontName(.bodySemibold16)
                     .foregroundColor(.white100)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 44)
+                    .frame(height: 44 * .deviceScale)
                     .background(buttonBackgroundColor)
                     .cornerRadius(10)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 40)
+                    .padding(.horizontal, 20 * .deviceScale)
+                    .padding(.bottom, 40 * .deviceScale)
             }
             .disabled(isSubmitDisabled)
         }

@@ -80,7 +80,7 @@ extension CurationEndpoints: TargetType {
 //    var headers: [String: String]? {
 //        return [
 //            "Content-Type": "application/json",
-//            "Authorization": "Bearer 테스트용 토큰 넣기"
+//            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTYyNTQyOH0.hl8a4nyq9IfYnwDKEKGJnOHOIu5WYwRp5znIQDwvl4oCsmFjdVwSfErVXBXXnVYyGxto8UzK5k_rFsfAS3nwDA"
 //        ]
 //    }
     

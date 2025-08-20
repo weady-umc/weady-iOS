@@ -19,10 +19,12 @@ extension StartView {
 }
 
 struct StartView: View {
+
     
     
     @Environment(\.router) private var router
     
+
     @StateObject private var vm: StartViewModel
     @State private var showHome = false
     
@@ -31,6 +33,7 @@ struct StartView: View {
     
     // 전체 데이터 전달용 (POST에 쓰일 값)
     init(
+
         nickname: String,
         gender: GenderCode? = nil,
         styleIds: [Int64]? = nil,
@@ -46,43 +49,79 @@ struct StartView: View {
         )
     }
     
+ nickname: String,
+          gender: GenderCode? = nil,
+          styleIds: [Int64]? = nil,
+          agreements: [OnboardingAgreement]? = nil
+      ) {
+          _vm = StateObject(
+              wrappedValue: StartViewModel(
+                  nickname: nickname,
+                  gender: gender,
+                  styleIds: styleIds,
+                  agreements: agreements
+              )
+          )
+      }
+    
+    // 덩어리 텍스트: ‘닉네임+님’은 붙이고(줄바꿈 금지), 나머지는 자연스럽게 감기게
+    private var composedTitle: Text {
+        Text("앞으로 웨디가\n")
+        + Text(verbatim: vm.nickname).bold()
+        + Text("\u{2060}님").bold()
+        + Text("의 취향에 맞는 하루를 ")
+        + Text("추천해드릴게요.")
+    }
+    
+    // 닉네임이 짧으면 한 줄, 길면 자연스럽게 2줄
+    @ViewBuilder
+    private func titleBlock() -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("취향 입력이 완료되었어요 !")
+                .fontName(.titleBold24)
+                .foregroundStyle(Color.black100)
+
+            Spacer().frame(height: 25)
+
+            composedTitle
+                .fontName(.titleMedium24)
+                .foregroundStyle(Color.black100)
+                .multilineTextAlignment(.leading)
+                .lineLimit(4)
+                .fixedSize(horizontal: false, vertical: true)
+                .allowsTightening(true)
+        }
+    }
+
+    @ViewBuilder
+    private func primaryButton() -> some View {
+        Button {
+            vm.startTapped()
+        } label: {
+            Text("웨디 시작하기")
+                .fontName(.bodyMedium16)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 11)
+                .background(Color.black100)
+                .foregroundStyle(Color.white100)
+                .cornerRadius(10)
+        }
+        .disabled(vm.isSubmitting)
+        .padding(.bottom, 22)
+    }
+
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // 1) 프로그레스 인디케이터 (5번째 스텝)
             ProgressIndicator(currentStep: 4, totalSteps: 5)
             
-            // 2) 타이틀: 언더라인된 닉네임 + 나머지 텍스트
-            VStack(alignment: .leading, spacing: 4) {
-                Text("취향 입력이 완료되었어요 !")
-                    .fontName(.titleBold24)
-                    .foregroundStyle(Color.black100)
-                
-                Spacer().frame(height: 25)
-                
-                Text("앞으로 웨디가")
-                    .fontName(.titleMedium24)
-                    .foregroundStyle(Color.black100)
-                
-                HStack(spacing: 0) {
-                    Text("\(vm.nickname)님")
-                        .fontName(.titleBold24)
-                        .foregroundStyle(Color.black100)
-                    Text("의 취향에 맞는 하루를")
-                        .fontName(.titleMedium24)
-                        .foregroundStyle(Color.black100)
-                }
-                
-                Text("추천해드릴게요.")
-                    .fontName(.titleMedium24)
-                    .foregroundStyle(Color.black100)
-            }
-            .padding(.horizontal, 32)
-            .padding(.top, 39)
-            
-            Spacer().frame(height: 78)
-            
+            Spacer().frame(height:39)
+                     titleBlock()
+                         .padding(.horizontal, 32)
             Spacer()
             
+
             // 4) 다음 버튼
             
             Button{
@@ -99,18 +138,25 @@ struct StartView: View {
             .disabled(vm.isSubmitting)
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
+
+            primaryButton()
+                      .padding(.horizontal, 20)
+
         }
         // 실패 시 경고
         .alert(item: $vm.alert) { a in
             Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
         }
-        
-        // 성공 시 Home
+
+
+        // 성공 시 Home 
+
         .fullScreenCover(isPresented: $vm.navigateHome) {
             BaseTabHost(
                 selectedTab: $selectedTab,
                 isTabBarHidden: $isTabBarHidden
             )
+
             
             // 성공 시 Home
             .onChange(of: vm.navigateHome) { oldValue, newValue in
@@ -118,6 +164,7 @@ struct StartView: View {
                 router.reset(to: .basetab)
                 
             }
+
         }
     }
     
