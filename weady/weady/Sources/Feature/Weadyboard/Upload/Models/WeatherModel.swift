@@ -40,6 +40,21 @@ enum WeatherType: String, CaseIterable, Identifiable, Codable {
     }
 
     var id: String { self.rawValue }
+    
+    var tagId: Int {
+            switch self {
+            case .sunny: return 1
+            case .cloudy: return 2
+            case .rainy: return 3
+            case .partlyCloudy: return 4
+            case .snowy: return 5
+            case .windy: return 6
+            }
+        }
+
+    static func from(tagId: Int) -> WeatherType {
+        return allCases.first { $0.tagId == tagId } ?? .sunny
+    }
 }
 
 // MARK: - 기온 태그

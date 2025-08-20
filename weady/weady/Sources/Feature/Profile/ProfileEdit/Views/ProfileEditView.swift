@@ -15,18 +15,33 @@ struct ProfileEditView: View {
             ZStack(alignment: .bottomTrailing) {
                 Group {
                     if let selectedImage = viewModel.selectedImage {
+                        // 새로 선택한 이미지
                         Image(uiImage: selectedImage)
                             .resizable()
                             .scaledToFill()
                     } else if let profileImageUrl = viewModel.profileImageUrl,
                               profileImageUrl.starts(with: "http"),
                               let url = URL(string: profileImageUrl) {
-                        AsyncImage(url: url) { image in
-                            image.resizable().scaledToFill()
-                        } placeholder: {
-                            Image("basicProfileImg").resizable().scaledToFill()
+                        // 서버에 있는 이미지
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView() // 로딩 중
+                                    .frame(width: 80, height: 80)
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                            case .failure(_):
+                                Image("basicProfileImg")
+                                    .resizable()
+                                    .scaledToFill()
+                            @unknown default:
+                                EmptyView()
+                            }
                         }
                     } else {
+                        // 기본 이미지
                         Image("basicProfileImg")
                             .resizable()
                             .scaledToFill()
@@ -113,16 +128,5 @@ struct ProfileEditView: View {
                 }
             }
         }
-    }
-}
-
-// MARK: - Preview
-#Preview {
-    let dummyProfile = MypageProfileModel(id: 1, name: "현재 닉네임", profileImageUrl: nil)
-    let dummyMypageVM = MypageViewModel()
-    dummyMypageVM.updateProfile(dummyProfile)
-
-    return NavigationStack {
-        ProfileEditView(viewModel: ProfileEditViewModel(mypageViewModel: dummyMypageVM))
     }
 }

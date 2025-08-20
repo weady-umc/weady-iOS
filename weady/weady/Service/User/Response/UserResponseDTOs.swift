@@ -1,5 +1,11 @@
 import Foundation
 
+struct BaseResponse<T: Decodable>: Decodable {
+    let code: Int
+    let message: String
+    let data: T
+}
+
 // MARK: - 마이페이지 조회
 struct GetMyPageResponse: Decodable {
     let userId: Int
@@ -11,6 +17,7 @@ struct GetMyPageResponse: Decodable {
 struct CalendarResponse: Decodable {
     let date: String // yyyy-MM-dd (date)
     let thumbnailUrl: String?
+    let weatherTagId: Int
 }
 
 // MARK: - 마이페이지 특정 게시물 조회
@@ -18,6 +25,7 @@ struct GetBoardInMyPageResponse: Decodable {
     let boardId: Int
     let createdAt: String // ISO8601 (date-time)
     let isPublic: Bool
+    let weatherTagId: Int
     let imageList: [BoardImgResponseDto]
 }
 

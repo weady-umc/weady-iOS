@@ -62,11 +62,7 @@ struct PhotoAddView: View {
                 print("이미지 로드 실패:", error.localizedDescription)
             }
         }
-
-        await MainActor.run {
-            images.append(contentsOf: newImages)
-        }
-
+        await MainActor.run {images.append(contentsOf: newImages)}
         selectedItems = []
     }
 }

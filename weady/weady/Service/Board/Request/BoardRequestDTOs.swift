@@ -6,6 +6,12 @@
 //
 
 import Foundation
+import UIKit
+
+struct LocalImage: Identifiable, Equatable {
+    let id = UUID()
+    var image: UIImage
+}
 
 struct CreateBoardRequestDTO: Encodable {
     let isPublic: Bool

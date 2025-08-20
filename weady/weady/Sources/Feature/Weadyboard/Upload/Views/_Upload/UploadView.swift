@@ -55,7 +55,6 @@ struct UploadView: View {
                             AnyView(
                                 FashionInfoView(viewModel: fashionViewModel) {
                                     viewModel.fashionModel = fashionViewModel.toFashionModel()
-                                    print("업로드 모델에 패션 정보 반영 완료")
                                 }
                             )
                         }
@@ -65,7 +64,6 @@ struct UploadView: View {
                             AnyView(
                                 PlaceInfoView(viewModel: placeViewModel) {
                                     viewModel.placeModel = placeViewModel.toPlaceModel()
-                                    print("업로드 모델에 장소 정보 반영 완료")
                                 }
                             )
                         }
@@ -106,7 +104,7 @@ struct UploadView: View {
                                 dismiss()
                             } else {
                                 isUploading = false
-                                errorMessage = "업로드에 실패했습니다. 다시 시도해주세요."
+                                errorMessage = ">>> 업로드에 실패했습니다. 다시 시도해주세요."
                                 showErrorAlert = true
                             }
                         }
