@@ -27,6 +27,7 @@
 		CDC1B6A42E4E468200F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDC1B90D2E505C7400F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDC1BB642E50809200F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CDC1C9CC2E5739B700F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDE727542E4C94AC005F67E7 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDF98D1B2E29549500446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -107,6 +108,11 @@
 			sourceTree = "<group>";
 		};
 		CDC1BB662E50809200F8629F /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CDC1C9CE2E5739B700F8629F /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -198,6 +204,10 @@
 				{
 					ProductGroup = CDE727562E4C94AC005F67E7 /* Products */;
 					ProjectRef = CDE727542E4C94AC005F67E7 /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CDC1C9CE2E5739B700F8629F /* Products */;
+					ProjectRef = CDC1C9CC2E5739B700F8629F /* weady.xcodeproj */;
 				},
 				{
 					ProductGroup = CDF98D1D2E29549500446374 /* Products */;

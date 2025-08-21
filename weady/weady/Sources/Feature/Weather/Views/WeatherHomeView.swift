@@ -47,29 +47,22 @@ struct WeatherHomeView: View {
             
         }
 
-        
+        .navigationBarBackButtonHidden()
         .edgeSwipeBack(topExclusion: 100) {
 
             }
         .safeAreaInset(edge: .top) {
             VStack(spacing: 0) {
 
-                Spacer().frame(height: 20 * .deviceScale)
+                //Spacer().frame(height: 20 * .deviceScale)
 
                 UnderlineSegmentedControl(
                     items: WeatherHomeModel.allCases,
                     selection: $viewModel.selectedSegment,
                     title: { $0.title })
 
-                Spacer().frame(height: 100)
-                CustomNavBar(
-                    viewTitle: "",
-                    showLogoButton: true,
-                    showAlarmButton: true,
-                    showBottomDivider: false,
-                    alarmAction: { homeRouter.push(.alarm) }
+                //Spacer().frame(height: 100)
 
-                )
                 .padding(.horizontal, 0)
                 .background(Color.white)
                 .overlay(Rectangle().fill(.clear).frame(height: 1), alignment: .bottom)

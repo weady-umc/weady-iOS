@@ -11,7 +11,7 @@ import Moya
 enum FashionEndpoints {
     /// GET /fashion/detail — 파라미터 없음, Bearer 필요
     case getDetail
-    case getSummary
+   
 }
 
 extension FashionEndpoints: TargetType {
@@ -27,21 +27,20 @@ extension FashionEndpoints: TargetType {
         switch self {
         case .getDetail:
             return "/detail"
-        case .getSummary:
-            return "/summary"
+
         }
     }
 
     var method: Moya.Method {
         switch self {
-        case .getDetail, .getSummary:
+        case .getDetail:
             return .get
         }
     }
 
     var task: Task {
         switch self {
-        case .getDetail, .getSummary:
+        case .getDetail:
             return .requestPlain
         }
     }
