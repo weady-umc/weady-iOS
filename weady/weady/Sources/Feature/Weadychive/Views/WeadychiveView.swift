@@ -238,48 +238,49 @@ struct WeadyboardListView: View {
             NoWeadyboardView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-            let columns = [
-                GridItem(.flexible(), spacing: 2),
-                GridItem(.flexible(), spacing: 2),
-                GridItem(.flexible(), spacing: 2)
-            ]
+            GeometryReader { proxy in
+                let spacing: CGFloat = 2
+                let columnsCount = 3
+                // 좌우 패딩 2씩 + 컬럼 간격
+                let horizontalPadding: CGFloat = 4
+                let totalSpacing = spacing * CGFloat(columnsCount - 1) + horizontalPadding
+                let cell = floor((proxy.size.width - totalSpacing) / CGFloat(columnsCount))
+                let columns = Array(repeating: GridItem(.fixed(cell), spacing: spacing), count: columnsCount)
 
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 2) {
-                    ForEach(items) { item in
-                        Button(action: {
-                            // TODO: - 해당 웨디보드 상세 화면으로 이동
-                        }) {
-                           
-                            if let urlStr = item.imgUrl, urlStr.hasPrefix("http"), let url = URL(string: urlStr) {
-                                AsyncImage(url: url) { image in
-                                    image
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(height: 160)
-                                        .clipped()
-                                } placeholder: {
-                                    Color.gray.opacity(0.3)
-                                        .frame(height: 160)
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: spacing) {
+                        ForEach(items) { item in
+                            Button(action: {
+                                // TODO: - 해당 웨디보드 상세 화면으로 이동
+                            }) {
+                                ZStack {
+                                    // Base placeholder to guarantee layout while images load
+                                    Color.gray.opacity(0.2)
+
+                                    if let urlStr = item.imgUrl, urlStr.hasPrefix("http"), let url = URL(string: urlStr) {
+                                        AsyncImage(url: url) { image in
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                        } placeholder: {
+                                            Color.gray.opacity(0.3)
+                                        }
+                                    } else if let localName = item.imgUrl, !localName.isEmpty {
+                                        Image(localName)
+                                            .resizable()
+                                            .scaledToFill()
+                                    }
                                 }
-                            } else if let localName = item.imgUrl, !localName.isEmpty {
-                                Image(localName)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(height: 160)
-                                    .clipped()
-                            } else {
-                                // imgUrl == nil 또는 빈 문자열일 때 플레이스홀더
-                                Color.gray.opacity(0.2)
-                                    .frame(height: 160)
+                                .frame(width: cell, height: cell)  // 절대 정사각형 셀
+                                .clipped()
                             }
                         }
                     }
+                    .padding(.horizontal, 2)
+                    .padding(.bottom, 0)
                 }
-                .padding(.horizontal, 2)
-                .padding(.bottom,0)
+                .ignoresSafeArea(.all, edges: .bottom)
             }
-            .ignoresSafeArea(.all,edges: .bottom)
         }
     }
 }
