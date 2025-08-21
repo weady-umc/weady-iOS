@@ -72,27 +72,26 @@ final class StartViewModel: ObservableObject {
         defer { isSubmitting = false }
 
         do {
+            // ✅ 서비스가 비정상(비-2xx)에서 throw 한다는 가정
             _ = try await service.submit(body: body)
-            // 성공이면 그대로 홈 이동
+            // ✅ 성공(2xx)일 때만 이동 신호
             navigateHome = true
         } catch let api as APIErrorResponse {
-            // 서버가 표준 에러 포맷을 준 경우
+            // ✅ 닉네임 중복(400)만 예외적으로 통과
             if api.code == 400, api.message.contains("이미 사용 중") {
-                // 닉네임 중복 = 보통 이미 온보딩 사용자 → 막지 말고 홈으로 보냄
                 navigateHome = true
                 return
             }
-            if api.code >= 500 {
-                // 서버 내부 오류도 사용자 진행 막지 않음 (기존 유저일 가능성)
-                navigateHome = true
-                return
-            }
-            // 그 외 에러만 경고
-            alert = .init(title: "실패", message: api.message)
+            
+            // ❌ 500 포함 그 외 모든 에러: 이동 금지 + 얼럿
+            alert = .init(title: "온보딩 실패", message: api.message)
+            
         } catch {
-            // 네트워크/디코딩 등 기타 예외
-            // 필요에 따라 홈으로 우회하거나, 안내만 띄울지 선택
-            alert = .init(title: "실패", message: "요청 처리에 실패했습니다. 네트워크 상태를 확인해 주세요.")
+            // ❌ 네트워크/디코딩 등 기타 예외: 이동 금지 + 얼럿
+            alert = .init(
+                title: "온보딩 실패",
+                message: "요청 처리에 실패했습니다. 네트워크 상태를 확인해 주세요."
+            )
         }
     }
 

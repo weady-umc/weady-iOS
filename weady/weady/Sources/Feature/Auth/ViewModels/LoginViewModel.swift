@@ -14,10 +14,16 @@ import AuthenticationServices
 import KeychainSwift
 
 final class LoginViewModel: ObservableObject {
+    // 공통 상태
     @Published var errorMessage: String?
     @Published var isNewUser: Bool?
     @Published var loginSucceeded: Bool = false
-    
+
+    // Apple 전용 표시용(필요시 UI에서 바인딩)
+    @Published var appleUserIdentifier: String = ""
+    @Published var appleEmail: String = ""
+    @Published var appleFullName: String = ""
+
     // MARK: - 카카오 로그인
     func loginWithKakao(completion: @escaping (Bool) -> Void) {
         UserApi.shared.loginWithKakaoAccount { token, error in
@@ -45,21 +51,15 @@ final class LoginViewModel: ObservableObject {
                     }
                     return
                 }
-                
-                guard let id = user?.id else {
-                    DispatchQueue.main.async {
-                        self.errorMessage = "카카오 사용자 ID 없음"
-                        completion(false)
+
+                if let id = user?.id {
+                    if let email = user?.kakaoAccount?.email {
+                        print("✅ Kakao ID: \(id), 이메일: \(email)")
+                    } else {
+                        print("⚠️ Kakao ID: \(id), 이메일 없음 (email 동의 안 됐을 수 있음)")
                     }
-                    return
                 }
-                
-                if let email = user?.kakaoAccount?.email {
-                    print("✅ Kakao ID: \(id), 이메일: \(email)")
-                } else {
-                    print("⚠️ Kakao ID: \(id), 이메일 없음 (email 동의 안 됐을 수 있음)")
-                }
-                
+
                 self.requestLogin(accessToken: accessToken, provider: "kakao") {
                     completion(true)
                 }
@@ -102,7 +102,53 @@ final class LoginViewModel: ObservableObject {
             }
         }
     }
-    
+
+    // MARK: - 애플 로그인 (AppleLoginManager 사용)
+    func loginWithApple(presentationAnchor: ASPresentationAnchor, completion: @escaping (Bool) -> Void) {
+        Task {
+            do {
+                // 1) 시스템 로그인 UI 진행
+                let credential = try await AppleLoginManager.shared.startSignInWithAppleFlow(presentationAnchor: presentationAnchor)
+
+                // 2) 식별자/이름/이메일
+                let userIdentifier = credential.user
+                let fullNameString: String = {
+                    if let comps = credential.fullName {
+                        let f = PersonNameComponentsFormatter()
+                        return f.string(from: comps)
+                    }
+                    return ""
+                }()
+                let emailString = credential.email ?? ""
+
+                // 3) identityToken만 사용 (authorizationCode 추출 제거 → 경고 해결)
+                guard let identityTokenData = credential.identityToken,
+                      let identityToken = String(data: identityTokenData, encoding: .utf8)
+                else {
+                    throw NSError(domain: "AppleTokenError", code: -2, userInfo: [NSLocalizedDescriptionKey: "Apple 토큰 추출 실패"])
+                }
+
+                // 상태 보관(필요 시 UI에 노출)
+                await MainActor.run {
+                    self.appleUserIdentifier = userIdentifier
+                    self.appleEmail = emailString
+                    self.appleFullName = fullNameString
+                }
+
+                // 4) 서버 로그인
+                self.requestLogin(accessToken: identityToken, provider: "apple") {
+                    completion(true)
+                }
+
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = "애플 로그인 실패: \(error.localizedDescription)"
+                }
+                completion(false)
+            }
+        }
+    }
+
     // MARK: - 공통 Login 요청
     private func requestLogin(accessToken: String, provider: String, completion: @escaping () -> Void) {
         let dto = LoginRequestDTO(accessToken: accessToken)
@@ -121,6 +167,7 @@ final class LoginViewModel: ObservableObject {
                         print("✅ isNewUser: \(response.isNewUser)")
                     }
                     self?.isNewUser = response.isNewUser
+                    UserDefaults.standard.set(response.isNewUser, forKey: "isNewUser")
                     self?.loginSucceeded = true
                     completion()
                 case .failure(let error):

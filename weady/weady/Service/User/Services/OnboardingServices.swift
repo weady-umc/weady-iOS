@@ -2,7 +2,7 @@
 //  OnboardingServices.swift
 //  weady
 //
-//  Created by ChatGPT on 2025/08/13
+//  Created by 김영택 on 2025/08/13
 //
 
 import Foundation

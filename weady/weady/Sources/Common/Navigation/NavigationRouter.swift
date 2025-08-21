@@ -8,9 +8,12 @@
 import SwiftUI
 
 final class NavigationRouter: ObservableObject {
-    
-    // AppRoute만 담는 스택
-    @Published var path: [AppRoute] = []
+    @Published var path: [AppRoute] = [] {
+        didSet {
+            print("🧭 AppRoute path changed -> \(path)")
+            Thread.callStackSymbols.prefix(12).forEach { print("   ", $0) }
+        }
+    }
     
     /// 특정 화면을 추가 (Push 기능)
     @MainActor
@@ -23,11 +26,9 @@ final class NavigationRouter: ObservableObject {
     /// 네비게이션 초기화 (전체 Pop)
     @MainActor
     func reset() { path.removeAll() }
-
-    @MainActor
-    func reset(to route: AppRoute) {
-        path.removeAll()
-        path.append(route)
+    
+    @MainActor func reset(to r: AppRoute) {
+        path = [r]
     }
 }
 

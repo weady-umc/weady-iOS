@@ -8,27 +8,35 @@
 import SwiftUI
 
 struct StyleSelectionView: View {
-    // 외부 주입용 ViewModel
     @StateObject private var vm: StyleSelectionViewModel
-    @State private var showNext = false
 
     private let gender: GenderCode?
     private let agreements: [OnboardingAgreement]
-    
+
+    // 통합 플로우 모드
+    var embeddedInFlow: Bool = false
+    var onSkip: (() -> Void)? = nil
+    var onNext: (([Int64]) -> Void)? = nil
+
     init(
         nickname: String,
         gender: GenderCode? = nil,
         agreements: [OnboardingAgreement],
+        embeddedInFlow: Bool = false,
+        onSkip: (() -> Void)? = nil,
+        onNext: (([Int64]) -> Void)? = nil,
         service: TagServiceProtocol = TagService()
     ) {
         self.gender = gender
         self.agreements = agreements
+        self.embeddedInFlow = embeddedInFlow
+        self.onSkip = onSkip
+        self.onNext = onNext
         _vm = StateObject(wrappedValue: StyleSelectionViewModel(nickname: nickname, service: service))
     }
-    
+
     private let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 15), count: 3)
-    
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             headerView()
@@ -39,45 +47,23 @@ struct StyleSelectionView: View {
         }
         .onAppear {
             print("DEBUG Style →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
-
             vm.loadCategories()
         }
-        // 다음 → StartView (스타일 포함)
-        .fullScreenCover(isPresented: $vm.didTapNext) {
-            let styleIds64: [Int64] = Array(vm.selectedIds).map { Int64($0) }.sorted()
-            StartView.onboarding(
-                nickname: vm.nickname,
-                gender: gender,
-                styleIds: styleIds64,
-                agreements: agreements
-            )
-        }
-        // 스킵 → StartView (스타일 없음)
-        .fullScreenCover(isPresented: $vm.didTapSkip) {
-            let styleIds64: [Int64] = []   // 스킵이면 빈 배열
-            StartView.onboarding(
-                nickname: vm.nickname,
-                gender: gender,
-                styleIds: styleIds64,
-                agreements: agreements
-            )
-        }
     }
-  
-    
-    
+
     @ViewBuilder
     private func headerView() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            //상단 인디케이터 + 페이지 표시
-            ProgressIndicator(currentStep: 3, totalSteps: 5)
-            
+            if !embeddedInFlow {
+                ProgressIndicator(currentStep: 3, totalSteps: 5)
+            }
+
             (Text("2").foregroundStyle(Color.black100)+Text("/2").foregroundStyle(Color.gray900))
                 .fontName(.bodyMedium16)
                 .padding(.top, 17)
                 .padding(.horizontal, 32)
                 .frame(maxWidth: .infinity, alignment: .trailing)
-            
+
             Text("\(vm.nickname)님은 어떤 스타일의 옷차림을 좋아하시나요?")
                 .fontName(.titleBold24)
                 .foregroundStyle(Color.black100)
@@ -85,39 +71,39 @@ struct StyleSelectionView: View {
                 .padding(.top, 17)
         }
     }
-    
+
     @ViewBuilder
     private func contentView() -> some View {
         if vm.isLoading {
             Spacer()
             ProgressView("불러오는 중…")
             Spacer()
-            
         } else if let err = vm.errorMessage {
             Spacer()
-            Text("에러: \(err)")
-                .foregroundColor(.red)
+            Text("에러: \(err)").foregroundColor(.red)
             Spacer()
-            
         } else {
             LazyVGrid(columns: columns, spacing: 20) {
                 ForEach(vm.categories, id: \.id) { cat in
                     CategoryButton(
                         name: cat.name,
                         isSelected: vm.selectedIds.contains(cat.id)
-                    ) {
-                        vm.toggle(cat)
-                    }
+                    ) { vm.toggle(cat) }
                 }
             }
             .padding(.horizontal, 30)
         }
     }
-    
+
     @ViewBuilder
     private func footerView() -> some View {
         VStack(spacing: 20) {
-            Button(action: vm.skip) {
+            Button {
+                vm.skip()
+                if vm.didTapSkip {
+                    onSkip?() // 통합 플로우 콜백
+                }
+            } label: {
                 Text("건너뛰기")
                     .fontName(.bodyMedium16)
                     .foregroundStyle(Color.gray800)
@@ -128,8 +114,14 @@ struct StyleSelectionView: View {
                             .stroke(Color.gray800, lineWidth: 1)
                     )
             }
-            
-            Button(action: vm.next) {
+
+            Button {
+                vm.next()
+                if vm.didTapNext {
+                    let ids: [Int64] = Array(vm.selectedIds).map { Int64($0) }.sorted()
+                    onNext?(ids) // 통합 플로우 콜백
+                }
+            } label: {
                 Text("다음")
                     .fontName(.bodyMedium16)
                     .frame(maxWidth: .infinity)
@@ -167,14 +159,3 @@ struct CategoryButton: View {
         }
     }
 }
-/*
-struct StyleSelectionView_Previews: PreviewProvider {
-    static var previews: some View {
-        StyleSelectionView(nickname: "테스트")
-
-    }
-    .environment(router)
-    .environmentObject(store)
-}
-*/
-
