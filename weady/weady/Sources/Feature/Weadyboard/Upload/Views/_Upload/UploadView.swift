@@ -396,16 +396,18 @@ private extension UploadView {
             weatherViewModel.selectedTempBand = band
             weatherViewModel.selectedWeatherTags = [w]
 
-            // FashionModel만 프리필 (FashionViewModel은 selectedTags가 get-only인 프로젝트라 VM 대입은 생략)
+            // FashionModel
             var fashion = FashionModel()
             fashion.selectedStyles = post.styleIdList.compactMap { StyleType(rawValue: $0) }
             fashion.selectedTags = post.brandDtoList.map { FashionTag(brandName: $0.brand, productName: $0.product) }
             viewModel.fashionModel = fashion
+            fashionViewModel.prefill(from: fashion)
 
-            // PlaceModel만 프리필 (PlaceViewModel도 직접 대입은 생략)
+            // PlaceModel
             var place = PlaceModel()
             place.places = post.placeDtoList.map { Place(placeName: $0.placeName, placeAddress: $0.placeAddress) }
             viewModel.placeModel = place
+            placeViewModel.prefill(from: place)     
 
         }
     }
