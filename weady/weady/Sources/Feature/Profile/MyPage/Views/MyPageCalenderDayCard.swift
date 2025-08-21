@@ -6,58 +6,73 @@ struct MyPageCalendarDayCard: View {
 
     var body: some View {
         Button(action: action) {
-            GeometryReader { geo in
-                ZStack(alignment: .topLeading) {
-                    // MARK: - 카드 배경
-                    Color.white300
-                        .cornerRadius(2)
+            ZStack(alignment: .topLeading) {
+                //MARK: - 카드 배경
+                Color.white300
+                    .cornerRadius(2)
 
-                    // MARK: - 썸네일 이미지
-                    if let urlString = model.thumbnailUrl,
-                       let url = URL(string: urlString) {
+                //MARK: - 썸네일 이미지
+                if let urlString = model.thumbnailUrl,
+                   let url = URL(string: urlString) {
+                    GeometryReader { geo in
                         AsyncImage(url: url) { phase in
                             switch phase {
                             case .empty:
                                 Color.gray.opacity(0.2) // 로딩중
                             case .success(let img):
-                                img.resizable()
-                                    .scaledToFill() // 썸네일 이미지
+                                img
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: geo.size.width, height: geo.size.height)
+                                    .clipped()
                             case .failure:
-                                Color.red.opacity(0.3) // 실패
+                                Color.gray.opacity(0.2) // 실패
                             @unknown default:
                                 Color.gray.opacity(0.2)
                             }
                         }
-                        .frame(width: geo.size.width, height: geo.size.height)
-                        .clipped()
-                        .cornerRadius(2)
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipped()
+                    .cornerRadius(2)
+                }
 
-                    // MARK: - 날짜 텍스트
-                    Text("\(Calendar.current.component(.day, from: model.dateObj))")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(.black)
-                        .padding(4)
+                //MARK: - 날짜 텍스트
+                Text("\(model.dayNumber)")
+                    .fontName(.metaMedium10)
+                    .foregroundColor(.black100)
+                    .padding(4)
 
-                    // MARK: - 날씨 아이콘
-                    if model.weatherTagId != -1 {
-                        VStack {
+                //MARK: - 날씨 아이콘
+                if let weatherImageName = model.weatherImageName {
+                    VStack {
+                        Spacer()
+                        HStack {
                             Spacer()
-                            HStack {
-                                Spacer()
-                                if let weatherImage = UIImage(named: WeatherType.from(tagId: model.weatherTagId).imageName) {
-                                    Image(uiImage: weatherImage)
-                                        .resizable()
-                                        .frame(width: 17, height: 17)
-                                        .padding(4)
-                                }
-                            }
+                            Image(weatherImageName)
+                                .resizable()
+                                .frame(width: 17, height: 17)
+                                .padding(4)
                         }
                     }
                 }
             }
-            .cornerRadius(2)
         }
         .frame(height: 65)
+    }
+}
+
+// MARK: - CalendarThumbnailModel 확장 (날짜/날씨 처리)
+extension CalendarThumbnailModel {
+    var dayNumber: Int {
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd"
+        guard let dateObj = df.date(from: date) else { return 0 }
+        return Calendar.current.component(.day, from: dateObj)
+    }
+
+    var weatherImageName: String? {
+        guard weatherTagId != -1 else { return nil }
+        return WeatherType.from(tagId: weatherTagId).imageName
     }
 }
