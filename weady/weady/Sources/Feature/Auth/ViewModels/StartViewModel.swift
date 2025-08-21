@@ -21,6 +21,7 @@ final class StartViewModel: ObservableObject {
     @Published var lastErrorMessage: String?
 
     private let service: OnboardingService
+    private var didRouteOnce = false
 
     init(
         nickname: String,
@@ -37,11 +38,15 @@ final class StartViewModel: ObservableObject {
     }
 
     func startTapped() {
+        guard !isSubmitting, !navigateHome else { return }
+        isSubmitting = true
         Task { await postAndNavigate() }
     }
 
     // 버튼 시점에만 POST
     private func postAndNavigate() async {
+        defer { isSubmitting = false }
+
         // 1) 약관 검증 (필수 3개)
         guard let agreements, requiredAgreed(agreements) else {
             self.lastErrorMessage = "필수 약관 동의 누락(만 14세 · 서비스 · 개인정보)"
@@ -59,16 +64,14 @@ final class StartViewModel: ObservableObject {
             agreements: agreements
         )
 
-        isSubmitting = true
-        defer { isSubmitting = false }
-
         do {
             try await service.submit(body: body)
-            navigateHome = true
+            // 성공 시 한 번만 true
+            if !navigateHome { navigateHome = true }
         } catch let api as APIErrorResponse {
             // ✅ 닉네임 중복(400)만 예외적으로 통과
             if api.code == 400, api.message.contains("이미 사용 중") {
-                navigateHome = true
+                if !navigateHome { navigateHome = true }
                 return
             }
             self.lastErrorMessage = api.message

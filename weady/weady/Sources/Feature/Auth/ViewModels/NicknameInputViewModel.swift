@@ -39,20 +39,21 @@ class NicknameInputViewModel: ObservableObject {
     /// 2~15자, 한글(가-힣), 영문, 숫자로만 이루어졌는지
     var isValidNickname: Bool {
         let pattern = "^[가-힣A-Za-z0-9]{2,15}$" // 2~15자
-        return NSPredicate(format: "SELF MATCHES %@", pattern)
-            .evaluate(with: nickname)
+        return NSPredicate(format: "SELF MATCHES %@", pattern).evaluate(with: nickname)
     }
     
-    // 유효성만 통과하면 서버 체크 시도
-    func next() {
+    /// 버튼에서 `await`로 기다릴 수 있게 변경 (첫 탭에 바로 분기)
+    @discardableResult
+    func next() async -> Bool {
         guard isValidNickname else {
             shouldShowValidationError = true
-            return
+            return false
         }
-        Task { await checkAndProceed() }
+        return await checkAndProceed()
     }
     
-    private func checkAndProceed() async {
+    private func checkAndProceed() async -> Bool {
+        if isChecking { return false } // 중복 클릭 차단
         isChecking = true
         defer { isChecking = false }
         
@@ -62,16 +63,18 @@ class NicknameInputViewModel: ObservableObject {
                 // 서버가 data=true면 "중복"
                 dupCheckMessage = "이미 사용 중인 닉네임입니다."
                 shouldNavigateNext = false
+                return false
             } else {
                 // 사용 가능
                 shouldNavigateNext = true
+                return true
             }
-            
-            
         } catch let api as APIErrorResponse {
             dupCheckMessage = api.message
+            return false
         } catch {
             dupCheckMessage = "닉네임 확인에 실패했습니다. 네트워크 상태를 확인해 주세요."
+            return false
         }
     }
 }
