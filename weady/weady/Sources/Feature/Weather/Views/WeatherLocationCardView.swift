@@ -16,7 +16,7 @@ struct WeatherLocationCardView: View {
         ZStack{
             Image(data.backgroundImage)
                 .resizable()
-                .frame(width: editMode ? 299 : 335, height: 82)
+                .frame(width: editMode ? 299 * .deviceScale : 335 * .deviceScale, height: 82 * .deviceScale)
                 .background(
                     RoundedRectangle(cornerRadius: 5)
                         .fill(.clear)
@@ -29,7 +29,7 @@ struct WeatherLocationCardView: View {
                             Image("placeIcon")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 7, height: 10)
+                                .frame(width: 7 * .deviceScale, height: 10 * .deviceScale)
                             
                             Text("현재 위치")
                                 .fontName(.metaRegular12)
@@ -57,20 +57,20 @@ struct WeatherLocationCardView: View {
                             .foregroundStyle(Color.white100)
                     }
                 }
-                .padding(.trailing, editMode ? 10 : 0)
+                .padding(.trailing, editMode ? 10 * .deviceScale : 0)
                 
                 if editMode {
                                     Image(systemName: "line.3.horizontal")
                                         .resizable()
-                                        .frame(width: 15.62, height: 12.02)
+                                        .frame(width: 15.62 * .deviceScale, height: 12.02 * .deviceScale)
                                         .foregroundStyle(Color.gray700.opacity(0.5))
                                         .padding(.trailing, 0)
                                         .contentShape(Rectangle()) // 터치 영역 확장
                                 }
                 
             }
-            .padding(.horizontal, 20)
-            .frame(width: editMode ? 299 : 335)
+            .padding(.horizontal, 20 * .deviceScale)
+            .frame(width: editMode ? 299 * .deviceScale : 335 * .deviceScale)
             
                 
         }

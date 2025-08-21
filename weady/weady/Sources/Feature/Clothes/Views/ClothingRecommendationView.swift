@@ -32,11 +32,14 @@ struct ClothingRecommendationView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            // Background
-            Image("backgroundImage")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
+            GeometryReader { proxy in
+                Image("backgroundImage")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+                    .clipped()
+                    .ignoresSafeArea()
+            }
 
             VStack(alignment: .center, spacing: 0) {
                 // 1) 주소 행

@@ -21,11 +21,11 @@ struct WeatherLocationView: View {
         // MARK: - Root Layout
         ZStack(alignment: .top) {
             VStack{
-                Spacer().frame(height: 6)
+                Spacer().frame(height: 6 * .deviceScale)
                 
                 // MARK: - 검색바
                 searchBar
-                Spacer().frame(height: 25)
+                Spacer().frame(height: 25 * .deviceScale)
                 
                 // MARK: - 현재 위치 카드 (예시 데이터)
                 Group {
@@ -67,7 +67,7 @@ struct WeatherLocationView: View {
                 viewModel.loadFavorites()
                 viewModel.loadNowLocationCard()
             }
-            .edgeSwipeBack(topExclusion: 100) {
+            .edgeSwipeBack(topExclusion: 100 * .deviceScale) {
                 homeRouter.pop()
                 }
 
@@ -80,7 +80,7 @@ struct WeatherLocationView: View {
                     showBottomDivider: true,
                     backAction: { homeRouter.pop() }     // 혹은 dismiss() 사용 중이면 { dismiss() }
                 )
-                .padding(.top, -15)
+                .padding(.top, -15 * .deviceScale)
                 .background(Color.white100.ignoresSafeArea(edges: .top))
                 
 
@@ -95,19 +95,19 @@ struct WeatherLocationView: View {
     private var searchBar: some View {
         HStack(spacing: 10)
         {
-            Spacer(minLength: 10)
+            Spacer(minLength: 10 * .deviceScale)
             
             Image("searchIcon")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: 17.5, height: 17.6)
+                .frame(width: 17.5 * .deviceScale, height: 17.6 * .deviceScale)
             
             Text("위치, 주소 검색")
                 .fontName(.captionRegular14)
                 .foregroundStyle(Color.gray200)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(width: 335, height: 40)
+        .frame(width: 335 * .deviceScale, height: 40 * .deviceScale)
         .background(
             RoundedRectangle(cornerRadius: 5)
                 .fill(Color.white400)
@@ -132,25 +132,25 @@ struct WeatherLocationView: View {
                     if editMode?.wrappedValue == .active {
                         Image("doneIcon")
                             .resizable()
-                            .frame(width: 33, height: 20)
+                            .frame(width: 33 * .deviceScale, height: 20 * .deviceScale)
                     } else {
                         Image("editIcon")
                             .resizable()
-                            .frame(width: 33, height: 20)
+                            .frame(width: 33 * .deviceScale, height: 20 * .deviceScale)
                     }
                 }
             }
-            .frame(width: 335)
+            .frame(width: 335 * .deviceScale)
             
-            Spacer().frame(height: 29)
+            Spacer().frame(height: 29 * .deviceScale)
             
             // MARK: - 비어 있을 때의 안내 뷰
             if viewModel.favoriteLocations.isEmpty {
                 VStack(alignment: .center) {
-                    Spacer().frame(height: 68.5)
+                    Spacer().frame(height: 68.5 * .deviceScale)
                     Image("addIcon")
                         .resizable()
-                        .frame(width: 21.9, height: 21.9)
+                        .frame(width: 21.9 * .deviceScale, height: 21.9 * .deviceScale)
                     Spacer().frame(height: 11.3)
                     Text("즐겨찾는 위치를 추가해보세요")
                         .fontName(.captionRegular14)
@@ -168,8 +168,8 @@ struct WeatherLocationView: View {
                                 }) {
                                     Image("deleteicon")
                                         .resizable()
-                                        .frame(width: 44, height: 44)
-                                        .padding(.leading, 4)
+                                        .frame(width: 44 * .deviceScale, height: 44 * .deviceScale)
+                                        .padding(.leading, 4 * .deviceScale)
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -203,7 +203,7 @@ struct WeatherLocationView: View {
                         .frame(alignment: .leading)
                         .listRowInsets(EdgeInsets())      // 기본 여백 제거
                         .listRowSeparator(.hidden)        // 구분선 숨김
-                        .padding(.bottom, 8)
+                        .padding(.bottom, 8 * .deviceScale)
                     }
                     
                 }
@@ -211,7 +211,7 @@ struct WeatherLocationView: View {
             }
         }
         // 편집 모드일 때 너비 확장
-        .frame(width: editMode?.wrappedValue == .active ? 375 : 335)
+        .frame(width: editMode?.wrappedValue == .active ? 375 * .deviceScale : 335 * .deviceScale)
     }
 
     // MARK: - 즐겨찾기 삭제 로직 (낙관적 업데이트)
