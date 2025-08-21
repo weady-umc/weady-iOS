@@ -38,14 +38,14 @@ struct HomeView: View {
         VStack {
             
             // MARK: - 상단 여백 (디자인 스펙)
-            Spacer().frame(height: 17)
+            Spacer().frame(height: 17 * .deviceScale)
             
             // MARK: - 인사/타이틀
             TopView
                
             
             
-            Spacer().frame(height: 25)
+            Spacer().frame(height: 25 * .deviceScale)
             
             // MARK: - [네비 버튼] 날씨 카드 (누르면 .weatherhome 로 이동)
             Button {
@@ -61,7 +61,7 @@ struct HomeView: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(Color.white200)
-                            .frame(width: 335, height: 147)
+                            .frame(width: 335 * .deviceScale, height: 147 * .deviceScale)
                         ProgressView().padding()
                     }
                 } else {
@@ -69,7 +69,7 @@ struct HomeView: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(Color.white200)
-                            .frame(width: 335.57, height: 147)
+                            .frame(width: 335 * .deviceScale, height: 147 * .deviceScale)
                         Text(errorMessage ?? "날씨 정보를 불러오는중입니다...")
                             .fontName(.bodyLight16)
                             .foregroundStyle(Color.black100)
@@ -97,14 +97,14 @@ struct HomeView: View {
             CurationStripView(
                 vm: curationVM,
                 onTapAll: { router.push(.weatherhome(initial: .third)) },
-                tileSize: .init(width: 280, height: 140),                   // ← 이미지 크기 직접 지정
+                tileSize: .init(width: 280 * .deviceScale, height: 140 * .deviceScale),                   // ← 이미지 크기 직접 지정
                 titleFont: .system(size: 17, weight: .bold),                // ← 폰트 직접 지정(또는 .fontName 사용)
                 titleColor: .white                                          // ← 색상도 원하는 대로
             )
 
             
         }
-        .padding(.bottom, 70)
+        .padding(.bottom, 70 * .deviceScale)
         
         .toolbar(.hidden, for: .navigationBar)        // 시스템 네비바 숨김
                 .safeAreaInset(edge: .top) {
@@ -187,7 +187,7 @@ struct HomeView: View {
             .lineLimit(2)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.leading, 24)
+            .padding(.leading, 24 * .deviceScale)
     }
 
     
@@ -226,7 +226,7 @@ struct HomeView: View {
             ZStack {
                 Image(data.homeBackground)                 // 날씨 상태에 따른 배경 이미지
                     .resizable()
-                    .frame(width: 335, height: 147)
+                    .frame(width: 335 * .deviceScale, height: 147 * .deviceScale)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
                 
                 VStack(spacing:0) {
@@ -234,7 +234,7 @@ struct HomeView: View {
                         Text("\(data.temperature)º")       // 현재 기온
                             .foregroundStyle(Color.white100)
                             .fontName(.homeRegular30)
-                            .padding(.leading, 18)
+                            .padding(.leading, 18 * .deviceScale)
                             
                         
                         Spacer()
@@ -244,7 +244,7 @@ struct HomeView: View {
                                 Image("placeIcon")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: 8, height: 11.43)
+                                    .frame(width: 8 * .deviceScale, height: 11.43 * .deviceScale)
                                 
                                 Text(data.place)            // 현재 위치명
                                     .foregroundStyle(Color.white100)
@@ -257,7 +257,7 @@ struct HomeView: View {
                                 .foregroundStyle(Color.white100)
                                 .fontName(.metaRegular10)
                         }
-                        .padding(.trailing, 12)
+                        .padding(.trailing, 12 * .deviceScale)
                         //.padding(.top, 19)
                     }
                     
@@ -265,11 +265,11 @@ struct HomeView: View {
                     HourlyHomeScrollView(hourlyWeatherList: data.hourlyWeather)
                         .padding(.leading, 0)
                         .padding(.trailing, 0)
-                        .padding(.top, 13)
+                        .padding(.top, 13 * .deviceScale)
                 }
                 
                 
-                .frame(width: 335, height: 147)
+                .frame(width: 335 * .deviceScale, height: 147 * .deviceScale)
                 
                 
             }
@@ -282,8 +282,8 @@ struct HomeView: View {
 
         return HStack {
             RemoteThumb(urlString: model.imageUrl)
-                .frame(width: 100, height: 90)
-                .padding(.leading, 24)
+                .frame(width: 100 * .deviceScale, height: 90 * .deviceScale)
+                .padding(.leading, 24 * .deviceScale)
             
             VStack(alignment: .leading, spacing: 3){
                 
@@ -305,17 +305,17 @@ struct HomeView: View {
                     .fontName(.bodyLight16)
                     .foregroundStyle(Color.black100)
             }
-            .padding(.leading, 13)
+            .padding(.leading, 13 * .deviceScale)
             
 
             Spacer()
             Image("rightArrow")
                 .resizable()
-                .frame(width: 10, height: 16)
-                .padding(.trailing, 14)
-                .padding(.leading, 13)
+                .frame(width: 10 * .deviceScale, height: 16 * .deviceScale)
+                .padding(.trailing, 14 * .deviceScale)
+                .padding(.leading, 13 * .deviceScale)
         }
-        .frame(width: 335, height: 100)
+        .frame(width: 335 * .deviceScale, height: 100 * .deviceScale)
         .background(RoundedRectangle(cornerRadius: 6).fill(Color.white200))
         .clipShape(RoundedRectangle(cornerRadius: 6))
         .contentShape(RoundedRectangle(cornerRadius: 6))
@@ -422,20 +422,20 @@ struct CurationStripView: View {
             HStack(spacing: 0){
                 Text("지금 날씨에 어울리는 장소")
                     .fontName(.bodySemibold16)
-                    .padding(.leading, 25)
+                    .padding(.leading, 25 * .deviceScale)
                     .foregroundStyle(Color.black100)
                 Spacer()
                 Image("rightArrow")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 10, height: 15.63)
-                    .padding(.trailing, 36)
+                    .frame(width: 10 * .deviceScale, height: 15.63 * .deviceScale)
+                    .padding(.trailing, 36 * .deviceScale)
                 //.padding(.bottom, 10)
             }
-            .padding(.bottom, 19)
+            .padding(.bottom, 19 * .deviceScale)
             
             ScrollView(.horizontal, showsIndicators: false) {
-                           LazyHStack(spacing: 13) {
+                           LazyHStack(spacing: 13 * .deviceScale) {
                                if vm.items.isEmpty {
                                    ForEach(dummyImages, id: \.self) { name in
                                        ZStack(alignment: .bottomLeading) {
@@ -460,7 +460,7 @@ struct CurationStripView: View {
                                                    Rectangle().fill(.gray.opacity(0.1))
                                                }
                                            }
-                                           .frame(width: 259, height: 128, alignment: .leading)
+                                           .frame(width: 259 * .deviceScale, height: 128 * .deviceScale, alignment: .leading)
                                            .clipped()
                                            .clipShape(RoundedRectangle(cornerRadius: 6))
                                            
@@ -480,14 +480,14 @@ struct CurationStripView: View {
                                    }
                                }
                            }
-                           .padding(.leading, 20)
+                           .padding(.leading, 20 * .deviceScale)
                        }
                      .scrollIndicators(.hidden)
                      .overlay(alignment: .bottom) {
-                         Color.white.frame(height: 3)   // 테마에 맞게 배경색 사용
+                         Color.white.frame(height: 3 * .deviceScale)   // 테마에 맞게 배경색 사용
                      }
                    }
-                   .frame(height: tileSize.height + 43) // 타이틀/간격만큼 여유
+                   .frame(height: tileSize.height * .deviceScale + 43 * .deviceScale) // 타이틀/간격만큼 여유
                    .contentShape(Rectangle())
                    .onTapGesture(perform: onTapAll)
                }

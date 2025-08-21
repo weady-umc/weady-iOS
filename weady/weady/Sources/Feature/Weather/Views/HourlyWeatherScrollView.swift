@@ -13,7 +13,7 @@ struct HourlyWeatherScrollView: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
+            HStack(spacing: 10 * .deviceScale) {
                 ForEach(hourlyWeatherList) { item in
                     HourlyWeatherView(weather: item)
                         
@@ -31,7 +31,7 @@ struct HourlyHomeScrollView: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 15) {
+            HStack(spacing: 15 * .deviceScale) {
                 ForEach(hourlyWeatherList) { item in
                     HourlyWeatherView(weather: item)
                         
@@ -52,18 +52,18 @@ struct HourlyWeatherHomeScrollView: View {
                 .fill(Color.gray.opacity(0.1))
             
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+                HStack(spacing: 10 * .deviceScale) {
                     ForEach(hourlyWeatherList) { item in
                         HourlyWeatherView(weather: item)
                         
                     }
                 }
-                .padding(.leading, 8)
+                .padding(.leading, 8 * .deviceScale)
                 //.padding(.trailing, 22)
             }
             .scrollTargetBehavior(.viewAligned)
         }
-        .frame(width: 335, height: 96)
+        .frame(width: 335 * .deviceScale, height: 96 * .deviceScale)
         
         
         .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -76,20 +76,20 @@ struct HourlyWeatherView: View {
     let weather: HourlyWeather
     
     var body: some View{
-        VStack(spacing: 2.5){
+        VStack(spacing: 2.5 * .deviceScale){
             Text(hourLabel(weather.time))
                 .foregroundStyle(Color.white100)
                 .fontName(.metaSemibold12)
             
             Image(weather.iconName)
                 .resizable()
-                .frame(width: 40, height: 40)
+                .frame(width: 40 * .deviceScale, height: 40 * .deviceScale)
             
             Text("\(weather.temp)º")
                 .foregroundStyle(Color.white100)
                 .fontName(.metaSemibold12)
         }
-        .frame(width: 60, height: 73)
+        .frame(width: 60 * .deviceScale, height: 73 * .deviceScale)
     }
 }
 

@@ -47,12 +47,12 @@ struct WeatherHomeView: View {
             
         }
         .navigationBarBackButtonHidden()
-        .edgeSwipeBack(topExclusion: 100) {
+        .edgeSwipeBack(topExclusion: 100 * .deviceScale) {
                 router.pop()
             }
         .safeAreaInset(edge: .top) {
             VStack(spacing: 0) {
-                Spacer().frame(height: 20)
+                Spacer().frame(height: 20 * .deviceScale)
 
                 UnderlineSegmentedControl(
                     items: WeatherHomeModel.allCases,
@@ -105,7 +105,7 @@ struct WeatherHomeView: View {
                         Image("placeIcon")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 12, height: 17.14)
+                            .frame(width: 12 * .deviceScale, height: 17.14 * .deviceScale)
                             .padding(5)
                         
                         Text(weather.place)
@@ -119,29 +119,29 @@ struct WeatherHomeView: View {
                             print("current router.path after push: \(router.path)")
                         }) {
                             Image("downIcon")
-                                .padding(5)
+                                .padding(5 * .deviceScale)
                         }
                         .zIndex(2)
                         
                     }
-                    .padding(.top, 43)
+                    .padding(.top, 43 * .deviceScale)
                     
-                    Spacer().frame(height: 30)
+                    Spacer().frame(height: 30 * .deviceScale)
                     
                     // MARK: - 메인 카드(현재온도/최저·최고/아이콘 등)
                     WeatherMainCardView(weather: weather)
-                        .padding(.bottom, 45)
+                        .padding(.bottom, 45 * .deviceScale)
                     
                     
                     // MARK: - 시간별 예보
                     HourlyWeatherHomeScrollView(hourlyWeatherList: weather.hourlyWeather)
-                        .padding(.horizontal, 10)
+                        .padding(.horizontal, 10 * .deviceScale)
                     
-                    Spacer().frame(height: 25)
+                    Spacer().frame(height: 25 * .deviceScale)
                     
                     // MARK: - 강수 확률 / 풍속 요약
                     bigRainWind(weather: weather)
-                        .padding(.bottom, 19)
+                        .padding(.bottom, 19 * .deviceScale)
                     
                     //Spacer().frame(height: 40)
                     
@@ -189,15 +189,15 @@ struct WeatherHomeView: View {
                 ZStack{
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color.gray.opacity(0.1))
-                        .frame(width: 159, height: 73)
+                        .frame(width: 159 * .deviceScale, height: 73 * .deviceScale)
                     
-                    HStack(spacing: 10){
+                    HStack(spacing: 10 * .deviceScale){
                         
                         Image(rainLevel.imageName)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 20, height: 31)
-                            .padding(.trailing, 8)
+                            .frame(width: 20 * .deviceScale, height: 31 * .deviceScale)
+                            .padding(.trailing, 8 * .deviceScale)
                             
                         
                         VStack{
@@ -219,13 +219,13 @@ struct WeatherHomeView: View {
                 ZStack{
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color.gray.opacity(0.1))
-                        .frame(width: 159, height: 73)
-                    HStack(spacing: 10){
+                        .frame(width: 159 * .deviceScale, height: 73 * .deviceScale)
+                    HStack(spacing: 10 * .deviceScale){
                         
                         Image(windDir.imageName)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 40, height: 40)
+                            .frame(width: 40 * .deviceScale, height: 40 * .deviceScale)
                             
                             
                         
@@ -239,7 +239,7 @@ struct WeatherHomeView: View {
                                 .fontName(.captionSemibold14)
                                 .foregroundStyle(Color.white100)
                         }
-                        .padding(.leading, 8)
+                        .padding(.leading, 8 * .deviceScale)
                     }
                 }
             }
@@ -256,23 +256,23 @@ struct WeatherHomeView: View {
                 Text("일별 예보")
                     .fontName(.captionRegular14)
                     .foregroundStyle(Color.white100)
-                    .padding(.leading, 78)
-                    .padding(.bottom, 12)
+                    .padding(.leading, 78 * .deviceScale)
+                    .padding(.bottom, 12 * .deviceScale)
                 
                 VStack(spacing: 0) {
                     // MARK: - 세로 스크롤 리스트
                     ScrollView(.vertical, showsIndicators: false) {
-                        LazyVStack(spacing: 2) {
+                        LazyVStack(spacing: 2 * .deviceScale) {
                             let rows = Array(items.prefix(maxRows))
                             ForEach(rows.indices, id: \.self) { i in
                                 MidTermRowView(forecast: rows[i], isToday: i == 0)
-                                    .padding(.horizontal, 22)
+                                    .padding(.horizontal, 22 * .deviceScale)
                                     //.padding(.vertical, 1)
                                 
                                 if i < rows.count  {
                                     Divider()
                                         .overlay(Color.white100)
-                                        .padding(.horizontal, 13)
+                                        .padding(.horizontal, 13 * .deviceScale)
                                 }
                             }
                         }
@@ -285,11 +285,11 @@ struct WeatherHomeView: View {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(.white.opacity(0.05))
                 )
-                .frame(width: 335, height: 330)
-                .padding(.leading, 26)
-                .padding(.trailing, 30)
+                .frame(width: 335 * .deviceScale, height: 330 * .deviceScale)
+                .padding(.leading, 26 * .deviceScale)
+                .padding(.trailing, 30 * .deviceScale)
                 
-                .padding(.horizontal, 42)
+                .padding(.horizontal, 42 * .deviceScale)
             }
         }
     }
@@ -305,8 +305,8 @@ struct WeatherHomeView: View {
                 Text(isToday ? "오늘" : "\(forecast.dayOfWeek)   ")
                     .fontName(.bodySemibold16)
                     .foregroundStyle(Color.white100)
-                    .padding(.leading, 10)
-                    .padding(.trailing, 28)
+                    .padding(.leading, 10 * .deviceScale)
+                    .padding(.trailing, 28 * .deviceScale)
                 
                 // MARK: - 오전/오후 하늘상태 아이콘
                 HStack(spacing: 0) {
@@ -314,43 +314,43 @@ struct WeatherHomeView: View {
                         Text("오전")
                             .fontName(.metaRegular8)
                             .foregroundStyle(Color.white100.opacity(0.8))
-                            .offset(y: 4)
+                            .offset(y: 4 * .deviceScale)
                         Image(WeatherLocationAddViewModel.mapSkyStatusToIcon(forecast.amSkyStatus))
                             .resizable().scaledToFit()
-                            .frame(width: 30, height: 30)
+                            .frame(width: 30 * .deviceScale, height: 30 * .deviceScale)
                     }
-                    .padding(.trailing, 15)
+                    .padding(.trailing, 15 * .deviceScale)
                     
                     VStack(spacing: 0) {
                         Text("오후")
                             .fontName(.metaRegular8)
                             .foregroundStyle(Color.white100.opacity(0.8))
-                            .offset(y: 4)
+                            .offset(y: 4 * .deviceScale)
                         Image(WeatherLocationAddViewModel.mapSkyStatusToIcon(forecast.pmSkyStatus))
                             .resizable().scaledToFit()
-                            .frame(width: 30, height: 30)
+                            .frame(width: 30 * .deviceScale, height: 30 * .deviceScale)
                     }
                 }
-                Spacer().frame(width: 13)
+                Spacer().frame(width: 13 * .deviceScale)
                 
                 // MARK: - 최저/최고 온도 + 바 시각화
-                HStack(spacing: 8) {
+                HStack(spacing: 8 * .deviceScale) {
                     Text("\(Int(forecast.minTemp))º")
                         .fontName(.captionRegular13)
                         .foregroundStyle(Color.white100)
                     
                     TempBar(low: forecast.minTemp, high: forecast.maxTemp)
-                        .frame(width: 77, height: 5)
+                        .frame(width: 77 * .deviceScale, height: 5 * .deviceScale)
                         
                     
                     Text("\(Int(forecast.maxTemp))º")
                         .fontName(.captionRegular13)
                         .foregroundStyle(Color.white100)
                 }
-                .frame(width: 160)
+                .frame(width: 160 * .deviceScale)
                 .padding(.trailing, 0)
             }
-            .frame(width: 335, height: 44)
+            .frame(width: 335 * .deviceScale, height: 44 * .deviceScale)
         }
     }
     
@@ -380,7 +380,7 @@ struct WeatherHomeView: View {
                         .offset(x: s)
                 }
             }
-            .frame(width: 77, height: 5)
+            .frame(width: 77 * .deviceScale, height: 5 * .deviceScale)
         }
     }
 }

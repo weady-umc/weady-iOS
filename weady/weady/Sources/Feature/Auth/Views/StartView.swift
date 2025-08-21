@@ -49,20 +49,7 @@ struct StartView: View {
         )
     }
     
- nickname: String,
-          gender: GenderCode? = nil,
-          styleIds: [Int64]? = nil,
-          agreements: [OnboardingAgreement]? = nil
-      ) {
-          _vm = StateObject(
-              wrappedValue: StartViewModel(
-                  nickname: nickname,
-                  gender: gender,
-                  styleIds: styleIds,
-                  agreements: agreements
-              )
-          )
-      }
+
     
     // 덩어리 텍스트: ‘닉네임+님’은 붙이고(줄바꿈 금지), 나머지는 자연스럽게 감기게
     private var composedTitle: Text {

@@ -185,7 +185,7 @@ final class CurationViewModel: ObservableObject {
                 id: card.id,
                 title: card.title,
                 // ⬇️ 썸네일 필드명은 실제 모델명에 맞춰서!
-                thumb: card.thumbnailURL // ← 여기!
+                thumb: card.bannerURL ?? card.backgroundURL // ← 여기!
             )
         }
     }

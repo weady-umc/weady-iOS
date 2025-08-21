@@ -168,7 +168,11 @@ struct LocationTag: Identifiable, Hashable {
 struct CurationCard: Identifiable, Equatable {
     let id: Int64
     let title: String
-    let thumbnailURL: URL?
+    let bannerURL: URL?              // ✅ 추가
+    let backgroundURL: URL?          // ✅ 추가
+
+    // 하위 호환: 기존 thumbnailURL 참조 코드가 있으면 그대로 동작
+    var thumbnailURL: URL? { bannerURL ?? backgroundURL }
 }
 
 struct CurationDetailImage: Identifiable, Equatable {
@@ -217,7 +221,8 @@ enum CurationMapper {
             CurationCard(
                 id: c.curationId,
                 title: c.curationTitle,
-                thumbnailURL: URL(string: c.backgroundImgUrl) //카드 썸네일 URL
+                bannerURL: c.bannerImgUrl.flatMap(URL.init(string:)),   // ✅ 배너
+                backgroundURL: URL(string: c.backgroundImgUrl)//카드 썸네일 URL
             )
         }
         return CurationFeed(
