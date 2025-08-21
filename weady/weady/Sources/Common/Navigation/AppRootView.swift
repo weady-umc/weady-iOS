@@ -85,10 +85,16 @@ struct AppRootView: View {
             showTabs = true
             router.path = []
         }
+        // 로그아웃 시 로그인 뷰로 이동
+        .onReceive(NotificationCenter.default.publisher(for: .appDidLogout)) { _ in
+            if showTabs { showTabs = false }
+            router.path = [.login]
+        }
     }
     
 }
 
 extension Notification.Name {
     static let showTabs = Notification.Name("ShowTabs")
+    static let appDidLogout = Notification.Name("appDidLogout")
 }
