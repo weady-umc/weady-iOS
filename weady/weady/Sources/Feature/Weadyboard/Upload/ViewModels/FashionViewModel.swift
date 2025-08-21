@@ -68,3 +68,12 @@ final class FashionViewModel: ObservableObject {
         )
     }
 }
+
+extension FashionViewModel {
+    func prefill(from model: FashionModel) {
+        self.fashion = model
+        self.searchQuery = ""
+        self.dummySearchResults = []
+        self.currentPage = 0
+    }
+}

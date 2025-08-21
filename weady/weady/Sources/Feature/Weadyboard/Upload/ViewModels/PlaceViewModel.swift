@@ -38,3 +38,12 @@ final class PlaceViewModel {
         return PlaceModel(places: selectedPlaces)
     }
 }
+
+extension PlaceViewModel {
+    func prefill(from model: PlaceModel) {
+        self.model = model
+        self.selectedPlaces = model.places
+        self.searchQuery = ""
+        self.searchResults = []
+    }
+}

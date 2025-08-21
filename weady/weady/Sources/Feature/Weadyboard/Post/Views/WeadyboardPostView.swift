@@ -25,20 +25,31 @@ struct WeadyboardPostView: View {
     @StateObject private var reportVM: WeadyboardReportViewModel
     @EnvironmentObject private var weadychiveVM: WeadychiveViewModel
     @StateObject private var tagVM = TagViewModel()
+    @EnvironmentObject private var appState: AppState
 
     // 단일 바텀시트 컨테이너 상태
     @State private var sheetState: WeadyboardPostSheetState = .none
     @State private var showDim: Bool = false
 
     @State private var currentImageIndex: Int = 0
-
+    
+    // 편집 네비게이션
+    @State private var goEdit = false
+    @State private var editingPostSnapshot: BoardDetailResponseDTO? = nil
+    
     init(boardId: Int, isTabBarHidden: Binding<Bool>) {
         self.boardId = boardId
         self._isTabBarHidden = isTabBarHidden
         _viewModel = StateObject(wrappedValue: WeadyboardPostViewModel(boardId: boardId))
         _reportVM = StateObject(wrappedValue: WeadyboardReportViewModel())
     }
-
+    
+    private var isMine: Bool {
+        guard let post = viewModel.post else { return false }
+        guard let myId = appState.currentUser?.id else { return false }
+        return post.userId == myId
+    }
+    
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
@@ -55,7 +66,6 @@ struct WeadyboardPostView: View {
                 if let post = viewModel.post {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 16 * .deviceScale) {
-                            
                             WeadyboardUserHeaderView(
                                 userName: post.userName,
                                 userProfileImageUrl: post.userProfileImageUrl,
@@ -106,7 +116,7 @@ struct WeadyboardPostView: View {
                                 .onAppear {
                                     viewModel.fetchPostDetail()
                                 }
-                            .padding(.horizontal, 20 * .deviceScale)
+                                .padding(.horizontal, 20 * .deviceScale)
                         }
                     }
                 } else if viewModel.isLoading {
@@ -123,15 +133,47 @@ struct WeadyboardPostView: View {
                     .animation(.easeInOut(duration: 0.2), value: showDim)
                     .onTapGesture { dismissSheet() }
                 
-                WeadyboardPostSheetContainer(
-                    state: $sheetState,
-                    boardId: boardId,
-                    reportViewModel: reportVM,
-                    onClose: { dismissSheet() }
-                )
-                .ignoresSafeArea(edges: .bottom)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .zIndex(2)
+                VStack(spacing: 0) {
+                    Spacer()
+                    
+                    Group {
+                        if isMine {
+                            // 내 게시물: 수정/삭제 시트
+                            BottomSheetContainer(
+                                height: 255 * .deviceScale,
+                                bottomPadding: 54 * .deviceScale,
+                                onClose: { dismissSheet() }
+                            ) {
+                                WeadyboardMyPostMoreActionSheet(
+                                    boardId: boardId,
+                                    onEdit: {
+                                        if let post = viewModel.post { editingPostSnapshot = post }
+                                        dismissSheet()
+                                        goEdit = true
+                                    },
+                                    onDeleteSuccess: {
+                                        dismiss()
+                                    }
+                                )
+                            }
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                            .zIndex(2)
+                            .ignoresSafeArea(edges: .bottom)
+                            
+                        } else {
+                            // 타인 게시물: 신고 시트
+                            WeadyboardPostSheetContainer(
+                                state: $sheetState,
+                                boardId: boardId,
+                                reportViewModel: reportVM,
+                                onClose: { dismissSheet() }
+                            )
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                            .zIndex(2)
+                            .ignoresSafeArea(edges: .bottom)
+                        }
+                    }
+                }
             }
         }
         .onAppear {
@@ -160,6 +202,17 @@ struct WeadyboardPostView: View {
         }
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
+        
+        .navigationDestination(isPresented: $goEdit) {
+            if let snapshot = editingPostSnapshot {
+                UploadView(
+                    mode: .edit(post: snapshot),
+                    onSuccess: { viewModel.fetchPostDetail() }
+                )
+            } else {
+                EmptyView()
+            }
+        }
     }
 
     private func present(_ newState: WeadyboardPostSheetState) {
@@ -171,41 +224,6 @@ struct WeadyboardPostView: View {
         withAnimation(.easeInOut(duration: 0.2)) { showDim = false }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             sheetState = .none
-        }
-    }
-
-    // MARK: - TagViewModel 사용
-    private func weatherName(for id: Int?) -> String {
-        guard let id else { return "" }
-        if let name = tagVM.weathers.first(where: { $0.id == id })?.name {
-            return name
-        }
-        switch id {
-        case 1: return "맑은 날"
-        case 2: return "구름 많은 날"
-        case 3: return "비 오는 날"
-        case 4: return "흐린 날"
-        case 5: return "눈 오는 날"
-        case 6: return "바람 많은 날"
-        default: return ""
-        }
-    }
-
-    private func temperatureName(for id: Int?) -> String {
-        guard let id else { return "" }
-        if let name = tagVM.temperatures.first(where: { $0.id == id })?.name {
-            return name
-        }
-        switch id {
-        case 1: return "~ -6℃"
-        case 2: return "-5℃ ~ 5℃"
-        case 3: return "6℃ ~ 11℃"
-        case 4: return "12℃ ~ 16℃"
-        case 5: return "17℃ ~ 22℃"
-        case 6: return "23℃ ~ 26℃"
-        case 7: return "27℃ ~ 30℃"
-        case 8: return "31℃ ~"
-        default: return ""
         }
     }
 }

@@ -36,9 +36,9 @@ extension UploadModel {
         CreateBoardRequestDTO(
             isPublic: self.isPublic,
             content: self.content,
-            weatherTagId: self.weatherTagId,
-            temperatureTagId: self.temperatureTagId,
             seasonTagId: self.seasonTagId,
+            temperatureTagId: self.temperatureTagId,
+            weatherTagId: self.weatherTagId,
             boardPlaceRequestDtoList: self.placeDtoList.map {
                 PlaceDTO(placeName: $0.placeName, placeAddress: $0.placeAddress)
             },

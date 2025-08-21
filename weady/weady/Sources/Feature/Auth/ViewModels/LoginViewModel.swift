@@ -12,7 +12,9 @@ import GoogleSignIn
 import GoogleSignInSwift
 import AuthenticationServices
 import KeychainSwift
+import UIKit
 
+@MainActor
 final class LoginViewModel: ObservableObject {
     // 공통 상태
     @Published var errorMessage: String?
@@ -23,7 +25,18 @@ final class LoginViewModel: ObservableObject {
     @Published var appleUserIdentifier: String = ""
     @Published var appleEmail: String = ""
     @Published var appleFullName: String = ""
-
+    
+    // 전역 상태 및 서비스
+    private weak var appState: AppState?
+    private let userService: UserService = {
+        UserService()
+    }()
+    
+    func attach(appState: AppState) {
+        self.appState = appState
+        self.userService.attach(appState: appState)
+    }
+    
     // MARK: - 카카오 로그인
     func loginWithKakao(completion: @escaping (Bool) -> Void) {
         UserApi.shared.loginWithKakaoAccount { token, error in
@@ -155,23 +168,29 @@ final class LoginViewModel: ObservableObject {
         
         AuthService().login(data: dto, provider: provider) { [weak self] result in
             DispatchQueue.main.async {
+                guard let self else { return }
                 switch result {
                 case .success(let response):
                     AuthManager.shared.saveTokens(
                         accessToken: response.accessToken,
                         refreshToken: response.refreshToken
                     )
-                    DispatchQueue.main.async {
-                        print("✅ accessToken: \(response.accessToken)")
-                        print("✅ refreshToken: \(response.refreshToken)")
-                        print("✅ isNewUser: \(response.isNewUser)")
-                    }
-                    self?.isNewUser = response.isNewUser
+                    print("✅ accessToken: \(response.accessToken)")
+                    print("✅ refreshToken: \(response.refreshToken)")
+                    print("✅ isNewUser: \(response.isNewUser)")
+                    
+                    self.isNewUser = response.isNewUser
                     UserDefaults.standard.set(response.isNewUser, forKey: "isNewUser")
-                    self?.loginSucceeded = true
+                    self.loginSucceeded = true
+                    
+                    // 로그인 성공 후, 내 정보 확보
+                    self.userService.ensureCurrentUserFromMyPage { _ in
+                        // 실패해도 로그인 플로우 자체는 진행되게 둠
+                    }
+                    
                     completion()
                 case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
+                    self.errorMessage = error.localizedDescription
                 }
             }
         }

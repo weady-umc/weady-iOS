@@ -107,6 +107,12 @@ extension BoardEndpoints: TargetType {
         if let token = AuthManager.shared.getAccessToken() {
             header["Authorization"] = "Bearer \(token)"
         }
+        switch self {
+        case .updateBoard :
+            header["Content-Type"] = "application/json"
+        default:
+            break
+        }
         return header
     }
 }
