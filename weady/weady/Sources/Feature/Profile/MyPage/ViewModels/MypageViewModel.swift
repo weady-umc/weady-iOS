@@ -1,17 +1,20 @@
 import Foundation
+import SwiftUI
 
-@Observable
-final class MypageViewModel {
+final class MypageViewModel: ObservableObject {
     // MARK: - 상태
-    var year: Int
-    var month: Int
-    var selectedFilter: String = "전체보기"
+    @Published var year: Int
+    @Published var month: Int
+    @Published var selectedFilter: String = "전체보기" {
+        didSet { applyFilter() }
+    }
     
-    var profile: MypageProfileModel?
-    var calendar: [CalendarThumbnailModel] = []
+    @Published var profile: MypageProfileModel?
+    @Published var calendar: [CalendarThumbnailModel] = []
+    @Published private(set) var filteredCalendar: [CalendarThumbnailModel] = []
     
-    var selectedDate: String? = nil
-    var selectedBoard: MypageBoardDetailModel? = nil // TODO: - 백엔드에 요청 : 게시물 2개 구현되도록 배열로 변경
+    @Published var selectedDate: String? = nil
+    @Published var selectedBoards: [MypageBoardDetailModel] = []
     
     private let userService = UserService()
     
@@ -25,13 +28,25 @@ final class MypageViewModel {
         fetchMypageData()
     }
     
+    // MARK: - 날짜 포맷
+    var dateFormatter: DateFormatter {
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd"
+        return df
+    }
+    
+    // MARK: - 선택 게시물 초기화
+    func clearSelectedBoards() {
+        selectedBoards = []
+    }
+    
     // MARK: - 필터 적용
-    var filterCalendar: [CalendarThumbnailModel] {
+    private func applyFilter() {
         switch selectedFilter {
-        case "전체보기": return calendar
-        case "공개보기": return calendar.filter { $0.isPublic }
-        case "나만보기": return calendar.filter { !$0.isPublic }
-        default: return calendar
+        case "전체보기": filteredCalendar = calendar
+        case "공개보기": filteredCalendar = calendar.filter { $0.isPublic }
+        case "나만보기": filteredCalendar = calendar.filter { !$0.isPublic }
+        default: filteredCalendar = calendar
         }
     }
     
@@ -40,13 +55,14 @@ final class MypageViewModel {
         self.profile = newProfile
     }
     
-    // MARK: - 마이페이지 조회
+    // MARK: - 마이페이지 데이터 조회
     func fetchMypageData() {
         userService.fetchMyPage(year: year, month: month) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let data):
                     self?.mapMyPageResponse(data)
+                    self?.applyFilter()
                 case .failure(let error):
                     print(">>> 마이페이지 불러오기 실패: \(error)")
                 }
@@ -54,52 +70,63 @@ final class MypageViewModel {
         }
     }
     
-    // MARK: - 특정 날짜 게시물 조회 (캘린더 카드 클릭시)
-    func fetchBoard(date: String, isPublic: Bool = true, completion: (() -> Void)? = nil) {
+    // MARK: - 특정 날짜 게시물 조회
+    func fetchBoards(for date: String, completion: (() -> Void)? = nil) {
         selectedDate = date
-        userService.fetchBoard(date: date, isPublic: isPublic) { [weak self] result in
+        selectedBoards = []
+        
+        let group = DispatchGroup()
+        
+        // 공유중 게시물
+        group.enter()
+        userService.fetchBoard(date: date, isPublic: true) { [weak self] result in
             DispatchQueue.main.async {
-                switch result {
-                case .success(let data):
-                    if data.boardId == 0 {
-                        self?.selectedBoard = nil
-                        print("해당 날짜의 게시물이 없습니다.")
-                    } else {
-                        self?.selectedBoard = self?.mapBoardResponse(data) //TODO: - (추후수정) 일단 게시물 1개만 반환
-                    }
-                case .failure(let error):
-                    self?.selectedBoard = nil
-                    print(">>> 해당 날짜 게시물 조회 실패: \(error)")
+                if case .success(let data) = result, data.boardId != 0,
+                   let board = self?.mapBoardResponse(data) {
+                    self?.selectedBoards.append(board)
                 }
-                completion?()
+                group.leave()
             }
+        }
+        
+        // 보관중 게시물
+        group.enter()
+        userService.fetchBoard(date: date, isPublic: false) { [weak self] result in
+            DispatchQueue.main.async {
+                if case .success(let data) = result, data.boardId != 0,
+                   let board = self?.mapBoardResponse(data) {
+                    self?.selectedBoards.append(board)
+                }
+                group.leave()
+            }
+        }
+        
+        group.notify(queue: .main) { [weak self] in
+            self?.selectedBoards.sort { $0.createdAt > $1.createdAt }
+            completion?()
         }
     }
     
-    // MARK: - DTO → 마이페이지 모델 변환
+    // MARK: - DTO → 모델 매핑
     private func mapMyPageResponse(_ dto: GetMyPageResponse) {
-        
-        print(">>> calendar response: \(dto.calendar)") //TODO: - 사용자가 업로드한 게시물 확인용 메싲
-
         profile = MypageProfileModel(
             id: dto.userId,
             name: dto.name,
             profileImageUrl: dto.profileImageUrl
         )
-
+        
         calendar = dto.calendar.map {
             CalendarThumbnailModel(
                 date: $0.date,
                 thumbnailUrl: $0.thumbnailUrl,
                 weatherTagId: $0.weatherTagId,
-                isPublic: true // TODO: API에서 isPublic 필드 받아오면 교체
+                isPublic: $0.isPublic
             )
         }
     }
     
-    // MARK: - DTO → 마이페이지 상세정보 모델 변환
     private func mapBoardResponse(_ dto: GetBoardInMyPageResponse) -> MypageBoardDetailModel {
-        return MypageBoardDetailModel(
+        MypageBoardDetailModel(
             boardId: dto.boardId,
             createdAt: dto.createdAt,
             isPublic: dto.isPublic,
@@ -108,8 +135,7 @@ final class MypageViewModel {
         )
     }
     
-    // MARK: - 게시물 이미지 리스트
     func boardImages() -> [BoardImageModel] {
-        return selectedBoard?.imageList ?? []
+        selectedBoards.first?.imageList ?? []
     }
 }
