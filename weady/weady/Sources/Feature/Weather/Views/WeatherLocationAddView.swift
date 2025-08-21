@@ -25,7 +25,7 @@ struct WeatherLocationAddView: View {
     var body: some View {
         VStack{
             
-            Spacer().frame(height: 44)
+            Spacer().frame(height: 44 * .deviceScale)
             
             ZStack{
                 // MARK: - 배경: 변환된 날씨가 준비되면 해당 배경 표시
@@ -33,7 +33,7 @@ struct WeatherLocationAddView: View {
                     Image(weather.weatherBackground)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 335, height: 694)
+                        .frame(width: 335 * .deviceScale, height: 694 * .deviceScale)
                     
                     VStack(spacing:0){
                         
@@ -48,10 +48,10 @@ struct WeatherLocationAddView: View {
                                 Image("closeIcon")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: 20, height: 20)
+                                    .frame(width: 20 * .deviceScale, height: 20 * .deviceScale)
                             }
                             //.offset(y:-40)
-                            .padding(.top, 24)
+                            .padding(.top, 24 * .deviceScale)
                         }
                         
                         // MARK: - 위치 표시 (아이콘 + 장소명)
@@ -59,32 +59,32 @@ struct WeatherLocationAddView: View {
                             Image("placeIcon")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 11.95, height: 17.071)
+                                .frame(width: 11.95 * .deviceScale, height: 17.071 * .deviceScale)
                             
                             Text(weather.place)
                                 .fontName(.bodySemibold16)
                                 .foregroundStyle(Color.white100)
                             
                         }
-                        .padding(.top, 14)
+                        .padding(.top, 14 * .deviceScale)
                         
-                        Spacer().frame(height: 24)
+                        Spacer().frame(height: 24 * .deviceScale)
                         
                         // MARK: - 메인 날씨 카드 (현재/최저/최고/아이콘)
                         WeatherMainCardView(weather: weather)
                         
-                        Spacer().frame(height: 44)
+                        Spacer().frame(height: 44 * .deviceScale)
                         
                         // MARK: - 시간별 예보 (가로 스크롤)
                         HourlyWeatherScrollView(hourlyWeatherList: weather.hourlyWeather)
-                            .padding(.leading, 37)
+                            .padding(.leading, 37 * .deviceScale)
                         
-                        Spacer().frame(height: 36)
+                        Spacer().frame(height: 36 * .deviceScale)
                         
                         // MARK: - 강수 확률 / 풍속
                         rainWind(weather: weather)
                         
-                        Spacer().frame(height: 65)
+                        Spacer().frame(height: 65 * .deviceScale)
                         
                         // MARK: - 즐겨찾기 추가 버튼 (서버 → 로컬 → 화면 이동)
                         Button(action: {
@@ -111,7 +111,7 @@ struct WeatherLocationAddView: View {
                                 Image("whitebackground")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: 280, height: 55)
+                                    .frame(width: 280 * .deviceScale, height: 55 * .deviceScale)
                                 
                                 Text("즐겨찾기 추가")
                                     .fontName(.captionSemibold14)
@@ -155,7 +155,7 @@ struct WeatherLocationAddView: View {
                             Image("whitebackground")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 280, height: 55)
+                                .frame(width: 280 * .deviceScale, height: 55 * .deviceScale)
                             
                             Text("즐겨찾기 추가")
                                 .fontName(.captionSemibold14)
@@ -168,7 +168,7 @@ struct WeatherLocationAddView: View {
 
 
         }
-        .edgeSwipeBack(topExclusion: 100) {
+        .edgeSwipeBack(topExclusion: 100 * .deviceScale) {
             homeRouter.pop()
 
             }
@@ -181,8 +181,8 @@ struct WeatherLocationAddView: View {
                     backAction: { homeRouter.pop() }// 혹은 dismiss() 사용 중이면 { dismiss() }
                     
                 )
-                .padding(.bottom, 20)
-                .padding(.top, 25)
+                .padding(.bottom, 20 * .deviceScale)
+                .padding(.top, 25 * .deviceScale)
                 .background(Color.white100.ignoresSafeArea(edges: .top))
                 
             }
@@ -211,19 +211,19 @@ struct WeatherMainCardView: View {
             Text("\(weather.temperature)º")
                 .foregroundStyle(Color.white100)
                 .fontName(.headingMedium80)
-                .padding(.trailing, 31)
+                .padding(.trailing, 31 * .deviceScale)
             
             VStack{
                 Image("\(weather.weatherIcon)")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 83, height: 58.1)
-                    .padding(.bottom, 20)
+                    .frame(width: 83 * .deviceScale, height: 58.1 * .deviceScale)
+                    .padding(.bottom, 20 * .deviceScale)
                 
                 Text("\(weather.description)")
                     .foregroundStyle(Color.white100)
                     .fontName(.captionSemibold14)
-                    .padding(.bottom, 4)
+                    .padding(.bottom, 4 * .deviceScale)
                 
                 Text("최저 \(weather.lowTemperature)º | 최고 \(weather.highTemperature)º")
                     .foregroundStyle(Color.white100)
@@ -250,15 +250,15 @@ struct rainWind :View {
             ZStack{
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color.gray.opacity(0.1))
-                    .frame(width: 129, height: 73)
+                    .frame(width: 129 * .deviceScale, height: 73 * .deviceScale)
                 
-                HStack(spacing: 10){
+                HStack(spacing: 10 * .deviceScale){
                     
                     Image(rainLevel.imageName)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 20, height: 31)
-                        .padding(.trailing, 8)
+                        .frame(width: 20 * .deviceScale, height: 31 * .deviceScale)
+                        .padding(.trailing, 8 * .deviceScale)
                         
                     
                     VStack{
@@ -274,20 +274,20 @@ struct rainWind :View {
                 }
             }
             
-            Spacer().frame(width: 14)
+            Spacer().frame(width: 14 * .deviceScale)
             
             // MARK: - 풍속
             ZStack{
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color.gray.opacity(0.1))
-                    .frame(width: 129, height: 73)
+                    .frame(width: 129 * .deviceScale, height: 73 * .deviceScale)
                 
-                HStack(spacing: 10){
+                HStack(spacing: 10 * .deviceScale){
                     
                     Image(windDir.imageName)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 40, height: 40)
+                        .frame(width: 40 * .deviceScale, height: 40 * .deviceScale)
                         
                         
                     

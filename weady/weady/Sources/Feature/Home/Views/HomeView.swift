@@ -126,7 +126,6 @@ struct HomeView: View {
             locationService.requestCurrentLocation() // 권한 요청 + 현재 좌표 1회/지속 업데이트 트리거
         }
         
-       // .task { await curationVM.loadLocationRaw(locationId: 64) }
 
         .task { await curationVM.boot() }
         // MARK: - 위치 좌표 스트림 수신 → 서버 now-location PATCH
@@ -433,7 +432,7 @@ struct CurationStripView: View {
                     .padding(.trailing, 36 * .deviceScale)
                 //.padding(.bottom, 10)
             }
-            .padding(.bottom, 19 * .deviceScale)
+            .padding(.bottom, 19)
             
             ScrollView(.horizontal, showsIndicators: false) {
                            LazyHStack(spacing: 13 * .deviceScale) {
@@ -466,17 +465,7 @@ struct CurationStripView: View {
                                            .clipShape(RoundedRectangle(cornerRadius: 6))
                                            
                                            
-                                         /*  // 👉 텍스트는 폰트/색/라인수 자유 조절
-                                           Text(it.title)
-                                               .font(titleFont)
-                                                   .foregroundStyle(.white)
-                                                   .multilineTextAlignment(.leading)
-                                                   .lineLimit(2)
-                                                   .truncationMode(.tail)
-                                                   .frame(width: tileSize.width - 26, alignment: .leading) // 폭을 고정해야 줄바꿈 됨
-                                                   .padding(.bottom, 12)
-                                                   .padding(.leading, 13)              // 필요하면
-                                          */
+                                  
                                        }
                                    }
                                }
@@ -494,100 +483,6 @@ struct CurationStripView: View {
                }
            }
 
-            /*
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 13){
-                    if vm.items.isEmpty {
-                        // 더미 카드
-                        ForEach(dummyImages, id: \.self) { name in
-                            Image(name)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: tileSize.width, height: tileSize.height)
-                                .clipped()
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                        }
-                    } else {
-                        ForEach(vm.items, id: \.id) { it in
-                            VStack(alignment: .leading, spacing: 8) {
-                                AsyncImage(url: it.thumb) { phase in
-                                    switch phase {
-                                    case .success(let img): img
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 259, height: 128, alignment: .leading)
-                                            .clipped()
-                                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    default:
-                                        Rectangle()
-                                            .fill(.gray.opacity(0.1))
-                                            .frame(width: 259, height: 128)
-                                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    }
-                                }
-                                Text(it.title)
-                                    .fontName(.bodyBold16)          // ← 여기서 폰트 변경
-                                    .foregroundStyle(Color.white100)
-                                    .lineLimit(2)
-                                    .multilineTextAlignment(.leading)
-                                    .padding(.bottom, 12)
-                                    .padding(.leading, 13)
-                            }
-                        }
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                    }
-                }
-                
-                .padding(.leading, 20)
-            }
-        }
-        
-        .frame(height: 171)
-        
-        .contentShape(Rectangle())
-        .onTapGesture(perform: onTapAll)
-        
-    }
-}
-
-// 홈용 타일
-private struct CardTile: View {
-    let title: String
-    let imageURL: URL?
-
-    var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            AsyncImage(url: imageURL) { phase in
-                switch phase {
-                case .success(let image): image
-                        .resizable()
-                        .scaledToFill()
-                        //.scaleEffect(0.97)
-                        .frame(width: 259, height: 128, alignment: .leading)
-                        .clipped()
-                default: Image("homeplacedata1")
-                }
-            }
-            .frame(width: 259, height: 128)
-            .clipped()
-            .frame(maxWidth: .infinity, alignment: .bottom)
-
-            if style.showsTileTitle {
-                Text(title)
-                    .fontName(.bodyBold16)          // ← 여기서 폰트 변경
-                    .foregroundStyle(Color.white100)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-                    .padding(.bottom, 12)
-                    .padding(.leading, 13)    // ← 여기서 위치/패딩 변경
-            }
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 6))
-    }
- 
-}
-
-*/
 
 //#Preview {
 //    HomeFlowHost(isTabBarHidden: .constant(false))
