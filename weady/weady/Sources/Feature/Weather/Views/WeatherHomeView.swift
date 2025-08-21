@@ -47,9 +47,9 @@ struct WeatherHomeView: View {
             
         }
 
-        
-        .edgeSwipeBack(topExclusion: 100) {
-
+        .navigationBarBackButtonHidden(true)
+        .edgeSwipeBack(topExclusion: 100 * .deviceScale) {
+            homeRouter.pop()
             }
         .safeAreaInset(edge: .top) {
             VStack(spacing: 0) {
@@ -61,20 +61,14 @@ struct WeatherHomeView: View {
                     selection: $viewModel.selectedSegment,
                     title: { $0.title })
 
-                Spacer().frame(height: 100)
-                CustomNavBar(
-                    viewTitle: "",
-                    showLogoButton: true,
-                    showAlarmButton: true,
-                    showBottomDivider: false,
-                    alarmAction: { homeRouter.push(.alarm) }
+                //Spacer().frame(height: 100)
 
-                )
                 .padding(.horizontal, 0)
                 .background(Color.white)
                 .overlay(Rectangle().fill(.clear).frame(height: 1), alignment: .bottom)
             }
             .background(Color.white.ignoresSafeArea(edges: .top))
+            
         }
 
 
@@ -117,7 +111,7 @@ struct WeatherHomeView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 12 * .deviceScale, height: 17.14 * .deviceScale)
-                            .padding(5)
+                            .padding(5 * .deviceScale)
                         
                         Text(weather.place)
                             .fontName(.bodySemibold16)
@@ -143,15 +137,7 @@ struct WeatherHomeView: View {
                     WeatherMainCardView(weather: weather)
                         .padding(.bottom, 45 * .deviceScale)
 
-                    Button(action: {
-                        print("current router.path before push: \(homeRouter.path)")
-                        homeRouter.push(.weatherlocation) // 위치 선택 화면으로 이동
-                        print("current router.path after push: \(homeRouter.path)")
-                    }) {
-                        Image("downIcon")
-                            .padding(8)
-                    }
-                    .zIndex(2)
+
 
                     
                     

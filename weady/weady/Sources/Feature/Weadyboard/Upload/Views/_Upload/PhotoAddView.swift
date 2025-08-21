@@ -5,7 +5,7 @@ struct PhotoAddView: View {
     @Binding var images: [LocalImage]
     @State private var selectedItems: [PhotosPickerItem] = []
 
-    private let maxImages = 10 // 사진 추가 최대 10개
+    private let maxImages = 9 // TODO: - 사진 추가 최대 10개 (최대 9개)
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -56,6 +56,12 @@ struct PhotoAddView: View {
             do {
                 if let data = try await item.loadTransferable(type: Data.self),
                    let uiImage = UIImage(data: data) {
+                    
+                    // 데이터 용량 계산
+                    let sizeInBytes = data.count
+                    let sizeInMB = Double(sizeInBytes) / 1024 / 1024
+                    print("추가된 이미지 용량: \(String(format: "%.2f", sizeInMB)) MB")
+                    
                     newImages.append(LocalImage(image: uiImage))
                 }
             } catch {

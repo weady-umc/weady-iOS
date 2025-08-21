@@ -33,12 +33,12 @@ struct WeatherSearchView: View {
             // MARK: - Results Area
             Group {
                 if viewModel.isLoading {
-                    ProgressView().padding(.top, 40)
+                    ProgressView().padding(.top, 40 * .deviceScale)
                 } else if didSearch && viewModel.filteredResults.isEmpty {
                     // 검색했는데 비었을 때만 표시
                     Text("검색 결과가 없습니다.")
                         .foregroundColor(.gray)
-                        .padding(.top, 40)
+                        .padding(.top, 40 * .deviceScale)
                 } else if !viewModel.filteredResults.isEmpty {
                     searchResultsList
                 } else {
@@ -49,7 +49,7 @@ struct WeatherSearchView: View {
             Spacer()
         }
         // MARK: - Navigation Bar
-        .edgeSwipeBack(topExclusion: 100) {
+        .edgeSwipeBack(topExclusion: 100 * .deviceScale) {
             homeRouter.pop()
         }
         .toolbar(.hidden, for: .navigationBar) // 시스템 네비바 숨김
@@ -60,7 +60,7 @@ struct WeatherSearchView: View {
                 showBottomDivider: true,
                 backAction: { homeRouter.pop() }     // 혹은 dismiss() 사용 중이면 { dismiss() }
             )
-            .padding(.top, -15)
+            .padding(.top, -15 * .deviceScale)
             .background(Color.white100.ignoresSafeArea(edges: .top))
             
             
@@ -78,15 +78,15 @@ struct WeatherSearchView: View {
     // MARK: - Search Bar View
     private var searchBar: some View {
         VStack {
-            Spacer().frame(height: 14)
+            Spacer().frame(height: 14 * .deviceScale)
             
-            HStack(spacing: 10) {
-                Spacer(minLength: 10)
+            HStack(spacing: 10 * .deviceScale) {
+                Spacer(minLength: 10 * .deviceScale)
                 
                 Image("searchIcon")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 17.5, height: 17.6)
+                    .frame(width: 17.5 * .deviceScale, height: 17.6 * .deviceScale)
                 
                 // 실제 입력 필드 (플레이스홀더 스타일 포함)
                 TextField("", text: $viewModel.searchText, prompt: Text("위치, 주소 검색")
@@ -108,13 +108,13 @@ struct WeatherSearchView: View {
                     didSearch = false            //  '검색 결과 없음' 숨김
             } label: {
                 Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 16, weight: .regular))
+                    .font(.system(size: 16 * .deviceScale, weight: .regular))
                     .foregroundStyle(Color.gray300)
             }
-            .padding(.trailing, 10)
+            .padding(.trailing, 10 * .deviceScale)
                 }
             }
-            .frame(width: 335, height: 40)
+            .frame(width: 335 * .deviceScale, height: 40 * .deviceScale)
             .background(RoundedRectangle(cornerRadius: 5).fill(Color.white400))
         }
         .frame(alignment: .top)
@@ -125,7 +125,7 @@ struct WeatherSearchView: View {
         VStack {
             // 서버 응답이 비어 있을 때의 안내
             if viewModel.searchResults.isEmpty {
-                Spacer().frame(height: 40)
+                Spacer().frame(height: 40 * .deviceScale)
                 Text("🔍 검색 결과가 없습니다.")
                     .foregroundColor(.clear)
             } else {
@@ -154,7 +154,7 @@ struct WeatherSearchView: View {
                                 .foregroundColor(.black)
                             
                         }
-                        .padding(.vertical, 6)
+                        .padding(.vertical, 6 * .deviceScale)
                     }
                     
                     .listRowSeparator(.hidden)
@@ -165,7 +165,7 @@ struct WeatherSearchView: View {
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .background(Color.white)
-                .frame(width: 335)
+                .frame(width: 335 * .deviceScale)
             }
         }
     }

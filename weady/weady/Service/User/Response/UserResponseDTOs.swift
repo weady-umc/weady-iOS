@@ -18,6 +18,7 @@ struct CalendarResponse: Decodable {
     let date: String // yyyy-MM-dd (date)
     let thumbnailUrl: String?
     let weatherTagId: Int
+    let isPublic: Bool
 }
 
 // MARK: - 마이페이지 특정 게시물 조회

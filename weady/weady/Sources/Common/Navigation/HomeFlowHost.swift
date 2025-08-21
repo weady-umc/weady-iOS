@@ -50,8 +50,8 @@ struct HomeFlowHost: View {
                     case .home:
                         HomeEntryView()
 
-                    case .weatherhome:
-                        WeatherHomeView()
+                    case .weatherhome(let initial):
+                        WeatherHomeView(initial: initial)
                     case .weatheradd(let place, let weather):
                         WeatherLocationAddView(
                             viewModel: WeatherLocationAddViewModel(),

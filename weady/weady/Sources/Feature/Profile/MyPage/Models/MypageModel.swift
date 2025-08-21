@@ -10,7 +10,7 @@ struct MypageProfileModel: Identifiable, Codable {
 // MARK: - 캘린더 썸네일 카드 데이터
 struct CalendarThumbnailModel: Identifiable, Codable {
     var id: String { date }
-    let date: String
+    let date: String // yyyy-MM-dd
     let thumbnailUrl: String?
     let weatherTagId: Int
     let isPublic: Bool
@@ -21,7 +21,10 @@ struct CalendarThumbnailModel: Identifiable, Codable {
     
     // 날짜 객체 미리 계산
     var dateObj: Date {
-        ISO8601DateFormatter().date(from: date) ?? Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone.current
+        return formatter.date(from: date) ?? Date()
     }
 }
 
@@ -36,7 +39,7 @@ struct BoardImageModel: Identifiable, Codable {
 struct MypageBoardDetailModel: Identifiable, Codable {
     var id: Int { boardId }
     let boardId: Int
-    let createdAt: String       
+    let createdAt: String // yyyy-MM-ddThh:mm:sssZ
     let isPublic: Bool
     let weatherTagId: Int
     let imageList: [BoardImageModel]

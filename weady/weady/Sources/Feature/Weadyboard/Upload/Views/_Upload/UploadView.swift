@@ -103,17 +103,12 @@ struct UploadView: View {
     @State private var isUploading = false
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
+    
+    // MARK: - 안내 메시지 배너
+    @State private var showCautionBanner = true
+    
+    // MARK: - 등록 버튼 활성화 조건 (사진 1장 + 날씨 태그)
 
-    // 모드/서비스
-    let mode: UploadMode
-    private let boardService = BoardService()
-
-    init(mode: UploadMode = .create, onSuccess: (() -> Void)? = nil) {
-        self.mode = mode
-        self.onSuccess = onSuccess
-    }
-
-    // 등록 버튼 활성 조건
     private var isFormValid: Bool {
         let hasPhoto: Bool = {
             switch mode {
@@ -141,28 +136,82 @@ struct UploadView: View {
                 VStack(spacing: 16) {
                     // 공개/비공개 배너
                     StatusBanner(type: viewModel.isPublic ? .public : .private)
-
-                    // 사진 (업로드뷰와 동일한 가로 스크롤 규격)
-                    switch mode {
-                    case .create:
-                        PhotoAddView(images: $viewModel.localImages)
-                    case .edit(let post):
-                        VStack(alignment: .leading, spacing: 8) {
-                            PhotoLockedStrip(urls: post.imageDtoList.map { $0.imgUrl })
-                            HStack(spacing: 6) {
-                                Image(systemName: "lock.fill").imageScale(.small)
-                                Text("기존 게시물은 사진을 수정할 수 없습니다.")
-                                    .fontName(.captionRegular14)
-                            }
-                            .foregroundStyle(Color.gray500)
-                            .padding(.top, 2)
+                    
+                    // MARK: - 사진 추가
+                    PhotoAddView(images: $viewModel.localImages)
+                    
+                    // MARK: - 텍스트 입력
+                    UploadTextView(content: $viewModel.content)
+                    
+                    // MARK: - 정보 추가 버튼들
+                    VStack(spacing: 15) {
+                        NavBtn(title: "날씨 정보 추가", isRequired: true) {
+                            AnyView(
+                                WeatherInfoView(viewModel: weatherViewModel) {
+                                    viewModel.weatherModel = weatherViewModel.toWeatherModel()
+                                    print("업로드 모델에 날씨 정보 반영 완료")
+                                }
+                            )
                         }
+                        Divider()
+                        
+                        NavBtn(title: "패션 정보 추가") {
+                            AnyView(
+                                FashionInfoView(viewModel: fashionViewModel) {
+                                    viewModel.fashionModel = fashionViewModel.toFashionModel()
+                                }
+                            )
+                        }
+                        Divider()
+                        
+                        NavBtn(title: "장소 정보 추가") {
+                            AnyView(
+                                PlaceInfoView(viewModel: placeViewModel) {
+                                    viewModel.placeModel = placeViewModel.toPlaceModel()
+                                }
+                            )
+                        }
+                        Divider()
+                        
+                        ToggleBtn(label: "커뮤니티 게시", isOn: $viewModel.isPublic)
+                            .padding(.vertical, 6)
+                        Divider()
+                        
+                        ToggleBtn(label: "유료 광고 포함", isOn: $viewModel.isAdd)
+                            .padding(.vertical, 6)
+                        Divider()
                     }
+                    
+                    // MARK: - 등록 버튼
+                    Button(action: {
+                        Task {
+                            isUploading = true
+                            viewModel.weatherModel = weatherViewModel.toWeatherModel()
+                            viewModel.fashionModel = fashionViewModel.toFashionModel()
+                            viewModel.placeModel = placeViewModel.toPlaceModel()
+                            
+                            // MARK: 업로드 정보 로그
+                            print("=== 업로드 정보 ===")
+                            print("계절:", viewModel.weatherModel.season ?? "없음")
+                            print("기온:", viewModel.weatherModel.temperature?.id ?? -1)
+                            print("날씨 태그:", viewModel.weatherModel.weather.map { "\($0)" }.joined(separator: ", "))
+                            print("날씨 직접 추가:", viewModel.weatherModel.isManual)
+                            print("스타일:", viewModel.fashionModel.selectedStyles)
+                            print("제품 태그:", viewModel.fashionModel.selectedTags.map { "\($0.brandName) - \($0.productName)" })
+                            print("장소:", viewModel.placeModel.places.map { "\($0.placeName) / \($0.placeAddress)" })
+                            print("===============================")
+                            
+                            let success = await viewModel.submitPost()
+                            
+                            if success {
+                                isUploading = false
+                                dismiss()
+                            } else {
+                                isUploading = false
+                                errorMessage = ">>> 업로드에 실패했습니다. 다시 시도해주세요."
+                                showErrorAlert = true
+                            }
 
-                    // 텍스트
-                    UploadTextView(content: $contentProxy)
-                        .onChange(of: contentProxy) { _, newValue in
-                            vm.content = newValue
                         }
 
                     // 정보 버튼
@@ -199,16 +248,40 @@ struct UploadView: View {
                 .padding(.horizontal, geometry.size.width * 0.05)
                 .padding(.bottom, geometry.size.height * 0.03)
             }
-            .navigationTitle(mode == .create ? "새 게시물" : "게시물 수정")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image("backicon")
-                            .resizable()
-                            .frame(width: 9, height: 16)
-                    }
+            // MARK: - caution 배너 (3초 동안 표시)
+            if showCautionBanner {
+                VStack {
+                    Spacer().frame(height: geometry.size.height * 0.37)
+
+                    OverlayBanner(
+                        imgName: "bannerCautionIcon",
+                        text: "하루 최대 '공유중' & '보관중' 게시물 1개씩 업로드 가능해요"
+                    )
+
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .transition(.opacity)
+                .animation(.easeInOut(duration: 0.3), value: showCautionBanner)
+            }
+        }
+        .navigationTitle("새 게시물")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { dismiss() }) {
+                    Image("backicon")
+                        .resizable()
+                        .frame(width: 9, height: 16)
+                }
+            }
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                withAnimation {
+                    showCautionBanner = false
+
                 }
             }
             .onAppear {
@@ -219,196 +292,9 @@ struct UploadView: View {
     }
 }
 
-// MARK: - Info Buttons Section
-private struct InfoButtonsSection: View {
-    var weatherViewModel: WeatherViewModel
-    var fashionViewModel: FashionViewModel
-    var placeViewModel: PlaceViewModel
 
-    let onWeatherCommit: () -> Void
-    let onFashionCommit: () -> Void
-    let onPlaceCommit: () -> Void
-
-    @Binding var isPublic: Bool
-    @Binding var isAdd: Bool
-
-    var body: some View {
-        VStack(spacing: 15) {
-            NavBtn(title: "날씨 정보 추가", isRequired: true) {
-                AnyView(
-                    WeatherInfoView(viewModel: weatherViewModel) {
-                        onWeatherCommit()
-                        print("업로드 모델에 날씨 정보 반영 완료")
-                    }
-                )
-            }
-            Divider()
-
-            NavBtn(title: "패션 정보 추가") {
-                AnyView(
-                    FashionInfoView(viewModel: fashionViewModel) {
-                        onFashionCommit()
-                    }
-                )
-            }
-            Divider()
-
-            NavBtn(title: "장소 정보 추가") {
-                AnyView(
-                    PlaceInfoView(viewModel: placeViewModel) {
-                        onPlaceCommit()
-                    }
-                )
-            }
-            Divider()
-
-            ToggleBtn(label: "커뮤니티 게시", isOn: $isPublic)
-                .padding(.vertical, 6)
-            Divider()
-
-            ToggleBtn(label: "유료 광고 포함", isOn: $isAdd)
-                .padding(.vertical, 6)
-            Divider()
-        }
-    }
-}
-
-// MARK: - 제출/수정 & 프리필
-private extension UploadView {
-    func handleSubmit() async {
-        isUploading = true
-
-        // 자식 VM 반영
-        viewModel.weatherModel = weatherViewModel.toWeatherModel()
-        viewModel.fashionModel = fashionViewModel.toFashionModel()
-        viewModel.placeModel   = placeViewModel.toPlaceModel()
-
-        // 디버그 로그
-        print("=== 업로드 정보 ===")
-        print("계절:", viewModel.weatherModel.season ?? "없음")
-        print("기온:", viewModel.weatherModel.temperature?.id ?? -1)
-        print("날씨 태그:", viewModel.weatherModel.weather.map { "\($0)" }.joined(separator: ", "))
-        print("날씨 직접 추가:", viewModel.weatherModel.isManual)
-        print("스타일:", viewModel.fashionModel.selectedStyles)
-        print("제품 태그:", viewModel.fashionModel.selectedTags.map { "\($0.brandName) - \($0.productName)" })
-        print("장소:", viewModel.placeModel.places.map { "\($0.placeName) / \($0.placeAddress)" })
-        print("===============================")
-
-        let success: Bool
-        switch mode {
-        case .create:
-            success = await viewModel.submitPost()
-        case .edit(let post):
-            success = await updateBoard(using: post)
-        }
-
-        isUploading = false
-        if success {
-            onSuccess?()   // 상세 재조회 콜백 (WeadyboardPostView에서 연결됨)
-            dismiss()
-        } else {
-            errorMessage = (mode == .create)
-                ? ">>> 업로드에 실패했습니다. 다시 시도해주세요."
-                : ">>> 수정에 실패했습니다. 다시 시도해주세요."
-            showErrorAlert = true
-        }
-    }
-
-    // 수정 PATCH: 서버 스냅샷 유지 + 사용자가 바꾼 값만 덮어쓰기
-    func updateBoard(using snapshot: BoardDetailResponseDTO) async -> Bool {
-        let wm = viewModel.weatherModel
-
-        let seasonId = wm.season.flatMap { s -> Int in
-            switch s { case .spring: return 1; case .summer: return 2; case .autumn: return 3; case .winter: return 4 }
-        } ?? snapshot.seasonTagId
-
-        let tempId   = wm.temperature?.id ?? snapshot.temperatureTagId
-
-        let weatherId = (wm.weather.first).flatMap { w -> Int in
-            switch w {
-            case .sunny: return 1
-            case .cloudy: return 2
-            case .rainy: return 3
-            case .partlyCloudy: return 4
-            case .snowy: return 5
-            case .windy: return 6
-            }
-        } ?? snapshot.weatherTagId
-
-        let places: [PlaceDTO] = viewModel.placeModel.places.isEmpty
-            ? snapshot.placeDtoList
-            : viewModel.placeModel.places.map { PlaceDTO(placeName: $0.placeName, placeAddress: $0.placeAddress) }
-
-        let brands: [BrandDTO] = viewModel.fashionModel.selectedTags.isEmpty
-            ? snapshot.brandDtoList
-            : viewModel.fashionModel.selectedTags.map { BrandDTO(brand: $0.brandName, product: $0.productName) }
-
-        let styleIds: [Int] = viewModel.fashionModel.selectedStyles.isEmpty
-            ? snapshot.styleIdList
-            : viewModel.fashionModel.selectedStyles.map { $0.rawValue }
-
-        let dto = UpdateBoardRequestDTO(
-            isPublic: viewModel.isPublic,
-            content: viewModel.content,
-            seasonTagId: seasonId,
-            temperatureTagId: tempId,
-            weatherTagId: weatherId,
-            boardPlaceRequestDtoList: places,
-            styleIds: styleIds,
-            boardBrandRequestDtoList: brands
-        )
-
-        return await withCheckedContinuation { cont in
-            boardService.updateBoard(boardId: snapshot.boardId, data: dto) { result in
-                switch result {
-                case .success: cont.resume(returning: true)
-                case .failure: cont.resume(returning: false)
-                }
-            }
-        }
-    }
-
-    func prefillIfNeeded() {
-        switch mode {
-        case .create:
-            contentProxy = viewModel.content
-
-        case .edit(let post):
-            // 텍스트/공개
-            viewModel.content  = post.content
-            contentProxy       = post.content
-            viewModel.isPublic = post.isPublic
-
-            // WeatherModel (도메인 + 날씨 VM 둘 다 세팅 → 모달 열었을 때 채워져 보이게)
-            let s = seasonType(for: post.seasonTagId)
-            let w = weatherType(for: post.weatherTagId)
-            let meta = temperatureMeta(for: post.temperatureTagId)
-            let band = TemperatureBand(id: post.temperatureTagId, name: meta.name, tempRange: meta.range)
-            viewModel.weatherModel = WeatherModel(
-                season: s,
-                temperature: band,
-                weather: [w],
-                isManual: false
-            )
-            // 날씨 VM 프리필 (이 VM은 프로퍼티 대입 가능)
-            weatherViewModel.isUsingCurrentLocation = false
-            weatherViewModel.selectedSeason = s
-            weatherViewModel.selectedTempBand = band
-            weatherViewModel.selectedWeatherTags = [w]
-
-            // FashionModel
-            var fashion = FashionModel()
-            fashion.selectedStyles = post.styleIdList.compactMap { StyleType(rawValue: $0) }
-            fashion.selectedTags = post.brandDtoList.map { FashionTag(brandName: $0.brand, productName: $0.product) }
-            viewModel.fashionModel = fashion
-            fashionViewModel.prefill(from: fashion)
-
-            // PlaceModel
-            var place = PlaceModel()
-            place.places = post.placeDtoList.map { Place(placeName: $0.placeName, placeAddress: $0.placeAddress) }
-            viewModel.placeModel = place
-            placeViewModel.prefill(from: place)     
-
-        }
+#Preview {
+    NavigationStack {
+        UploadView()
     }
 }
