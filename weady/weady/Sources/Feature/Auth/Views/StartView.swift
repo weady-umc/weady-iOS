@@ -9,11 +9,8 @@ import SwiftUI
 
 struct StartView: View {
 
-    
-    
     @Environment(\.router) private var router
     
-
     @StateObject private var vm: StartViewModel
     @EnvironmentObject var homeRouter: HomeRouter
     
@@ -91,9 +88,6 @@ struct StartView: View {
 
             primaryButton()
                 .padding(.horizontal, 20)
-        }
-        .alert(item: $vm.alert) { a in
-            Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
         }
 
         .onChange(of: vm.navigateHome) { _, go in
