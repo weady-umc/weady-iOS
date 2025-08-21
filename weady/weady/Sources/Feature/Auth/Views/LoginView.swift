@@ -17,8 +17,6 @@ struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
     @State var appleviewModel: AppleLoginViewModel = .init()
     
-    @AppStorage("didCompleteOnboarding") private var didCompleteOnboarding = false
-
     @State private var didRoute = false
     @State private var appearedAt = Date.distantPast
     private let minDelayAfterAppear: TimeInterval = 0.18
@@ -135,6 +133,7 @@ struct LoginView: View {
     }
 
     /// 로그인 이후/이미 로그인 상태에서의 분기를 "한 번만" 수행
+    @MainActor
     private func routeAfterLoginOnce() {
         guard !didRoute else { return }
         didRoute = true
@@ -146,15 +145,14 @@ struct LoginView: View {
                 try? await Task.sleep(nanoseconds: UInt64(remain * 1_000_000_000))
             }
 
-            if (viewModel.isNewUser ?? false) == true {
-                didCompleteOnboarding = false
-                router.reset(to: .onboarding)
+            // 서버 로그인 결과 온보딩 상태 반영
+            OnboardingStateStore.shared.handleServerLogin(isNewUser: viewModel.isNewUser ?? false)
+
+            if (viewModel.isNewUser ?? false) {
+                router.path = [.onboarding]
             } else {
-                if didCompleteOnboarding {
-                    router.reset(to: .basetab)
-                } else {
-                    router.reset(to: .onboarding)
-                }
+                NotificationCenter.default.post(name: .showTabs, object: nil)
+                router.path = []
             }
         }
     }

@@ -9,9 +9,9 @@ import SwiftUI
 
 struct StartView: View {
     @StateObject private var vm: StartViewModel
-
+    @Environment(\.router) private var router
+    
     var onFinish: (() -> Void)? = nil
-
     @State private var didFinish = false
 
     init(
@@ -86,10 +86,11 @@ struct StartView: View {
         .alert(item: $vm.alert) { a in
             Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
         }
-        .onChange(of: vm.navigateHome) { _, newValue in
-            guard newValue, !didFinish else { return }
+        .onChange(of: vm.navigateHome) { _, go in
+            guard go, !didFinish else { return }
             didFinish = true
-            onFinish?()    // 컨테이너가 스택 교체 수행
+            OnboardingStateStore.shared.markAllCompleted()
+            onFinish?() 
         }
     }
 }

@@ -8,28 +8,23 @@
 import SwiftUI
 
 struct AppRootView: View {
-    /// 전역 네비게이션 경로
     @EnvironmentObject private var router: NavigationRouter
-
-    /// 탭 컨트롤러/브리지/토스트
     @State private var tabController = AppTabController()
     @State private var weadyboardBridge = WeadyboardRouteBridge()
     @State private var isTabBarHidden = false
     @State private var selectedTab: TabType = .home
     @StateObject private var toastCenter = ToastCenter.shared
     
-    // MARK: Body
+    @State private var didInitialRoute = false
+    @State private var showSplash = true
+    @State private var showTabs = false  
+    
     var body: some View {
         NavigationStack(
-            path: Binding(
-                get: { router.path },
-                set: { router.path = $0 }
-            )
+            path: Binding(get: { router.path }, set: { router.path = $0 })
         ) {
-            SplashView()
-                .environment(router)
-                .environmentObject(router)
-                .navigationBarHidden(true)
+            Color.white
+                .ignoresSafeArea()
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
                     case .login:
@@ -39,41 +34,61 @@ struct AppRootView: View {
                             .navigationBarHidden(true)
                         
                     case .onboarding:
-                        // 온보딩 컨테이너: 완료 시 스택을 탭으로 '교체'
                         OnboardingFlowView {
-                            router.path = [.basetab]
+                            showTabs = true
+                            router.path = []
                         }
                         .environment(router)
                         .environmentObject(router)
-
+                        
                     case .basetab:
-                        ZStack(alignment: .bottom) {
-                            BaseTabScreen(selectedTab: $selectedTab,
-                                          isTabBarHidden: $isTabBarHidden)
-                                .environment(router)
-                                .environmentObject(router)
-                                .environment(tabController)
-                                .environment(weadyboardBridge)
-                            
-                            // 탭바 오버레이
-                            if !isTabBarHidden {
-                                BaseTabView(
-                                    selectedTab: Binding(
-                                        get: { tabController.selected },
-                                        set: { tabController.switchTo($0) }
-                                    ),
-                                    isTabBarHidden: $isTabBarHidden
-                                )
-                                .transition(.move(edge: .bottom))
-                                .animation(.easeInOut, value: isTabBarHidden)
-                            }
-                        }
-                        .ignoresSafeArea(.keyboard, edges: .bottom)
-                        .navigationBarHidden(true)
+                        EmptyView()
                     }
                 }
         }
+        .overlay {
+            if showSplash { SplashView().ignoresSafeArea() }
+        }
+        .task {
+            guard !didInitialRoute else { return }
+            didInitialRoute = true
+            
+            try? await Task.sleep(nanoseconds: 1_200_000_000)
+            await MainActor.run {
+                defer { showSplash = false }
+                router.path = [.login]
+            }
+        }
+        .onChange(of: router.path) { _, newValue in
+            if newValue.isEmpty, !showTabs {
+                router.path = [.login]
+            }
+        }
+        .fullScreenCover(isPresented: $showTabs) {
+            BaseTabScreen(
+                selectedTab: Binding(
+                    get: { tabController.selected },
+                    set: { tabController.switchTo($0) }
+                ),
+                isTabBarHidden: $isTabBarHidden
+            )
+            .environment(router)
+            .environmentObject(router)
+            .environment(tabController)
+            .environment(weadyboardBridge)
+            .ignoresSafeArea()
+            .interactiveDismissDisabled(true)
+        }
         .environment(router)
         .environmentObject(toastCenter)
+        .onReceive(NotificationCenter.default.publisher(for: .showTabs)) { _ in
+            showTabs = true
+            router.path = []
+        }
     }
+    
+}
+
+extension Notification.Name {
+    static let showTabs = Notification.Name("ShowTabs")
 }

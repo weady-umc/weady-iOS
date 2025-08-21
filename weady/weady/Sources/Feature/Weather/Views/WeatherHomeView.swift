@@ -15,7 +15,7 @@ struct WeatherHomeView: View {
     @State private var viewModel = WeatherHomeViewModel()
        // 탭 세그먼트, 중기예보 상태를 관리
     private let shortData = ShortWeatherData.example              // API 실패 시 사용할 예시 데이터
-    @Environment(HomeRouter.self) var router                      // 라우팅(화면 전환) 환경 객체
+    @EnvironmentObject var homeRouter: HomeRouter
     @State private var fetchedShort: ShortWeatherData? = nil      // API로 받아온 단기예보 원본 캐시
 
     var body: some View {
@@ -46,7 +46,7 @@ struct WeatherHomeView: View {
         }
         
         .edgeSwipeBack(topExclusion: 100) {
-                router.pop()
+            homeRouter.pop()
             }
         .toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .top) {
@@ -57,7 +57,7 @@ struct WeatherHomeView: View {
                     showLogoButton: true,
                     showAlarmButton: true,
                     showBottomDivider: false,
-                    alarmAction: { router.push(.alarm) }
+                    alarmAction: { homeRouter.push(.alarm) }
                 )
                 // 세그먼트 바로 이어서
                 SegmentView
@@ -116,9 +116,9 @@ struct WeatherHomeView: View {
                         .foregroundStyle(Color.white100)
                     
                     Button(action: {
-                        print("current router.path before push: \(router.path)")
-                        router.push(.weatherlocation) // 위치 선택 화면으로 이동
-                        print("current router.path after push: \(router.path)")
+                        print("current router.path before push: \(homeRouter.path)")
+                        homeRouter.push(.weatherlocation) // 위치 선택 화면으로 이동
+                        print("current router.path after push: \(homeRouter.path)")
                     }) {
                         Image("downIcon")
                             .padding(8)
@@ -372,12 +372,12 @@ struct WeatherHomeView: View {
     }
 }
 
-#Preview {
-    WeatherHomeView()
-        .environment(HomeRouter()) // 단독 미리보기
-}
-
 //#Preview {
-//    HomeFlowHost(isTabBarHidden: .constant(false))
-//        .environment(HomeRouter()) // FlowHost에서의 미리보기
+//    WeatherHomeView()
+//        .environment(HomeRouter()) // 단독 미리보기
 //}
+//
+////#Preview {
+////    HomeFlowHost(isTabBarHidden: .constant(false))
+////        .environment(HomeRouter()) // FlowHost에서의 미리보기
+////}

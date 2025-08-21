@@ -14,8 +14,7 @@ struct WeatherLocationAddView: View {
     @ObservedObject var locationViewModel: WeatherLocationViewModel     // 즐겨찾기 서버/로컬 상태 관리
     @Environment(\.dismiss) private var dismiss                         // 현재 시트/화면 닫기
     @Binding var selectedPlace: AddressDocument?                        // 선택된 장소(주소 문서) 바인딩
-    @Environment(HomeRouter.self) private var router                    // 화면 전환용 라우터
-
+    @EnvironmentObject var homeRouter: HomeRouter
     // MARK: - Completion Handler (옵션)
     var onComplete: (() -> Void)? = nil
     
@@ -93,7 +92,7 @@ struct WeatherLocationAddView: View {
                                 locationViewModel.addFavorite(from: place, with: weatherData)
                                 // 3. 성공 시 화면 이동
                                 DispatchQueue.main.async {
-                                    router.push(.weatherlocation)
+                                    homeRouter.push(.weatherlocation)
                                 }
                             } else {
                                 print("❌ 서버 즐겨찾기 추가 실패")
@@ -120,7 +119,7 @@ struct WeatherLocationAddView: View {
             }
         }
         .edgeSwipeBack(topExclusion: 100) {
-                router.pop()
+            homeRouter.pop()
             }
         // MARK: - 진입 시 변환 데이터 준비 (ShortWeatherData → WeatherAddData)
         .onAppear {
@@ -279,5 +278,5 @@ struct rainWind :View {
         selectedPlace: .constant(dummyPlace),
         weather: ShortWeatherData.example
     )
-    .environment(HomeRouter())
+    .environmentObject(HomeRouter())
 }

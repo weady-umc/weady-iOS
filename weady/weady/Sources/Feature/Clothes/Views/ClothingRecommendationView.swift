@@ -15,8 +15,7 @@ struct ClothingRecommendationView: View {
     @StateObject private var vm: ClothingRecommendationViewModel
     //@State private var showLocationPicker = false
     //private enum Route: Hashable { case weadyboard }
-    @Environment(HomeRouter.self) private var router
-
+    @EnvironmentObject var homeRouter: HomeRouter
     
     enum HelpStep: Hashable { case intro, details }
     @State private var showHelp = false
@@ -63,7 +62,7 @@ struct ClothingRecommendationView: View {
                         .padding(.trailing, 3)
                     
                     Button {
-                        router.push(.weatherlocation)
+                        homeRouter.push(.weatherlocation)
                     } label: {
                         Image("clothesDownIcon")
                             .resizable()
@@ -156,7 +155,7 @@ struct ClothingRecommendationView: View {
                 WeadyboardCTA(
                     title: "다른 사람들은 어떻게 입었는지 보러가기",
                     images: ["howPic1","howPic2","howPic3"],
-                    onTap: { router.push(.weadyboard) }
+                    onTap: { homeRouter.push(.weadyboard) }
                 )
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.top, 13)
@@ -199,7 +198,7 @@ struct ClothingRecommendationView_Previews: PreviewProvider {
         NavigationStack {
             ClothingRecommendationView(vm: .preview)
         }
-        .environment(router)
+        .environmentObject(router)
         // .environment(\.router, router)
     }
 }

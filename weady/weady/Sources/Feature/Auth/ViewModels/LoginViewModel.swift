@@ -121,6 +121,7 @@ final class LoginViewModel: ObservableObject {
                         print("✅ isNewUser: \(response.isNewUser)")
                     }
                     self?.isNewUser = response.isNewUser
+                    UserDefaults.standard.set(response.isNewUser, forKey: "isNewUser")
                     self?.loginSucceeded = true
                     completion()
                 case .failure(let error):

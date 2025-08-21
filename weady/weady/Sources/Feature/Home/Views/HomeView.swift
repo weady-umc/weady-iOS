@@ -11,7 +11,7 @@ import KeychainSwift
 struct HomeView: View {
     
     // MARK: - Router / Location 환경 주입
-    @Environment(HomeRouter.self) var router                         // 화면 전환용 커스텀 라우터
+    @EnvironmentObject var homeRouter: HomeRouter                     // 화면 전환용 커스텀 라우터
     @StateObject private var locationService = LocationService()     // 현재 위치 획득용 서비스 (CLLocationManager 래핑 가정)
     
     @AppStorage("nickname") private var nickname: String = ""
@@ -47,7 +47,7 @@ struct HomeView: View {
             
             // MARK: - [네비 버튼] 날씨 카드 (누르면 .weatherhome 로 이동)
             Button {
-                router.push(.weatherhome)
+                homeRouter.push(.weatherhome)
             } label: {
                 
                 // MARK: - 상단 날씨 카드 3단계 상태 렌더링
@@ -79,7 +79,7 @@ struct HomeView: View {
             
             // MARK: - [네비 버튼] 옷차림/장소 카드 (누르면 .clothes 로 이동)
             Button {
-                router.push(.clothes)
+                homeRouter.push(.clothes)
             } label: {
                 ClothesView
                     .frame(width: 380, height: 120)
@@ -100,18 +100,18 @@ struct HomeView: View {
                     PlaceView
                         .redacted(reason: .placeholder)
                         .contentShape(Rectangle())
-                        .onTapGesture { router.push(.curation) }
+                        .onTapGesture { homeRouter.push(.curation) }
 
                 case .success:
                     if curationVM.cards.isEmpty {
                         // 성공인데 카드가 0개면 기본 PlaceView 노출
                         PlaceView
                             .contentShape(Rectangle())
-                            .onTapGesture { router.push(.curation) }
+                            .onTapGesture { homeRouter.push(.curation) }
                     } else {
                         // 정상 데이터
                         CurationStripView(vm: curationVM) {
-                            router.push(.curation)
+                            homeRouter.push(.curation)
                         }
                     }
 
@@ -119,7 +119,7 @@ struct HomeView: View {
                     // 실패 ⇒ 기본 PlaceView 노출
                     PlaceView
                         .contentShape(Rectangle())
-                        .onTapGesture { router.push(.curation) }
+                        .onTapGesture { homeRouter.push(.curation) }
                 }
             }
 
@@ -133,7 +133,7 @@ struct HomeView: View {
                         showLogoButton: true,                  // ← 왼쪽 로고
                         showAlarmButton: true,                 // ← 오른쪽 알림
                         showBottomDivider: true,
-                        alarmAction: { router.push(.alarm) }   // 알림 화면으로 이동 등
+                        alarmAction: { homeRouter.push(.alarm) }   // 알림 화면으로 이동 등
                     )
                     // 상단(노치)까지 흰색
                     .background(Color.white100.ignoresSafeArea(edges: .top))

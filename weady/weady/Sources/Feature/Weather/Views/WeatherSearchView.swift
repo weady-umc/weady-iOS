@@ -11,7 +11,7 @@ import KeychainSwift
 struct WeatherSearchView: View {
     
     // MARK: - Environment / ViewModels / State
-    @Environment(HomeRouter.self) var router                           // 화면 전환 라우터
+    @EnvironmentObject var homeRouter: HomeRouter
     @StateObject private var viewModel = WeatherSearchViewModel()      // 검색 텍스트, 검색 결과, 선택 로직 관리
     @Environment(\.dismiss) private var dismiss                         // 현재 화면 닫기
     @Binding var selectedPlace: AddressDocument?                        // 상위로 전달할 선택된 장소
@@ -46,7 +46,7 @@ struct WeatherSearchView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .edgeSwipeBack(topExclusion: 100) {
-                router.pop()
+            homeRouter.pop()
             }
         .toolbar {
             // 좌측 상단 뒤로가기
@@ -116,7 +116,7 @@ struct WeatherSearchView: View {
                                 print("✅ 날씨 데이터 수신 완료: \(weather)")
                                 self.previewWeatherData = weather
                                 self.showWeatherPreview = true
-                                router.push(.weatheradd(place, weather)) // WeatherLocationAddView로 이동
+                                homeRouter.push(.weatheradd(place, weather)) // WeatherLocationAddView로 이동
                             } else {
                                 print("❌ 날씨 데이터를 가져오지 못함")
                             }
@@ -145,6 +145,6 @@ struct WeatherSearchView: View {
 struct WeatherSearchView_Previews: PreviewProvider {
     static var previews: some View {
         WeatherSearchView(selectedPlace: .constant(nil))
-            .environment(HomeRouter())
+            .environmentObject(HomeRouter())
     }
 }
