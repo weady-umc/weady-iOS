@@ -12,11 +12,30 @@ import GoogleSignIn
 import GoogleSignInSwift
 import AuthenticationServices
 import KeychainSwift
+import UIKit
 
+@MainActor
 final class LoginViewModel: ObservableObject {
+    // 공통 상태
     @Published var errorMessage: String?
     @Published var isNewUser: Bool?
     @Published var loginSucceeded: Bool = false
+
+    // Apple 전용 표시용(필요시 UI에서 바인딩)
+    @Published var appleUserIdentifier: String = ""
+    @Published var appleEmail: String = ""
+    @Published var appleFullName: String = ""
+    
+    // 전역 상태 및 서비스
+    private weak var appState: AppState?
+    private let userService: UserService = {
+        UserService()
+    }()
+    
+    func attach(appState: AppState) {
+        self.appState = appState
+        self.userService.attach(appState: appState)
+    }
     
     // MARK: - 카카오 로그인
     func loginWithKakao(completion: @escaping (Bool) -> Void) {
@@ -45,21 +64,15 @@ final class LoginViewModel: ObservableObject {
                     }
                     return
                 }
-                
-                guard let id = user?.id else {
-                    DispatchQueue.main.async {
-                        self.errorMessage = "카카오 사용자 ID 없음"
-                        completion(false)
+
+                if let id = user?.id {
+                    if let email = user?.kakaoAccount?.email {
+                        print("✅ Kakao ID: \(id), 이메일: \(email)")
+                    } else {
+                        print("⚠️ Kakao ID: \(id), 이메일 없음 (email 동의 안 됐을 수 있음)")
                     }
-                    return
                 }
-                
-                if let email = user?.kakaoAccount?.email {
-                    print("✅ Kakao ID: \(id), 이메일: \(email)")
-                } else {
-                    print("⚠️ Kakao ID: \(id), 이메일 없음 (email 동의 안 됐을 수 있음)")
-                }
-                
+
                 self.requestLogin(accessToken: accessToken, provider: "kakao") {
                     completion(true)
                 }
@@ -102,29 +115,82 @@ final class LoginViewModel: ObservableObject {
             }
         }
     }
-    
+
+    // MARK: - 애플 로그인 (AppleLoginManager 사용)
+    func loginWithApple(presentationAnchor: ASPresentationAnchor, completion: @escaping (Bool) -> Void) {
+        Task {
+            do {
+                // 1) 시스템 로그인 UI 진행
+                let credential = try await AppleLoginManager.shared.startSignInWithAppleFlow(presentationAnchor: presentationAnchor)
+
+                // 2) 식별자/이름/이메일
+                let userIdentifier = credential.user
+                let fullNameString: String = {
+                    if let comps = credential.fullName {
+                        let f = PersonNameComponentsFormatter()
+                        return f.string(from: comps)
+                    }
+                    return ""
+                }()
+                let emailString = credential.email ?? ""
+
+                // 3) identityToken만 사용 (authorizationCode 추출 제거 → 경고 해결)
+                guard let identityTokenData = credential.identityToken,
+                      let identityToken = String(data: identityTokenData, encoding: .utf8)
+                else {
+                    throw NSError(domain: "AppleTokenError", code: -2, userInfo: [NSLocalizedDescriptionKey: "Apple 토큰 추출 실패"])
+                }
+
+                // 상태 보관(필요 시 UI에 노출)
+                await MainActor.run {
+                    self.appleUserIdentifier = userIdentifier
+                    self.appleEmail = emailString
+                    self.appleFullName = fullNameString
+                }
+
+                // 4) 서버 로그인
+                self.requestLogin(accessToken: identityToken, provider: "apple") {
+                    completion(true)
+                }
+
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = "애플 로그인 실패: \(error.localizedDescription)"
+                }
+                completion(false)
+            }
+        }
+    }
+
     // MARK: - 공통 Login 요청
     private func requestLogin(accessToken: String, provider: String, completion: @escaping () -> Void) {
         let dto = LoginRequestDTO(accessToken: accessToken)
         
         AuthService().login(data: dto, provider: provider) { [weak self] result in
             DispatchQueue.main.async {
+                guard let self else { return }
                 switch result {
                 case .success(let response):
                     AuthManager.shared.saveTokens(
                         accessToken: response.accessToken,
                         refreshToken: response.refreshToken
                     )
-                    DispatchQueue.main.async {
-                        print("✅ accessToken: \(response.accessToken)")
-                        print("✅ refreshToken: \(response.refreshToken)")
-                        print("✅ isNewUser: \(response.isNewUser)")
+                    print("✅ accessToken: \(response.accessToken)")
+                    print("✅ refreshToken: \(response.refreshToken)")
+                    print("✅ isNewUser: \(response.isNewUser)")
+                    
+                    self.isNewUser = response.isNewUser
+                    UserDefaults.standard.set(response.isNewUser, forKey: "isNewUser")
+                    self.loginSucceeded = true
+                    
+                    // 로그인 성공 후, 내 정보 확보
+                    self.userService.ensureCurrentUserFromMyPage { _ in
+                        // 실패해도 로그인 플로우 자체는 진행되게 둠
                     }
-                    self?.isNewUser = response.isNewUser
-                    self?.loginSucceeded = true
+                    
                     completion()
                 case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
+                    self.errorMessage = error.localizedDescription
                 }
             }
         }

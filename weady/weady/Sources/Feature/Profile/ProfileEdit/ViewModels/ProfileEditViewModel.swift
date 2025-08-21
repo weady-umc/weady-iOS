@@ -39,7 +39,9 @@ final class ProfileEditViewModel {
                         profileImageUrl: response.profileImageUrl
                     )
                     self?.mypageViewModel.updateProfile(updatedProfile)
+
                     UserDefaults.standard.set(response.name, forKey: "nickname") // Home화면의 닉네임에 수정사항 반영
+
                     completion(true)
                     
                 case .failure(let error):

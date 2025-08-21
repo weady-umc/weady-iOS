@@ -238,48 +238,68 @@ struct WeadyboardListView: View {
             NoWeadyboardView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-            let columns = [
-                GridItem(.flexible(), spacing: 2),
-                GridItem(.flexible(), spacing: 2),
-                GridItem(.flexible(), spacing: 2)
-            ]
+            GeometryReader { proxy in
+                // Layout constants
+                let columnsCount = 3
+                let spacing: CGFloat = 2
+                let sidePadding: CGFloat = 2
+                // Compute available content width AFTER horizontal padding
+                let available = proxy.size.width - (sidePadding * 2)
+                let totalSpacing = spacing * CGFloat(columnsCount - 1)
+                let cell = floor((available - totalSpacing) / CGFloat(columnsCount))
+                let columns = Array(repeating: GridItem(.fixed(cell), spacing: spacing), count: columnsCount)
 
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 2) {
-                    ForEach(items) { item in
-                        Button(action: {
-                            // TODO: - 해당 웨디보드 상세 화면으로 이동
-                        }) {
-                           
-                            if let urlStr = item.imgUrl, urlStr.hasPrefix("http"), let url = URL(string: urlStr) {
-                                AsyncImage(url: url) { image in
-                                    image
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(height: 160)
-                                        .clipped()
-                                } placeholder: {
-                                    Color.gray.opacity(0.3)
-                                        .frame(height: 160)
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: spacing) {
+                        ForEach(items) { item in
+                            Button(action: {
+                                // TODO: - 해당 웨디보드 상세 화면으로 이동
+                            }) {
+                                ZStack {
+                                    // Placeholder to stabilize layout
+                                    Rectangle()
+                                        .fill(Color.gray.opacity(0.18))
+
+                                    // Remote
+                                    if let urlStr = item.imgUrl,
+                                       urlStr.hasPrefix("http"),
+                                       let url = URL(string: urlStr) {
+                                        AsyncImage(url: url) { phase in
+                                            switch phase {
+                                            case .success(let image):
+                                                image
+                                                    .resizable()
+                                                    .aspectRatio(1, contentMode: .fill) // fill the square
+                                                    .clipped()
+                                            case .failure(_):
+                                                Image(systemName: "photo")
+                                                    .font(.system(size: 22))
+                                                    .foregroundStyle(.gray)
+                                            case .empty:
+                                                ProgressView()
+                                            @unknown default:
+                                                EmptyView()
+                                            }
+                                        }
+                                    // Local
+                                    } else if let localName = item.imgUrl, !localName.isEmpty {
+                                        Image(localName)
+                                            .resizable()
+                                            .aspectRatio(1, contentMode: .fill)
+                                            .clipped()
+                                    }
                                 }
-                            } else if let localName = item.imgUrl, !localName.isEmpty {
-                                Image(localName)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(height: 160)
-                                    .clipped()
-                            } else {
-                                // imgUrl == nil 또는 빈 문자열일 때 플레이스홀더
-                                Color.gray.opacity(0.2)
-                                    .frame(height: 160)
+                                .frame(width: cell, height: cell) // hard square
+                                .contentShape(Rectangle())
                             }
+                            .buttonStyle(.plain)
                         }
                     }
+                    .padding(.horizontal, sidePadding)
+                    .padding(.bottom, 0)
                 }
-                .padding(.horizontal, 2)
-                .padding(.bottom,0)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
-            .ignoresSafeArea(.all,edges: .bottom)
         }
     }
 }

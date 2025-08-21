@@ -16,6 +16,8 @@ enum WeatherEndpoints {
     case getMidTermWeather                             // 중기예보 조회
     case getPreview(bCode: String, x: Double, y: Double) // 주소/좌표 기반 미리보기
     case updateNowLocation(longitude: Double, latitude: Double) // 현재 위치 서버 반영(PATCH)
+    
+    
 }
 
 // MARK: - TargetType
@@ -42,6 +44,7 @@ extension WeatherEndpoints: TargetType {
             return "/api/v1/weather/preview"
         case .updateNowLocation:
             return "/api/v1/users/now-location"
+
         }
     }
     

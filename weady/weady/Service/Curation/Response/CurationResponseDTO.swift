@@ -46,6 +46,7 @@ struct curationDTO: Codable {
     let curationId: Int64
     let curationTitle: String
     let backgroundImgUrl: String
+    let bannerImgUrl: String?
 }
 
 // MARK: - ApiResponseCurationByLocationResponseDto
@@ -61,7 +62,7 @@ struct ApiResponseCurationByLocationResponseDto: Codable {
     }
 }
 
-// MARK: - CurationByLocationResponseDto
+// MARK: - CurationByLocationResponseDto 홈화면에서도 이거씀
 struct CurationByLocationResponseDto: Codable {
     let locationId: Int64
     let locationName: String

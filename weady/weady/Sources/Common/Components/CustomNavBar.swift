@@ -23,7 +23,9 @@ struct CustomNavBar: View {
 
     var body: some View {
         VStack(spacing: 0) {
+
             ZStack {
+
                 Text(viewTitle)
                     .fontName(.bodySemibold16)
 

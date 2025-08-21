@@ -16,9 +16,9 @@ struct LocalImage: Identifiable, Equatable {
 struct CreateBoardRequestDTO: Encodable {
     let isPublic: Bool
     let content: String
-    let weatherTagId: Int
-    let temperatureTagId: Int
     let seasonTagId: Int
+    let temperatureTagId: Int
+    let weatherTagId: Int
     let boardPlaceRequestDtoList: [PlaceDTO]
     let styleIds: [Int]
     let boardBrandRequestDtoList: [BrandDTO]
@@ -27,9 +27,9 @@ struct CreateBoardRequestDTO: Encodable {
 struct UpdateBoardRequestDTO: Encodable {
     let isPublic: Bool
     let content: String
-    let weatherTagId: Int
-    let temperatureTagId: Int
     let seasonTagId: Int
+    let temperatureTagId: Int
+    let weatherTagId: Int
     let boardPlaceRequestDtoList: [PlaceDTO]
     let styleIds: [Int]
     let boardBrandRequestDtoList: [BrandDTO]   

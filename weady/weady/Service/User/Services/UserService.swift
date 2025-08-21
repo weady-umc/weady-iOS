@@ -7,11 +7,18 @@ final class UserService: NetworkManager {
     typealias Endpoint = UserEndpoints
     let provider: MoyaProvider<UserEndpoints>
     
-    init(provider: MoyaProvider<UserEndpoints>? = nil) {
+    private weak var appState: AppState?
+
+    init(provider: MoyaProvider<UserEndpoints>? = nil, appState: AppState? = nil) {
         let plugins: [PluginType] = [
             NetworkLoggerPlugin(configuration: .init(logOptions: .verbose))
         ]
         self.provider = provider ?? MoyaProvider<UserEndpoints>(plugins: plugins)
+        self.appState = appState
+    }
+    
+    func attach(appState: AppState) {
+        self.appState = appState
     }
     
     // MARK: - 프로필 수정 (닉네임 + 이미지)
@@ -66,6 +73,31 @@ final class UserService: NetworkManager {
                 }
             case .failure(let error):
                 completion(.failure(error))
+            }
+        }
+    }
+    
+    // 앱 진입 또는 로그인 직후: /users/my-page로 내 userId 확보 및 AppState.currentUser 세팅
+    func ensureCurrentUserFromMyPage(completion: @escaping (Result<User, Error>) -> Void) {
+        let now = Date()
+        let comps = Calendar.current.dateComponents([.year, .month], from: now)
+        let year = comps.year ?? 1970
+        let month = comps.month ?? 1
+        
+        fetchMyPage(year: year, month: month) { [weak self] result in
+            switch result {
+            case .success(let my):
+                let user = User(
+                    id: my.userId,
+                    nickname: my.name,
+                    profileImageUrl: my.profileImageUrl,
+                    email: self?.appState?.currentUser?.email
+                )
+                self?.appState?.currentUser = user
+                completion(.success(user))
+                
+            case .failure(let err):
+                completion(.failure(err))
             }
         }
     }

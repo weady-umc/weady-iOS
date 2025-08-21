@@ -7,6 +7,16 @@
 
 import Foundation
 
+// 빈 오브젝트용
+struct EmptyObject: Decodable {}
+
+// code/message + (빈) data 래퍼
+struct AckEnvelope: Decodable {
+    let code: Int
+    let message: String
+    let data: EmptyObject?   // 서버가 {} 주면 디코딩 성공
+}
+
 // MARK: - 즐겨찾기 목록 응답 루트
 // 서버가 반환하는 공통 래퍼 형식: { code, message, data: [UserFavoriteLocation] }
 struct UserFavoriteLocationResponse : Decodable {
@@ -38,4 +48,22 @@ struct PostFavoriteLocationResponse: Decodable {
 // MARK: - 생성된 위치 식별자 컨테이너
 struct LocationID: Decodable {
     let locationId: Int?               // 서버가 반환하는 locationId (대표설정 시 사용 가능)
+}
+
+// MARK: - 현재 위치 지역 조회 (GET /api/v1/users/favorites/nowLocations)
+struct FavoriteNowLocationEnvelope: Decodable {
+    let code: Int
+    let message: String
+    let data: FavoriteNowLocationData
+}
+
+struct FavoriteNowLocationData: Decodable, Hashable {
+    let bCode: String
+    let locationAddress1: String
+    let locationAddress2: String
+    let locationAddress3: String
+    let locationAddress4: String
+    let currentTemp: Double
+    let actualTmx: Double
+    let actualTmn: Double
 }

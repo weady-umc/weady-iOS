@@ -252,6 +252,8 @@ private extension WeatherServices {
         // ③ [...] (바로 배열)
         return try dec.decode([MidTermForecast].self, from: data)
     }
+    
+
 }
 
 // MARK: - 보조 래퍼 타입 (간단 포맷 대응)

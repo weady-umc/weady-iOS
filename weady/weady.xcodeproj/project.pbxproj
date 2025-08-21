@@ -22,9 +22,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		56D70A2A2E57562600EB390D /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		56D70A2B2E57562600EB390D /* AppleLoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleLoginManager.swift; sourceTree = "<group>"; };
+		56D70A2C2E57562600EB390D /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		56D70A2D2E57562600EB390D /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
+		56D70A2E2E57562600EB390D /* CommonResponseDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonResponseDTOs.swift; sourceTree = "<group>"; };
+		56D70A2F2E57562600EB390D /* DefaultNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultNetworkManager.swift; sourceTree = "<group>"; };
+		56D70A302E57562600EB390D /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		56D70A312E57562600EB390D /* NetworkManager+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkManager+Extensions.swift"; sourceTree = "<group>"; };
+		56D70A322E57562600EB390D /* NetworkManager+Protocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkManager+Protocols.swift"; sourceTree = "<group>"; };
+		56D70A332E57562600EB390D /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		808ED0FB2E1D9EFF00442DA8 /* weady.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = weady.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDC1AB1F2E4CBC6200F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDC1B6A42E4E468200F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CDC1D3672E578B8900F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDE727542E4C94AC005F67E7 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDF98D1B2E29549500446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -73,11 +84,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		56D70A342E57562600EB390D /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				56D70A2A2E57562600EB390D /* API.swift */,
+				56D70A2B2E57562600EB390D /* AppleLoginManager.swift */,
+				56D70A2C2E57562600EB390D /* AppState.swift */,
+				56D70A2D2E57562600EB390D /* AuthManager.swift */,
+				56D70A2E2E57562600EB390D /* CommonResponseDTOs.swift */,
+				56D70A2F2E57562600EB390D /* DefaultNetworkManager.swift */,
+				56D70A302E57562600EB390D /* NetworkError.swift */,
+				56D70A312E57562600EB390D /* NetworkManager+Extensions.swift */,
+				56D70A322E57562600EB390D /* NetworkManager+Protocols.swift */,
+				56D70A332E57562600EB390D /* Secrets.xcconfig */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		808ED0F22E1D9EFF00442DA8 = {
 			isa = PBXGroup;
 			children = (
 				808ED0FD2E1D9EFF00442DA8 /* weady */,
 				808ED0FC2E1D9EFF00442DA8 /* Products */,
+				56D70A342E57562600EB390D /* Utilities */,
 			);
 			sourceTree = "<group>";
 		};
@@ -95,6 +124,11 @@
 			sourceTree = "<group>";
 		};
 		CDC1B6A62E4E468200F8629F /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CDC1D3692E578B8900F8629F /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -184,6 +218,10 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
+					ProductGroup = CDC1D3692E578B8900F8629F /* Products */;
+					ProjectRef = CDC1D3672E578B8900F8629F /* weady.xcodeproj */;
+				},
+				{
 					ProductGroup = CDE727562E4C94AC005F67E7 /* Products */;
 					ProjectRef = CDE727542E4C94AC005F67E7 /* weady.xcodeproj */;
 				},
@@ -231,7 +269,7 @@
 		808ED1042E1D9F0100442DA8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 808ED0FD2E1D9EFF00442DA8 /* weady */;
-			baseConfigurationReferenceRelativePath = Sources/Common/Utilities/Secrets.xcconfig;
+			baseConfigurationReferenceRelativePath = Resources/Config/Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -297,7 +335,7 @@
 		808ED1052E1D9F0100442DA8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 808ED0FD2E1D9EFF00442DA8 /* weady */;
-			baseConfigurationReferenceRelativePath = Sources/Common/Utilities/Secrets.xcconfig;
+			baseConfigurationReferenceRelativePath = Resources/Config/Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;

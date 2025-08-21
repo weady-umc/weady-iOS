@@ -8,198 +8,245 @@
 
 import SwiftUI
 import Combine
-import Charts
+import Observation
 
+// MARK: - ClothingRecommendationView
 
 struct ClothingRecommendationView: View {
+    // ViewModel
     @StateObject private var vm: ClothingRecommendationViewModel
-    //@State private var showLocationPicker = false
-    //private enum Route: Hashable { case weadyboard }
-    @Environment(HomeRouter.self) private var router
 
-    
+    // Routing / Tabs
+    @Environment(\.homeRouter) private var router
+    @Environment(AppTabController.self) private var tabController
+
+    // Help Overlay
     enum HelpStep: Hashable { case intro, details }
     @State private var showHelp = false
     @State private var helpStep: HelpStep = .intro
-    
-    let same = Date()
-    // 기본 init: 내부에서 VM 생성
-    init() {
-        _vm = StateObject(wrappedValue: ClothingRecommendationViewModel())
-    }
-    
-    // 실제 앱에서 토큰으로 초기화
-    init(token: String) {
-        _vm = StateObject(wrappedValue: ClothingRecommendationViewModel())
-    }
-    
-    // Preview에서 더미 VM 주입
-    init(vm: ClothingRecommendationViewModel) {
-        _vm = StateObject(wrappedValue: vm)
-    }
-    
-    var body: some View {
-        
-        ZStack(alignment: .top) {
-            Image("backgroundImage")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-            
-            VStack(alignment: .center, spacing: 0) {
-                // 주소
-                HStack {
-                    Image("mapIcon")
-                        .resizable()
-                        .frame(width: 12, height: 17)
-                        .padding(.trailing, 3)
-                    
-                    Text(vm.addressText)
-                        .fontName(.bodySemibold16)
-                        .foregroundStyle(.appwhite100)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .layoutPriority(1)
-                        .padding(.trailing, 3)
-                    
-                    Button {
-                        router.push(.weatherlocation)
-                    } label: {
-                        Image("clothesDownIcon")
-                            .resizable()
-                            .frame(width: 10, height: 4)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                }
-                .frame(height: 24)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.top, 144)
 
-                
-                // 추천 옷 이미지
-#if DEBUG
-                // Preview에서는 네트워크 호출 없이 바로 에셋 이미지를 보여주기
-                Image("teeShirt")
+    // Initializers (기존 시그니처 유지)
+    init() { _vm = StateObject(wrappedValue: ClothingRecommendationViewModel()) }
+    init(token: String) { _vm = StateObject(wrappedValue: ClothingRecommendationViewModel()) }
+    init(vm: ClothingRecommendationViewModel) { _vm = StateObject(wrappedValue: vm) }
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            GeometryReader { proxy in
+                Image("backgroundImage")
                     .resizable()
-                    .frame(width: 187, height: 187)
-                    .frame(maxWidth: .infinity, alignment: .center)
+                    .scaledToFill()
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+                    .clipped()
+                    .ignoresSafeArea()
+            }
+
+            VStack(alignment: .center, spacing: 0) {
+                // 1) 주소 행
+                AddressRow(
+                    text: vm.addressText,
+                    onTapChevron: { router.push(HomeRoute.weatherlocation) }
+                )
+                .padding(.top, 41)
+
+                // 2) 추천 이미지
+                HeroImage(imageUrl: vm.clothingImageUrl)
                     .padding(.top, -10)
-#else
-                AsyncImage(url: vm.clothingImageUrl) { image in
-                    image.resizable().aspectRatio(contentMode: .fit)
-                } placeholder: {
-                    ProgressView()
-                }
-                .frame(width: 187, height: 187)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.top, -10)
-#endif
-                
-                // 추천 문구
-                VStack(){
-                    HStack(spacing: 0){
-                        Text("오늘은 ")
-                            .fontName(.titleMedium24)
-                        Text(vm.clothingName)
-                            .fontName(.titleBold24)
-                        Text(vm.subjectParticle)
-                            .fontName(.titleMedium24)
-                    }
-                    Text("딱 좋은 날이에요.")
-                        .fontName(.titleMedium24)
-                }
-                .padding(.top, -10)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .foregroundStyle(.appwhite100)
-                
-                // 체감온도
-                HStack(spacing: 9) {
-                    Image("thermometer")
-                        .resizable()
-                        .frame(width: 8, height: 16)
-                    Text("체감 \(vm.feelTemp)°")
-                        .fontName(.captionRegular14)
-                        .foregroundStyle(.appwhite100)
-                }
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.top, 15)
-                
-                Spacer().frame(height: 23)
-                
-                // 기온 차트
-                TemperatureChartView(chartItems: vm.chartItems)
-                    .frame(width: 310, height: 133)
+
+                // 3) 추천 문구
+                CopyBlock(title: vm.clothingName, particle: vm.subjectParticle)
+                    .padding(.top, -5)
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.trailing, 20)
-                
-                // 체감온도 기준
-                Button {
+                    .foregroundStyle(.appwhite100)
+
+                // 4) 체감온도
+                FeelTempRow(feelTemp: vm.feelTemp)
+                    .padding(.top, 15)
+
+                Spacer().frame(height: 23)
+
+                // 5) 기온 차트 섹션
+                TemperatureChartSection(chartItems: vm.chartItems)
+
+                // 6) 체감온도 기준 (도움말)
+                HelpButton {
                     withAnimation(.easeInOut(duration: 0.2)) {
-                        helpStep = .intro   // 첫 화면부터 시작
-                        showHelp = true     // 오버레이 열기
-                    }
-                } label: {
-                    HStack(spacing: 3) {
-                        Image("helpIcon")
-                            .resizable()
-                            .frame(width: 12, height: 12)
-                        Text("체감온도 기준")
-                            .fontName(.metaMedium8)
-                            .foregroundColor(.appwhite100)
+                        helpStep = .intro
+                        showHelp = true
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                .padding(.horizontal, 20)
                 .padding(.top, 13)
-                
+
+                // 7) Weadyboard CTA (탭 전환)
                 WeadyboardCTA(
                     title: "다른 사람들은 어떻게 입었는지 보러가기",
                     images: ["howPic1","howPic2","howPic3"],
-                    onTap: { router.push(.weadyboard) }
+                    onTap: { tabController.switchTo(.weadyboard) }
                 )
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.top, 13)
                 .padding(.bottom, 19)
             }
-            
-            // 도움말 오버레이
+
+            // Help Overlay (외부 컴포넌트가 프로젝트에 있다고 가정)
             HelpOverlay(
                 isPresented: $showHelp,
                 step: $helpStep,
-                onClose: { withAnimation(.easeOut(duration: 0.2)) { showHelp = false }}
+                onClose: { withAnimation(.easeOut(duration: 0.2)) { showHelp = false } }
             )
         }
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
-        
 
-// MARK: - Preview & Mock
-extension ClothingRecommendationViewModel {
-    static var preview: ClothingRecommendationViewModel {
-        let vm = ClothingRecommendationViewModel()
-        vm.addressText = "서초구 양재1동"
-        vm.feelTemp = 19
-        vm.clothingName = "반팔"
-        vm.clothingImageUrl = Bundle.main.url(forResource: "shirt_icon", withExtension: "png")
-        vm.chartItems = (8...21).map { hour in
-            // 샘플 온도는 자유롭게
-            let samples = [24,26,27,29,30,31,32,31,31,30,28,26,25,24]
-            let t = samples[hour - 8]
-            return ChartItem(time: hour, feelTmp: Double(t),
-                             clothing: ClothingItem(name: "샘플", imageUrl: "teeShirt"))
+// MARK: - Private Subviews (same file)
+
+private struct AddressRow: View {
+    let text: String
+    let onTapChevron: () -> Void
+
+    var body: some View {
+        HStack(spacing: 3) {
+            Image("mapIcon")
+                .resizable()
+                .frame(width: 12, height: 17)
+
+            Text(text)
+                .fontName(.bodySemibold16)
+                .foregroundStyle(.appwhite100)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .layoutPriority(1)
+
+            Button(action: onTapChevron) {
+                Image("clothesDownIcon")
+                    .resizable()
+                    .frame(width: 10, height: 4)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
         }
-        return vm
+        .frame(height: 24)
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 
+private struct HeroImage: View {
+    let imageUrl: URL?
+
+    var body: some View {
+#if DEBUG
+        Image("teeShirt")
+            .resizable()
+            .frame(width: 195, height: 195)
+            .frame(maxWidth: .infinity, alignment: .center)
+#else
+        Group {
+            if let url = imageUrl {
+                AsyncImage(url: url) { image in
+                    image.resizable().aspectRatio(contentMode: .fit)
+                } placeholder: { ProgressView() }
+            } else {
+                Color.clear
+            }
+        }
+        .frame(width: 195, height: 195)
+        .frame(maxWidth: .infinity, alignment: .center)
+#endif
+    }
+}
+
+private struct CopyBlock: View {
+    let title: String
+    let particle: String
+
+    var body: some View {
+        VStack {
+            HStack(spacing: 0) {
+                Text("오늘은 ").fontName(.titleMedium24)
+                Text(title).fontName(.titleBold24)
+                Text(particle).fontName(.titleMedium24)
+            }
+            Text("딱 좋은 날이에요.")
+                .fontName(.titleMedium24)
+        }
+    }
+}
+
+private struct FeelTempRow: View {
+    let feelTemp: Int
+
+    var body: some View {
+        HStack(spacing: 9) {
+            Image("thermometer")
+                .resizable()
+                .frame(width: 8, height: 16)
+            Text("체감 \(feelTemp)°")
+                .fontName(.captionRegular14)
+                .foregroundStyle(.appwhite100)
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+    }
+}
+
+private struct TemperatureChartSection: View {
+    let chartItems: [ChartItem]
+    var body: some View {
+        TemperatureChartView(chartItems: chartItems)
+            .frame(width: 310, height: 133)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.trailing, 20)
+    }
+}
+
+private struct HelpButton: View {
+    let onTap: () -> Void
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 3) {
+                Image("helpIcon")
+                    .resizable()
+                    .frame(width: 12, height: 12)
+                Text("체감온도 기준")
+                    .fontName(.metaMedium8)
+                    .foregroundColor(.appwhite100)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .padding(.horizontal, 20)
+    }
+}
+
+// MARK: - EnvironmentKey for HomeRouter (키패스 기반 주입)
+
+private struct HomeRouterKey: EnvironmentKey {
+    static let defaultValue: HomeRouter = HomeRouter()
+}
+
+extension EnvironmentValues {
+    var homeRouter: HomeRouter {
+        get { self[HomeRouterKey.self] }
+        set { self[HomeRouterKey.self] = newValue }
+    }
+}
+
+// MARK: - Preview
+
+#if DEBUG
 struct ClothingRecommendationView_Previews: PreviewProvider {
     static var previews: some View {
         let router = HomeRouter()
+        let tabs = AppTabController()
+
         NavigationStack {
-            ClothingRecommendationView(vm: .preview)
+            // ① 기본 생성자 사용
+            ClothingRecommendationView()
+            // 또는 ② 명시적으로 생성
+            // ClothingRecommendationView(vm: ClothingRecommendationViewModel())
         }
-        .environment(router)
-        // .environment(\.router, router)
+        .environment(\.homeRouter, router) // 커스텀 키패스 주입
+        .environment(tabs)                 // AppTabController typed env
     }
 }
+#endif

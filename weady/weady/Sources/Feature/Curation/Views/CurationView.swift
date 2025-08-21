@@ -5,14 +5,13 @@ import KeychainSwift
 struct CurationView: View {
 //MARK: - 프로퍼티
     @StateObject private var vm = CurationViewModel()
-    @Environment(HomeRouter.self) private var router
-  
-    
+    @EnvironmentObject var homeRouter: HomeRouter
     
     
 //MARK: -뷰 바디
     var body: some View {
 
+        Spacer().frame(height:14)
         
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
@@ -62,7 +61,7 @@ struct CurationView: View {
                             CardRow(title: card.title, imageURL: card.thumbnailURL)
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    router.push(.curationdetail(curationId: Int64(card.id)))
+                                    homeRouter.push(.curationdetail(curationId: Int64(card.id)))
                                 }
                                 .padding(.horizontal, 16)
                             
@@ -162,8 +161,8 @@ private struct CardRow: View {
     }
 }
 
-
-#Preview("CurationView") {
-    CurationView()
-        .environment(HomeRouter()) //  Observation 스타일 프리뷰 주입
-}
+//
+//#Preview("CurationView") {
+//    CurationView()
+//        .environment(HomeRouter()) //  Observation 스타일 프리뷰 주입
+//}

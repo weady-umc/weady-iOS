@@ -33,11 +33,11 @@ class WeatherHomeViewModel {
     private var didLoadedOnce = false                        // 최초 1회만 로드하도록 제어
     private var bag = Set<AnyCancellable>()                  // 향후 Combine 바인딩용(현재는 미사용)
 
-    // ✅ 생성자 추가 (기본값은 공용 Provider 쓰는 WeatherService)
-    init(weather: WeatherServices = WeatherServices()) {
+    init(initial: WeatherHomeModel = .first,
+         weather: WeatherServices = WeatherServices()) {
         self.weather = weather
+        self.selectedSegment = initial       // ← 여기서 초기 탭 확정
     }
-
     
     
     // MARK: - 최초 진입 시 두 가지 예보를 한 번만 로드
