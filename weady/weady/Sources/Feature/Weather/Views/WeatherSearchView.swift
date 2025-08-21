@@ -58,7 +58,7 @@ struct WeatherSearchView: View {
                 viewTitle: "위치",
                 showBackButton: true,
                 showBottomDivider: true,
-                backAction: { router.pop() }     // 혹은 dismiss() 사용 중이면 { dismiss() }
+                backAction: { homeRouter.pop() }     // 혹은 dismiss() 사용 중이면 { dismiss() }
             )
             .padding(.top, -15)
             .background(Color.white100.ignoresSafeArea(edges: .top))

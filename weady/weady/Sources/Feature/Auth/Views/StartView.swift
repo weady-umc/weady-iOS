@@ -15,7 +15,7 @@ struct StartView: View {
     
 
     @StateObject private var vm: StartViewModel
-    @Environment(\.router) private var router
+    @EnvironmentObject var homeRouter: HomeRouter
     
     var onFinish: (() -> Void)? = nil
     @State private var didFinish = false

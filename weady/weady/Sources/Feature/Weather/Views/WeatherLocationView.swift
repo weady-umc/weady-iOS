@@ -36,7 +36,7 @@ struct WeatherLocationView: View {
                                       // 기본 위치(즐겨찾기) 해제 → 홈에서 현재 위치 기반으로 보이도록
                                       viewModel.unsetDefaultFavoriteOnServer { ok in
                                           if ok {
-                                              router.push(.weatherhome(initial: .first))
+                                              homeRouter.push(.weatherhome(initial: .first))
                                           } else {
                                               // TODO: 토스트/얼럿 노출 원하면 여기서 처리
                                               print("⚠️ 기본 위치 해제 실패")
@@ -78,7 +78,7 @@ struct WeatherLocationView: View {
                     viewTitle: "위치",
                     showBackButton: true,
                     showBottomDivider: true,
-                    backAction: { router.pop() }     // 혹은 dismiss() 사용 중이면 { dismiss() }
+                    backAction: { homeRouter.pop() }     // 혹은 dismiss() 사용 중이면 { dismiss() }
                 )
                 .padding(.top, -15)
                 .background(Color.white100.ignoresSafeArea(edges: .top))
@@ -191,7 +191,7 @@ struct WeatherLocationView: View {
                                     if ok {
                                         // 성공 시 홈 화면으로 이동 (서버의 기본위치 기준으로 로드)
 
-                                        homeRouter.push(.weatherhome)
+                                        homeRouter.push(.weatherhome(initial: .first))
 
                                     } else {
                                         // 실패 시 토스트/얼럿 넣고 싶으면 여기
