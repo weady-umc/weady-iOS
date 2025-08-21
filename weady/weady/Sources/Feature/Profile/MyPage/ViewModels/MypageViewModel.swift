@@ -79,7 +79,7 @@ final class MypageViewModel {
     // MARK: - DTO → 마이페이지 모델 변환
     private func mapMyPageResponse(_ dto: GetMyPageResponse) {
         
-        print(">>> calendar response: \(dto.calendar)") //TODO: - 사용자가 업로드한 게시물 확인용 메싲
+        print(">>> calendar response: \(dto.calendar)") //TODO: - 사용자가 업로드한 게시물 확인용 메시지
 
         profile = MypageProfileModel(
             id: dto.userId,

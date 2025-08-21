@@ -14,6 +14,9 @@ struct UploadView: View {
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
     
+    // MARK: - 안내 메시지 배너
+    @State private var showCautionBanner = true
+    
     // MARK: - 등록 버튼 활성화 조건 (사진 1장 + 날씨 태그)
     private var isFormValid: Bool {
         guard viewModel.localImages.count >= 1 else { return false }
@@ -32,13 +35,13 @@ struct UploadView: View {
                 VStack(spacing: 16) {
                     // MARK: - 공유/보관 상태 배너
                     StatusBanner(type: viewModel.isPublic ? .public : .private)
-
+                    
                     // MARK: - 사진 추가
                     PhotoAddView(images: $viewModel.localImages)
-
+                    
                     // MARK: - 텍스트 입력
                     UploadTextView(content: $viewModel.content)
-
+                    
                     // MARK: - 정보 추가 버튼들
                     VStack(spacing: 15) {
                         NavBtn(title: "날씨 정보 추가", isRequired: true) {
@@ -50,7 +53,7 @@ struct UploadView: View {
                             )
                         }
                         Divider()
-
+                        
                         NavBtn(title: "패션 정보 추가") {
                             AnyView(
                                 FashionInfoView(viewModel: fashionViewModel) {
@@ -59,7 +62,7 @@ struct UploadView: View {
                             )
                         }
                         Divider()
-
+                        
                         NavBtn(title: "장소 정보 추가") {
                             AnyView(
                                 PlaceInfoView(viewModel: placeViewModel) {
@@ -68,7 +71,7 @@ struct UploadView: View {
                             )
                         }
                         Divider()
-
+                        
                         ToggleBtn(label: "커뮤니티 게시", isOn: $viewModel.isPublic)
                             .padding(.vertical, 6)
                         Divider()
@@ -77,7 +80,7 @@ struct UploadView: View {
                             .padding(.vertical, 6)
                         Divider()
                     }
-
+                    
                     // MARK: - 등록 버튼
                     Button(action: {
                         Task {
@@ -85,7 +88,7 @@ struct UploadView: View {
                             viewModel.weatherModel = weatherViewModel.toWeatherModel()
                             viewModel.fashionModel = fashionViewModel.toFashionModel()
                             viewModel.placeModel = placeViewModel.toPlaceModel()
-
+                            
                             // MARK: 업로드 정보 로그
                             print("=== 업로드 정보 ===")
                             print("계절:", viewModel.weatherModel.season ?? "없음")
@@ -96,7 +99,7 @@ struct UploadView: View {
                             print("제품 태그:", viewModel.fashionModel.selectedTags.map { "\($0.brandName) - \($0.productName)" })
                             print("장소:", viewModel.placeModel.places.map { "\($0.placeName) / \($0.placeAddress)" })
                             print("===============================")
-
+                            
                             let success = await viewModel.submitPost()
                             
                             if success {
@@ -133,21 +136,45 @@ struct UploadView: View {
                 .padding(.horizontal, geometry.size.width * 0.05)
                 .padding(.bottom, geometry.size.height * 0.03)
             }
-            .navigationTitle("새 게시물")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image("backicon")
-                            .resizable()
-                            .frame(width: 9, height: 16)
-                    }
+            // MARK: - caution 배너 (3초 동안 표시)
+            if showCautionBanner {
+                VStack {
+                    Spacer().frame(height: geometry.size.height * 0.37)
+
+                    OverlayBanner(
+                        imgName: "bannerCautionIcon",
+                        text: "하루 최대 '공유중' & '보관중' 게시물 1개씩 업로드 가능해요"
+                    )
+
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .transition(.opacity)
+                .animation(.easeInOut(duration: 0.3), value: showCautionBanner)
+            }
+        }
+        .navigationTitle("새 게시물")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { dismiss() }) {
+                    Image("backicon")
+                        .resizable()
+                        .frame(width: 9, height: 16)
+                }
+            }
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                withAnimation {
+                    showCautionBanner = false
                 }
             }
         }
     }
 }
+
 
 #Preview {
     NavigationStack {
