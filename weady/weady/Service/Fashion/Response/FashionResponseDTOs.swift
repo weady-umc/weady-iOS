@@ -7,7 +7,8 @@
 
 import Foundation
 
-// 서버 응답 DTO 
+// MARK: - 서버 응답 DTO (서버 JSON 스키마 1:1)
+
 struct FashionDetailResponseDTO: Decodable {
     let code: Int
     let message: String
@@ -17,19 +18,24 @@ struct FashionDetailResponseDTO: Decodable {
 struct FashionDataDTO: Decodable {
     let locationId: Int
     let locationBCode: String
-    let address1, address2, address3, address4: String
+    let address1: String
+    let address2: String
+    let address3: String
+    let address4: String
     let recommendation: RecommendationDTO
     let chart: [ChartItemDTO]
     let tags: TagsDTO
 }
 
 struct RecommendationDTO: Decodable {
+    /// 서버: 0,100,…,2300 (시각×100)
     let time: Int
     let feelTmp: Double
     let clothing: ClothingItemDTO
 }
 
 struct ChartItemDTO: Decodable {
+    /// 서버: 0,100,…,2300 (시각×100)
     let time: Int
     let feelTmp: Double
     let clothing: ClothingItemDTO
@@ -41,7 +47,9 @@ struct ClothingItemDTO: Decodable {
 }
 
 struct TagsDTO: Decodable {
-    let season, weather, temperature: TagDTO
+    let season: TagDTO
+    let weather: TagDTO
+    let temperature: TagDTO
 }
 
 struct TagDTO: Decodable {
@@ -49,60 +57,7 @@ struct TagDTO: Decodable {
     let name: String
 }
 
-// MARK: - DTO → Domain 매핑 (이미 프로젝트에 있는 도메인 모델로 변환)
-extension FashionDetailResponseDTO {
-    func toDomain() -> FashionDetailResponse {
-        FashionDetailResponse(code: code, message: message, data: data.toDomain())
-    }
-}
-
-extension FashionDataDTO {
-    func toDomain() -> FashionData {
-        FashionData(
-            locationId: locationId,
-            locationBCode: locationBCode,
-            address1: address1,
-            address2: address2,
-            address3: address3,
-            address4: address4,
-            recommendation: recommendation.toDomain(),
-            chart: chart.map { $0.toDomain() },
-            tags: tags.toDomain()
-        )
-    }
-}
-
-extension RecommendationDTO {
-    func toDomain() -> Recommendation {
-        Recommendation(time: time, feelTmp: feelTmp, clothing: clothing.toDomain())
-    }
-}
-
-extension ChartItemDTO {
-    func toDomain() -> ChartItem {
-        ChartItem(time: time, feelTmp: feelTmp, clothing: clothing.toDomain())
-    }
-}
-
-extension ClothingItemDTO {
-    func toDomain() -> ClothingItem {
-        ClothingItem(name: name, imageUrl: imageUrl)
-    }
-}
-
-extension TagsDTO {
-    func toDomain() -> Tags {
-        Tags(season: season.toDomain(), weather: weather.toDomain(), temperature: temperature.toDomain())
-    }
-}
-
-extension TagDTO {
-    func toDomain() -> Tag {
-        Tag(id: id, name: name)
-    }
-}
-
-
+// MARK: - Summary DTO
 
 struct FashionSummaryResponseDTO: Decodable {
     let code: Int
@@ -116,15 +71,3 @@ struct FashionSummaryDTO: Decodable {
     let imageUrl: String
 }
 
-// 필요하면 도메인 변환
-struct FashionSummary: Equatable {
-    let locationId: Int
-    let recommendation: String
-    let imageUrl: String
-}
-
-extension FashionSummaryDTO {
-    func toDomain() -> FashionSummary {
-        .init(locationId: locationId, recommendation: recommendation, imageUrl: imageUrl)
-    }
-}
