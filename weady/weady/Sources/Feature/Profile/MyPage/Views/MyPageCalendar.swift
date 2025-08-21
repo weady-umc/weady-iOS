@@ -6,6 +6,7 @@ struct MyPageCalendar: View {
     private let weekDays = ["MON","TUE","WED","THU","FRI","SAT","SUN"]
     
     @State private var showOverlay: Bool = false
+    @Binding var boardShowOverlay: Bool
     
     var body: some View {
         VStack(spacing: 14) {
@@ -32,8 +33,7 @@ struct MyPageCalendar: View {
                         
                         // MARK: - 해당 날짜에 맞는 CalendarThumbnailModel 찾기
                         let model = viewModel.filterCalendar.first(where: {
-                            guard let modelDate = ISO8601DateFormatter().date(from: $0.date) else { return false }
-                            return Calendar.current.isDate(modelDate, inSameDayAs: date)
+                            Calendar.current.isDate($0.dateObj, inSameDayAs: date)
                         })
                         
                         // MARK: - 게시물이 없는 경우 기본 모델 (thumbnailUrl, 날씨 X)
@@ -51,18 +51,9 @@ struct MyPageCalendar: View {
                                 formatter.dateFormat = "yyyy-MM-dd"
                                 let dateString = formatter.string(from: date)
                                 
-                                // 게시물 조회
+                                // 해당 날짜 게시물 조회
                                 viewModel.fetchBoard(date: dateString)
-                                withAnimation { showOverlay = true }
-                            }
-                            
-                            // MARK: - 게시물 오버레이
-                            if showOverlay,
-                               let selectedBoard = viewModel.selectedBoard,
-                               let boardDate = selectedBoard.createdAtDate,
-                               Calendar.current.isDate(boardDate, inSameDayAs: date) {
-                                MypageBoardView(board: selectedBoard, isPresented: $showOverlay)
-                                    .transition(.move(edge: .top))
+                                withAnimation { boardShowOverlay = true }
                             }
                         }
                     } else {
@@ -88,14 +79,5 @@ struct MyPageCalendar: View {
         days.append(contentsOf: range.map { Optional($0) })
         
         return days
-    }
-}
-
-// MARK: - 프리뷰
-extension MypageBoardDetailModel {
-    var createdAtDate: Date? {
-        let isoFormatter = ISO8601DateFormatter()
-        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return isoFormatter.date(from: createdAt)
     }
 }
