@@ -50,7 +50,7 @@ struct HomeView: View {
             // MARK: - [네비 버튼] 날씨 카드 (누르면 .weatherhome 로 이동)
             Button {
 
-                homeRouter.push(.weatherhome)
+                homeRouter.push(.weatherhome(initial: .first))
             } label: {
                 
                 // MARK: - 상단 날씨 카드 3단계 상태 렌더링
@@ -83,7 +83,7 @@ struct HomeView: View {
             // MARK: - [네비 버튼] 옷차림/장소 카드 (누르면 .clothes 로 이동)
             Button {
 
-                homeRouter.push(
+                homeRouter.push(.weatherhome(initial: .second))
             } label: {
                 ClothesView
                     
@@ -113,7 +113,7 @@ struct HomeView: View {
                         showLogoButton: true,                  // ← 왼쪽 로고
                         showAlarmButton: true,                 // ← 오른쪽 알림
                         showBottomDivider: false,
-                        alarmAction: { router.push(.alarm) }   // 알림 화면으로 이동 등
+                        alarmAction: { homeRouter.push(.alarm) }   // 알림 화면으로 이동 등
 
                     )
                     // 상단(노치)까지 흰색
