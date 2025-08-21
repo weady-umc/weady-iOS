@@ -15,8 +15,7 @@ import AuthenticationServices
 struct LoginView: View {
     @Environment(\.router) private var router
     @StateObject private var viewModel = LoginViewModel()
-    @State var appleviewModel: AppleLoginViewModel = .init()
-    
+
     @State private var didRoute = false
     @State private var appearedAt = Date.distantPast
     private let minDelayAfterAppear: TimeInterval = 0.18
@@ -115,12 +114,13 @@ struct LoginView: View {
             .signInWithAppleButtonStyle(.whiteOutline)
             .cornerRadius(6)
             .onTapGesture {
-                Task {
-                    if let window = UIApplication.shared.connectedScenes
-                        .compactMap({ $0 as? UIWindowScene })
-                        .first?.windows.first {
-                        await appleviewModel.loginWithApple(presentationAnchor: window)
+                if let anchor = activePresentationAnchor() {
+                    viewModel.loginWithApple(presentationAnchor: anchor) { success in
+                        guard success else { return }
+                        routeAfterLoginOnce()
                     }
+                } else {
+                    viewModel.errorMessage = "로그인 창을 표시할 윈도우를 찾지 못했습니다."
                 }
             }
             
@@ -130,6 +130,25 @@ struct LoginView: View {
         .onAppear {
             appearedAt = Date()
         }
+        .alert(item: Binding(
+            get: { viewModel.errorMessage.map { LocalAlertMessage(message: $0) } },
+            set: { _ in viewModel.errorMessage = nil }
+        )) { alert in
+            Alert(title: Text("로그인 오류"), message: Text(alert.message), dismissButton: .default(Text("확인")))
+        }
+    }
+
+    private func activePresentationAnchor() -> ASPresentationAnchor? {
+        guard let scene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { $0.activationState == .foregroundActive })
+        else { return nil }
+
+        // keyWindow가 있으면 우선 사용, 없으면 첫 번째 윈도우
+        if let keyWindow = scene.windows.first(where: { $0.isKeyWindow }) {
+            return keyWindow
+        }
+        return scene.windows.first
     }
 
     /// 로그인 이후/이미 로그인 상태에서의 분기를 "한 번만" 수행
@@ -156,4 +175,10 @@ struct LoginView: View {
             }
         }
     }
+}
+
+// MARK: - 간단 Alert 바인딩용 Wrapper
+private struct LocalAlertMessage: Identifiable {
+    let id = UUID()
+    let message: String
 }
