@@ -14,8 +14,7 @@ enum FashionEndpoints {
     /// - locationId가 있으면 쿼리로 전달 (?locationId=357)
     case getDetail(locationId: Int? = nil)
 
-    /// GET /api/v1/fashion/summary
-    case getSummary
+
 
 }
 
@@ -31,7 +30,7 @@ extension FashionEndpoints: TargetType {
         switch self {
 
         case .getDetail:  return "/detail"
-        case .getSummary: return "/summary"
+    
 
         }
     }
@@ -58,9 +57,6 @@ extension FashionEndpoints: TargetType {
                 return .requestPlain
             }
 
-        case .getSummary:
-
-            return .requestPlain
         }
     }
 

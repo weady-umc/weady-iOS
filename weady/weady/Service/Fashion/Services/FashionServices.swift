@@ -76,15 +76,6 @@ final class FashionService: NetworkManager {
 
     }
 
-    /// GET /api/v1/fashion/summary
-    public func getFashionSummary(
-        completion: @escaping (Result<FashionSummaryResponseDTO, NetworkError>) -> Void
-    ) {
-        request(
-            target: .getSummary,
-            decodingType: FashionSummaryResponseDTO.self,
-            completion: completion
-        )
-    }
+
 }
 

@@ -331,7 +331,7 @@ struct HomeView: View {
         fashionError = nil
         fashion = nil
 
-        FashionService().getFashionSummary { result in
+        FashionSummaryService().getFashionSummary { result in
             DispatchQueue.main.async {
                 isLoadingFashion = false
                 switch result {
