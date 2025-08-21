@@ -110,7 +110,14 @@ struct UploadView: View {
     // 모드/서비스
     let mode: UploadMode
     private let boardService = BoardService()
-    
+
+    @State private var didPrefill = false
+
+    init(mode: UploadMode = .create, onSuccess: (() -> Void)? = nil) {
+        self.mode = mode
+        self.onSuccess = onSuccess
+    }
+
     // MARK: - 등록 버튼 활성화 조건 (사진 1장 + 날씨 태그)
     
     private var isFormValid: Bool {
@@ -131,144 +138,150 @@ struct UploadView: View {
             && !weatherViewModel.selectedWeatherTags.isEmpty
         }
     }
-    
-    init(mode: UploadMode = .create, onSuccess: (() -> Void)? = nil) {
-        self.mode = mode
-        self.onSuccess = onSuccess
-    }
-    
+
     var body: some View {
         @Bindable var vm = viewModel
         
         GeometryReader { geometry in
-            ZStack {
-                ScrollView {
-                    VStack(spacing: 16) {
-                        // 공개/비공개 배너
-                        StatusBanner(type: viewModel.isPublic ? .public : .private)
-                        
-                        // MARK: - 사진 추가
-                        switch mode {
-                        case .create:
-                            PhotoAddView(images: $viewModel.localImages)
-                        case .edit(let post):
-                            VStack(alignment: .leading, spacing: 8) {
-                                PhotoLockedStrip(urls: post.imageDtoList.map { $0.imgUrl })
-                                HStack(spacing: 6) {
-                                    Image(systemName: "lock.fill").imageScale(.small)
-                                    Text("기존 게시물은 사진을 수정할 수 없습니다.")
-                                        .fontName(.captionRegular13)
-                                }
-                                .foregroundStyle(Color.gray500)
-                                .padding(.top, 2)
+            ScrollView {
+                VStack(spacing: 16) {
+                    // 공개/비공개 배너
+                    StatusBanner(type: viewModel.isPublic ? .public : .private)
+
+                    // 사진
+                    switch mode {
+                    case .create:
+                        PhotoAddView(images: $viewModel.localImages)
+                    case .edit(let post):
+                        VStack(alignment: .leading, spacing: 8) {
+                            PhotoLockedStrip(urls: post.imageDtoList.map { $0.imgUrl })
+                            HStack(spacing: 6) {
+                                Image(systemName: "lock.fill").imageScale(.small)
+                                Text("기존 게시물은 사진을 수정할 수 없습니다.")
+                                    .fontName(.captionRegular14)
                             }
+                            .foregroundStyle(Color.gray500)
+                            .padding(.top, 2)
                         }
-                        
-                        // MARK: - 텍스트 입력
-                        UploadTextView(content: $viewModel.content)
-                        
-                        // MARK: - 정보 추가 버튼들
-                        VStack(spacing: 15) {
-                            NavBtn(title: "날씨 정보 추가", isRequired: true) {
-                                AnyView(
-                                    WeatherInfoView(viewModel: weatherViewModel) {
-                                        viewModel.weatherModel = weatherViewModel.toWeatherModel()
-                                        print("업로드 모델에 날씨 정보 반영 완료")
-                                    }
-                                )
-                            }
-                            Divider()
-                            
-                            NavBtn(title: "패션 정보 추가") {
-                                AnyView(
-                                    FashionInfoView(viewModel: fashionViewModel) {
-                                        viewModel.fashionModel = fashionViewModel.toFashionModel()
-                                    }
-                                )
-                            }
-                            Divider()
-                            
-                            NavBtn(title: "장소 정보 추가") {
-                                AnyView(
-                                    PlaceInfoView(viewModel: placeViewModel) {
-                                        viewModel.placeModel = placeViewModel.toPlaceModel()
-                                    }
-                                )
-                            }
-                            Divider()
-                            
-                            ToggleBtn(label: "커뮤니티 게시", isOn: $viewModel.isPublic)
-                                .padding(.vertical, 6)
-                            Divider()
-                            
-                            ToggleBtn(label: "유료 광고 포함", isOn: $viewModel.isAdd)
-                                .padding(.vertical, 6)
-                            Divider()
-                        }
-                        
-                        // 등록/수정 버튼
-                        Button(action: {
-                            Task {
-                                await handleSubmit()
-                            } }) {
-                                if isUploading {
-                                    ProgressView().frame(maxWidth: .infinity).padding()
-                                } else {
-                                    Text(mode == .create ? "등록하기" : "수정하기")
-                                        .frame(maxWidth: .infinity)
-                                        .padding()
-                                        .fontName(.bodyMedium16)
-                                        .background(isFormValid ? Color.black100 : Color.gray800)
-                                        .foregroundStyle(Color.white100)
-                                        .cornerRadius(8)
-                                }
-                            }
-                            .disabled(!isFormValid || isUploading)
-                            .alert(mode == .create ? "업로드 실패" : "수정 실패", isPresented: $showErrorAlert) {
-                                Button("확인", role: .cancel) { }
-                            } message: { Text(errorMessage) }
                     }
-                    .padding(.horizontal, geometry.size.width * 0.05)
-                    .padding(.bottom, geometry.size.height * 0.03)
+
+                    // 텍스트
+                    UploadTextView(content: $contentProxy)
+                        .onChange(of: contentProxy) { _, newValue in
+                            if vm.content != newValue { vm.content = newValue }
+                        }
+                        .onChange(of: vm.content) { _, newValue in
+                            if contentProxy != newValue { contentProxy = newValue }
+                        }
+
+                    // 정보 버튼
+                    InfoButtonsSection(
+                        weatherViewModel: weatherViewModel,
+                        fashionViewModel: fashionViewModel,
+                        placeViewModel: placeViewModel,
+                        onWeatherCommit: { viewModel.weatherModel = weatherViewModel.toWeatherModel() },
+                        onFashionCommit: { viewModel.fashionModel = fashionViewModel.toFashionModel() },
+                        onPlaceCommit: { viewModel.placeModel = placeViewModel.toPlaceModel() },
+                        isPublic: $viewModel.isPublic,
+                        isAdd: $viewModel.isAdd
+                    )
+
+                    // 등록/수정 버튼
+                    Button(action: { Task { await handleSubmit() } }) {
+                        if isUploading {
+                            ProgressView().frame(maxWidth: .infinity).padding()
+                        } else {
+                            Text(viewModel.mode == .create ? "등록하기" : "수정하기")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .fontName(.bodyMedium16)
+                                .background(isFormValid ? Color.black100 : Color.gray800)
+                                .foregroundStyle(Color.white100)
+                                .cornerRadius(8)
+                        }
+                    }
+                    .disabled(!isFormValid || isUploading)
+                    .alert(mode == .create ? "업로드 실패" : "수정 실패", isPresented: $showErrorAlert) {
+                        Button("확인", role: .cancel) { }
+                    } message: { Text(errorMessage) }
                 }
-                
-                // MARK: - caution 배너 (3초 동안 표시)
-                if showCautionBanner {
-                    VStack {
-                        Spacer().frame(height: geometry.size.height * 0.37)
-                        OverlayBanner(
-                            imgName: "bannerCautionIcon",
-                            text: "하루 최대 '공유중' & '보관중' 게시물 1개씩 업로드 가능해요"
-                        )
-                        
-                        Spacer()
+                .padding(.horizontal, geometry.size.width * 0.05)
+                .padding(.bottom, geometry.size.height * 0.03)
+            }
+            .navigationTitle(mode == .create ? "새 게시물" : "게시물 수정")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { dismiss() }) {
+                        Image("backicon")
+                            .resizable()
+                            .frame(width: 9, height: 16)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .transition(.opacity)
-                    .animation(.easeInOut(duration: 0.3), value: showCautionBanner)
+                }
+            }
+            .onAppear {
+                viewModel.mode = mode
+                if !didPrefill {
+                    prefillIfNeeded()
+                    contentProxy = viewModel.content
+                    didPrefill = true
                 }
             }
         }
-        .navigationTitle(mode == .create ? "새 게시물" : "게시물 수정")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: { dismiss() }) {
-                    Image("backicon")
-                        .resizable()
-                        .frame(width: 9, height: 16)
-                }
+    }
+}
+
+// MARK: - Info Buttons Section
+private struct InfoButtonsSection: View {
+    var weatherViewModel: WeatherViewModel
+    var fashionViewModel: FashionViewModel
+    var placeViewModel: PlaceViewModel
+
+    let onWeatherCommit: () -> Void
+    let onFashionCommit: () -> Void
+    let onPlaceCommit: () -> Void
+
+    @Binding var isPublic: Bool
+    @Binding var isAdd: Bool
+
+    var body: some View {
+        VStack(spacing: 15) {
+            NavBtn(title: "날씨 정보 추가", isRequired: true) {
+                AnyView(
+                    WeatherInfoView(viewModel: weatherViewModel) {
+                        onWeatherCommit()
+                        print("업로드 모델에 날씨 정보 반영 완료")
+                    }
+                )
             }
-        }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                withAnimation {
-                    showCautionBanner = false
-                }
+            Divider()
+
+            NavBtn(title: "패션 정보 추가") {
+                AnyView(
+                    FashionInfoView(viewModel: fashionViewModel) {
+                        onFashionCommit()
+                    }
+                )
             }
-            viewModel.mode = mode
-            prefillIfNeeded()
+            Divider()
+
+            NavBtn(title: "장소 정보 추가") {
+                AnyView(
+                    PlaceInfoView(viewModel: placeViewModel) {
+                        onPlaceCommit()
+                    }
+                )
+            }
+            Divider()
+
+            ToggleBtn(label: "커뮤니티 게시", isOn: $isPublic)
+                .padding(.vertical, 6)
+            Divider()
+
+            ToggleBtn(label: "유료 광고 포함", isOn: $isAdd)
+                .padding(.vertical, 6)
+            Divider()
         }
     }
 }
@@ -309,8 +322,8 @@ private extension UploadView {
             dismiss()
         } else {
             errorMessage = (mode == .create)
-            ? ">>> 업로드에 실패했습니다. 다시 시도해주세요."
-            : ">>> 수정에 실패했습니다. 다시 시도해주세요."
+                ? ">>> 업로드에 실패했습니다. 다시 시도해주세요."
+                : ">>> 수정에 실패했습니다. 다시 시도해주세요."
             showErrorAlert = true
         }
     }
@@ -337,17 +350,17 @@ private extension UploadView {
         } ?? snapshot.weatherTagId
         
         let places: [PlaceDTO] = viewModel.placeModel.places.isEmpty
-        ? snapshot.placeDtoList
-        : viewModel.placeModel.places.map { PlaceDTO(placeName: $0.placeName, placeAddress: $0.placeAddress) }
-        
+            ? snapshot.placeDtoList
+            : viewModel.placeModel.places.map { PlaceDTO(placeName: $0.placeName, placeAddress: $0.placeAddress) }
+
         let brands: [BrandDTO] = viewModel.fashionModel.selectedTags.isEmpty
-        ? snapshot.brandDtoList
-        : viewModel.fashionModel.selectedTags.map { BrandDTO(brand: $0.brandName, product: $0.productName) }
-        
+            ? snapshot.brandDtoList
+            : viewModel.fashionModel.selectedTags.map { BrandDTO(brand: $0.brandName, product: $0.productName) }
+
         let styleIds: [Int] = viewModel.fashionModel.selectedStyles.isEmpty
-        ? snapshot.styleIdList
-        : viewModel.fashionModel.selectedStyles.map { $0.rawValue }
-        
+            ? snapshot.styleIdList
+            : viewModel.fashionModel.selectedStyles.map { $0.rawValue }
+
         let dto = UpdateBoardRequestDTO(
             isPublic: viewModel.isPublic,
             content: viewModel.content,
@@ -373,9 +386,8 @@ private extension UploadView {
         switch mode {
         case .create:
             contentProxy = viewModel.content
-            
+
         case .edit(let post):
-            // 텍스트/공개
             viewModel.content  = post.content
             contentProxy       = post.content
             viewModel.isPublic = post.isPublic
@@ -385,7 +397,6 @@ private extension UploadView {
             let w = weatherType(for: post.weatherTagId)
             let meta = temperatureMeta(for: post.temperatureTagId)
             let band = TemperatureBand(id: post.temperatureTagId, name: meta.name, tempRange: meta.range)
-            
             viewModel.weatherModel = WeatherModel(
                 season: s,
                 temperature: band,
@@ -410,65 +421,5 @@ private extension UploadView {
             viewModel.placeModel = place
             placeViewModel.prefill(from: place)
         }
-    }
-}
-
-// MARK: - Info Buttons Section
-private struct InfoButtonsSection: View {
-    var weatherViewModel: WeatherViewModel
-    var fashionViewModel: FashionViewModel
-    var placeViewModel: PlaceViewModel
-    
-    let onWeatherCommit: () -> Void
-    let onFashionCommit: () -> Void
-    let onPlaceCommit: () -> Void
-    
-    @Binding var isPublic: Bool
-    @Binding var isAdd: Bool
-    
-    var body: some View {
-        VStack(spacing: 15) {
-            NavBtn(title: "날씨 정보 추가", isRequired: true) {
-                AnyView(
-                    WeatherInfoView(viewModel: weatherViewModel) {
-                        onWeatherCommit()
-                        print("업로드 모델에 날씨 정보 반영 완료")
-                    }
-                )
-            }
-            Divider()
-            
-            NavBtn(title: "패션 정보 추가") {
-                AnyView(
-                    FashionInfoView(viewModel: fashionViewModel) {
-                        onFashionCommit()
-                    }
-                )
-            }
-            Divider()
-            
-            NavBtn(title: "장소 정보 추가") {
-                AnyView(
-                    PlaceInfoView(viewModel: placeViewModel) {
-                        onPlaceCommit()
-                    }
-                )
-            }
-            Divider()
-            
-            ToggleBtn(label: "커뮤니티 게시", isOn: $isPublic)
-                .padding(.vertical, 6)
-            Divider()
-            
-            ToggleBtn(label: "유료 광고 포함", isOn: $isAdd)
-                .padding(.vertical, 6)
-            Divider()
-        }
-    }
-}
-
-#Preview {
-    NavigationStack {
-        UploadView(mode: .create)
     }
 }
