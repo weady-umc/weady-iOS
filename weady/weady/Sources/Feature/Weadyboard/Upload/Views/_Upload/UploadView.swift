@@ -88,6 +88,8 @@ struct UploadView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel = UploadViewModel()
 
+    @Binding var isTabBarHidden: Bool
+
     // 상세 재조회 콜백
     private let onSuccess: (() -> Void)?
 
@@ -113,8 +115,22 @@ struct UploadView: View {
 
     @State private var didPrefill = false
 
-    init(mode: UploadMode = .create, onSuccess: (() -> Void)? = nil) {
+    init(
+        mode: UploadMode = .create,
+        isTabBarHidden: Binding<Bool>,
+        onSuccess: (() -> Void)? = nil
+    ) {
         self.mode = mode
+        self._isTabBarHidden = isTabBarHidden
+        self.onSuccess = onSuccess
+    }
+    
+    init(
+        mode: UploadMode = .create,
+        onSuccess: (() -> Void)? = nil
+    ) {
+        self.mode = mode
+        self._isTabBarHidden = .constant(false)
         self.onSuccess = onSuccess
     }
 
@@ -189,17 +205,17 @@ struct UploadView: View {
                     // 등록/수정 버튼
                     Button(action: { Task { await handleSubmit() } }) {
                         if isUploading {
-                            ProgressView().frame(maxWidth: .infinity).padding()
+                            ProgressView()
                         } else {
                             Text(viewModel.mode == .create ? "등록하기" : "수정하기")
-                                .frame(maxWidth: .infinity)
-                                .padding()
                                 .fontName(.bodyMedium16)
-                                .background(isFormValid ? Color.black100 : Color.gray800)
-                                .foregroundStyle(Color.white100)
-                                .cornerRadius(10)
                         }
                     }
+                    .buttonStyle(.plain)
+                    .frame(width: 335 * .deviceScale, height: 44 * .deviceScale)
+                    .background(isFormValid ? Color.black100 : Color.gray800)
+                    .foregroundStyle(Color.white100)
+                    .cornerRadius(10)
                     .disabled(!isFormValid || isUploading)
                     .alert(mode == .create ? "업로드 실패" : "수정 실패", isPresented: $showErrorAlert) {
                         Button("확인", role: .cancel) { }
@@ -247,6 +263,10 @@ struct UploadView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                 withAnimation { showCautionBanner = false }
             }
+            isTabBarHidden = true
+        }
+        .onDisappear {
+            isTabBarHidden = false
         }
     }
 }
