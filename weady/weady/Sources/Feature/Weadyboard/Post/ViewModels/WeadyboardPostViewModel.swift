@@ -96,4 +96,40 @@ final class WeadyboardPostViewModel: ObservableObject {
             }
         }
     }
+
+    // 게시글 수정
+    func updateBoard(with dto: UpdateBoardRequestDTO, completion: @escaping (Bool) -> Void) {
+        boardService.updateBoard(boardId: boardId, data: dto) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success(let updated):
+                    self.post = updated
+                    self.isLiked = updated.goodStatus
+                    self.likeCount = updated.goodCount
+                    self.commentCount = updated.commentCount
+                    completion(true)
+                case .failure(let err):
+                    self.errorMessage = err.localizedDescription
+                    completion(false)
+                }
+            }
+        }
+    }
+
+    // 게시글 삭제
+    func deleteBoard(completion: @escaping (Bool) -> Void) {
+        boardService.deleteBoard(boardId: boardId) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success:
+                    completion(true)
+                case .failure(let err):
+                    self.errorMessage = err.localizedDescription
+                    completion(false)
+                }
+            }
+        }
+    }
 }

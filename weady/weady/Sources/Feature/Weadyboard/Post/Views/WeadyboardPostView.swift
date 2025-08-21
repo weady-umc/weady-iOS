@@ -33,7 +33,7 @@ struct WeadyboardPostView: View {
 
     @State private var currentImageIndex: Int = 0
     
-    // 편집 네비게이션 (deprecated API 제거)
+    // 편집 네비게이션
     @State private var goEdit = false
     @State private var editingPostSnapshot: BoardDetailResponseDTO? = nil
     
@@ -116,7 +116,7 @@ struct WeadyboardPostView: View {
                                 .onAppear {
                                     viewModel.fetchPostDetail()
                                 }
-                            .padding(.horizontal, 20 * .deviceScale)
+                                .padding(.horizontal, 20 * .deviceScale)
                         }
                     }
                 } else if viewModel.isLoading {
@@ -205,7 +205,10 @@ struct WeadyboardPostView: View {
         
         .navigationDestination(isPresented: $goEdit) {
             if let snapshot = editingPostSnapshot {
-                UploadView(mode: .edit(post: snapshot))
+                UploadView(
+                    mode: .edit(post: snapshot),
+                    onSuccess: { viewModel.fetchPostDetail() }
+                )
             } else {
                 EmptyView()
             }
