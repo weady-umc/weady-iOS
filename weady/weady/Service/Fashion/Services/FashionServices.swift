@@ -73,6 +73,7 @@ final class FashionService: NetworkManager {
             decodingType: FashionDetailResponseDTO.self,
             completion: completion
         )
+
     }
 
     /// GET /api/v1/fashion/summary

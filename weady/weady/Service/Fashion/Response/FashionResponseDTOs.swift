@@ -59,15 +59,4 @@ struct TagDTO: Decodable {
 
 // MARK: - Summary DTO
 
-struct FashionSummaryResponseDTO: Decodable {
-    let code: Int
-    let message: String
-    let data: FashionSummaryDTO
-}
-
-struct FashionSummaryDTO: Decodable {
-    let locationId: Int
-    let recommendation: String
-    let imageUrl: String
-}
 

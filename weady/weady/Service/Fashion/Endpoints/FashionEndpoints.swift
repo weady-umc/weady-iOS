@@ -9,12 +9,14 @@ import Foundation
 import Moya
 
 enum FashionEndpoints {
+
     /// GET /api/v1/fashion/detail
     /// - locationId가 있으면 쿼리로 전달 (?locationId=357)
     case getDetail(locationId: Int? = nil)
 
     /// GET /api/v1/fashion/summary
     case getSummary
+
 }
 
 extension FashionEndpoints: TargetType {
@@ -27,14 +29,16 @@ extension FashionEndpoints: TargetType {
 
     var path: String {
         switch self {
+
         case .getDetail:  return "/detail"
         case .getSummary: return "/summary"
+
         }
     }
 
     var method: Moya.Method {
         switch self {
-        case .getDetail, .getSummary:
+        case .getDetail:
             return .get
         }
     }
@@ -43,6 +47,7 @@ extension FashionEndpoints: TargetType {
 
     var task: Task {
         switch self {
+
         case .getDetail(let locationId):
             if let id = locationId {
                 return .requestParameters(
@@ -54,6 +59,7 @@ extension FashionEndpoints: TargetType {
             }
 
         case .getSummary:
+
             return .requestPlain
         }
     }
