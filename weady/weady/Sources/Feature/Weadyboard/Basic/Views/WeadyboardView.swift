@@ -90,7 +90,7 @@ struct WeadyboardView: View {
                         .background(Color.black70)
                         .clipShape(RoundedRectangle(cornerRadius: 30 * .deviceScale))
                     }
-                    .padding(.bottom, 22 * .deviceScale)
+                    .padding(.bottom, 64 * .deviceScale)
                     .padding(.trailing, 16 * .deviceScale)
                 }
             }

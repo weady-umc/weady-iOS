@@ -1,3 +1,4 @@
+
 import Foundation
 import Observation
 import UIKit
@@ -5,6 +6,7 @@ import UIKit
 @Observable
 final class UploadViewModel {
     // MARK: - Services
+    var mode: UploadMode = .create
     private let boardService = BoardService()
     
     // MARK: - Properties
@@ -18,7 +20,7 @@ final class UploadViewModel {
     var fashionModel: FashionModel = FashionModel()
     var placeModel: PlaceModel = PlaceModel()
     
-    // MARK: - DTO 생성
+    // MARK: - DTO 생성 (원형 유지)
     private func buildRequestBody() -> CreateBoardRequestDTO? {
         guard let season = weatherModel.season,
               let tempBand = weatherModel.temperature,
@@ -38,9 +40,9 @@ final class UploadViewModel {
         return CreateBoardRequestDTO(
             isPublic: isPublic,
             content: content,
-            weatherTagId: mapWeatherToId(weatherTag),
-            temperatureTagId: tempBand.id,
             seasonTagId: mapSeasonToId(season),
+            temperatureTagId: tempBand.id,
+            weatherTagId: mapWeatherToId(weatherTag),
             boardPlaceRequestDtoList: placeDtoList,
             styleIds: styleIds,
             boardBrandRequestDtoList: brandDtoList
@@ -68,37 +70,66 @@ final class UploadViewModel {
         }
     }
     
-    // MARK: - 게시글 업로드
+    // MARK: - 게시글 업로드/수정 (원형 흐름 최대한 유지)
     func submitPost() async -> Bool {
-        do {
-            guard !localImages.isEmpty else { throw UploadError.invalidData }
-            guard let requestDTO = buildRequestBody() else { throw UploadError.invalidData }
-            
-            let response = try await boardService.createBoard(
-                data: requestDTO,
-                images: localImages.map { $0.image }
+        switch mode {
+        case .create:
+            let upload = UploadModel(
+                isPublic: self.isPublic,
+                isAdd: self.isAdd,
+                content: self.content,
+                imageDtoList: [],
+                imgCount: localImages.count,
+                weatherTagId: mapWeatherToId(weatherModel.weather.first ?? .sunny),
+                temperatureTagId: weatherModel.temperature?.id ?? 0,
+                seasonTagId: mapSeasonToId(weatherModel.season ?? .spring),
+                placeDtoList: placeModel.places.map {
+                    UploadPlace(placeName: $0.placeName, placeAddress: $0.placeAddress)
+                },
+                styleIds: fashionModel.selectedStyles.map { $0.rawValue },
+                brandDtoList: fashionModel.selectedTags.map {
+                    UploadBrand(brand: $0.brandName, product: $0.productName)
+                }
             )
-            
-            uploadedImages = response.imageDtoList.sorted { $0.imgOrder < $1.imgOrder }
-            print("*** 업로드 성공, 이미지 개수: \(uploadedImages.count)")
-            uploadedImages.forEach { imageDTO in
-                print("순서: \(imageDTO.imgOrder), URL: \(imageDTO.imgUrl)")
+            let dto = upload.toCreateBoardRequestDTO
+
+            do {
+                _ = try await boardService.createBoard(
+                    data: dto,
+                    images: localImages.map { $0.image }
+                )
+                return true
+            } catch {
+                print("❌ create 실패: \(error)")
+                return false
             }
-            return true
-        } catch {
-            print(">>> 업로드 실패:", error.localizedDescription)
-            return false
-        }
-    }
-    
-    // MARK: - 업로드 에러
-    enum UploadError: Error, LocalizedError {
-        case invalidData
-        case uploadFailed(reason: String)
-        var errorDescription: String? {
-            switch self {
-            case .invalidData: return "업로드할 데이터가 유효하지 않습니다."
-            case .uploadFailed(let reason): return "업로드에 실패했습니다: \(reason)"
+
+        case .edit(let post):
+            let dto = UpdateBoardRequestDTO(
+                isPublic: self.isPublic,
+                content: self.content,
+                seasonTagId: post.seasonTagId,
+                temperatureTagId: post.temperatureTagId,
+                weatherTagId: post.weatherTagId,
+                boardPlaceRequestDtoList: placeModel.places.isEmpty
+                    ? post.placeDtoList
+                    : placeModel.places.map { PlaceDTO(placeName: $0.placeName, placeAddress: $0.placeAddress) },
+                styleIds: post.styleIdList, 
+                boardBrandRequestDtoList: fashionModel.selectedTags.isEmpty
+                    ? post.brandDtoList
+                    : fashionModel.selectedTags.map { BrandDTO(brand: $0.brandName, product: $0.productName) }
+            )
+
+            return await withCheckedContinuation { continuation in
+                boardService.updateBoard(boardId: post.boardId, data: dto) { result in
+                    switch result {
+                    case .success:
+                        continuation.resume(returning: true)
+                    case .failure(let err):
+                        print("❌ update 실패: \(err)")
+                        continuation.resume(returning: false)
+                    }
+                }
             }
         }
     }

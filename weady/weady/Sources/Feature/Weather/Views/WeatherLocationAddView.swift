@@ -14,8 +14,7 @@ struct WeatherLocationAddView: View {
     @ObservedObject var locationViewModel: WeatherLocationViewModel     // 즐겨찾기 서버/로컬 상태 관리
     @Environment(\.dismiss) private var dismiss                         // 현재 시트/화면 닫기
     @Binding var selectedPlace: AddressDocument?                        // 선택된 장소(주소 문서) 바인딩
-    @Environment(HomeRouter.self) private var router                    // 화면 전환용 라우터
-
+    @EnvironmentObject var homeRouter: HomeRouter
     // MARK: - Completion Handler (옵션)
     var onComplete: (() -> Void)? = nil
     
@@ -126,14 +125,52 @@ struct WeatherLocationAddView: View {
                     
                     
                     
+
                 } else {
                     // MARK: - 변환 전 로딩 상태
                     ProgressView("날씨 정보를 불러오는 중...")
+
+                    // MARK: - 즐겨찾기 추가 버튼 (서버 → 로컬 → 화면 이동)
+                    Button(action: {
+                        guard let place = selectedPlace,
+                              let weatherData = viewModel.weather else { return }
+
+                        // 1. 서버 API로 즐겨찾기 추가
+                        locationViewModel.addFavoriteToServer(bCode: place.address.bCode) { success in
+                            if success {
+                                print("✅ 서버 즐겨찾기 추가 성공")
+                                // 2. 로컬 목록에도 추가
+                                locationViewModel.addFavorite(from: place, with: weatherData)
+                                // 3. 성공 시 화면 이동
+                                DispatchQueue.main.async {
+                                    homeRouter.push(.weatherlocation)
+                                }
+                            } else {
+                                print("❌ 서버 즐겨찾기 추가 실패")
+                                // 실패 시 Alert/토스트 등 후속 처리 지점
+                            }
+                        }
+                    }) {
+                        ZStack {
+                            Image("whitebackground")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 280, height: 55)
+                            
+                            Text("즐겨찾기 추가")
+                                .fontName(.captionSemibold14)
+                                .foregroundStyle(Color.black100)
+                        }
+                    }
+
                 }
             }
-            // MARK: - Navigation Bar
-            .edgeSwipeBack(topExclusion: 100) {
-                router.pop()
+
+
+        }
+        .edgeSwipeBack(topExclusion: 100) {
+            homeRouter.pop()
+
             }
             .toolbar(.hidden, for: .navigationBar) // 시스템 네비바 숨김
             .safeAreaInset(edge: .top) {
@@ -291,5 +328,5 @@ struct rainWind :View {
         selectedPlace: .constant(dummyPlace),
         weather: ShortWeatherData.example
     )
-    .environment(HomeRouter())
+    .environmentObject(HomeRouter())
 }

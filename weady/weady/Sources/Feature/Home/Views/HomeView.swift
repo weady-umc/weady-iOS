@@ -11,7 +11,7 @@ import KeychainSwift
 struct HomeView: View {
     
     // MARK: - Router / Location 환경 주입
-    @Environment(HomeRouter.self) var router                         // 화면 전환용 커스텀 라우터
+    @EnvironmentObject var homeRouter: HomeRouter                     // 화면 전환용 커스텀 라우터
     @StateObject private var locationService = LocationService()     // 현재 위치 획득용 서비스 (CLLocationManager 래핑 가정)
     
     @AppStorage("nickname") private var nickname: String = ""
@@ -49,7 +49,8 @@ struct HomeView: View {
             
             // MARK: - [네비 버튼] 날씨 카드 (누르면 .weatherhome 로 이동)
             Button {
-                router.push(.weatherhome(initial: .first))
+
+                homeRouter.push(.weatherhome)
             } label: {
                 
                 // MARK: - 상단 날씨 카드 3단계 상태 렌더링
@@ -81,8 +82,8 @@ struct HomeView: View {
             
             // MARK: - [네비 버튼] 옷차림/장소 카드 (누르면 .clothes 로 이동)
             Button {
-                router.push(.weatherhome(initial: .second))
 
+                homeRouter.push(
             } label: {
                 ClothesView
                     
@@ -96,12 +97,11 @@ struct HomeView: View {
             // HomeView 내
             CurationStripView(
                 vm: curationVM,
-                onTapAll: { router.push(.weatherhome(initial: .third)) },
+                onTapAll: { homeRouter.push(.weatherhome(initial: .third)) },
                 tileSize: .init(width: 280 * .deviceScale, height: 140 * .deviceScale),                   // ← 이미지 크기 직접 지정
                 titleFont: .system(size: 17, weight: .bold),                // ← 폰트 직접 지정(또는 .fontName 사용)
                 titleColor: .white                                          // ← 색상도 원하는 대로
             )
-
             
         }
         .padding(.bottom, 70 * .deviceScale)
@@ -114,6 +114,7 @@ struct HomeView: View {
                         showAlarmButton: true,                 // ← 오른쪽 알림
                         showBottomDivider: false,
                         alarmAction: { router.push(.alarm) }   // 알림 화면으로 이동 등
+
                     )
                     // 상단(노치)까지 흰색
                     .background(Color.white100.ignoresSafeArea(edges: .top))

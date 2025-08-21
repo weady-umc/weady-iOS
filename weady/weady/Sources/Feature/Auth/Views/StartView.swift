@@ -7,17 +7,6 @@
 
 import SwiftUI
 
-extension StartView {
-    static func onboarding(
-        nickname: String,
-        gender: GenderCode?,
-        styleIds: [Int64]?,
-        agreements: [OnboardingAgreement]?
-    ) -> StartView {
-        StartView(nickname: nickname, gender: gender, styleIds: styleIds, agreements: agreements)
-    }
-}
-
 struct StartView: View {
 
     
@@ -26,18 +15,17 @@ struct StartView: View {
     
 
     @StateObject private var vm: StartViewModel
-    @State private var showHome = false
+    @Environment(\.router) private var router
     
-    @State private var selectedTab: TabType = .home
-    @State private var isTabBarHidden: Bool = false
-    
-    // 전체 데이터 전달용 (POST에 쓰일 값)
-    init(
+    var onFinish: (() -> Void)? = nil
+    @State private var didFinish = false
 
+    init(
         nickname: String,
         gender: GenderCode? = nil,
         styleIds: [Int64]? = nil,
-        agreements: [OnboardingAgreement]? = nil
+        agreements: [OnboardingAgreement]? = nil,
+        onFinish: (() -> Void)? = nil
     ) {
         _vm = StateObject(
             wrappedValue: StartViewModel(
@@ -47,11 +35,10 @@ struct StartView: View {
                 agreements: agreements
             )
         )
-    }
-    
 
-    
-    // 덩어리 텍스트: ‘닉네임+님’은 붙이고(줄바꿈 금지), 나머지는 자연스럽게 감기게
+        self.onFinish = onFinish
+    }
+
     private var composedTitle: Text {
         Text("앞으로 웨디가\n")
         + Text(verbatim: vm.nickname).bold()
@@ -59,17 +46,14 @@ struct StartView: View {
         + Text("의 취향에 맞는 하루를 ")
         + Text("추천해드릴게요.")
     }
-    
-    // 닉네임이 짧으면 한 줄, 길면 자연스럽게 2줄
+
     @ViewBuilder
     private func titleBlock() -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("취향 입력이 완료되었어요 !")
                 .fontName(.titleBold24)
                 .foregroundStyle(Color.black100)
-
             Spacer().frame(height: 25)
-
             composedTitle
                 .fontName(.titleMedium24)
                 .foregroundStyle(Color.black100)
@@ -100,82 +84,23 @@ struct StartView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // 1) 프로그레스 인디케이터 (5번째 스텝)
-            ProgressIndicator(currentStep: 4, totalSteps: 5)
-            
-            Spacer().frame(height:39)
-                     titleBlock()
-                         .padding(.horizontal, 32)
+            Spacer().frame(height: 39)
+            titleBlock()
+                .padding(.horizontal, 32)
             Spacer()
-            
-
-            // 4) 다음 버튼
-            
-            Button{
-                vm.startTapped() // 여기서만 POST
-            } label: {
-                Text("웨디 시작하기")
-                    .fontName(.bodyMedium16)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 11)
-                    .background(Color.black100)
-                    .foregroundStyle(Color.white100)
-                    .cornerRadius(10)
-            }
-            .disabled(vm.isSubmitting)
-            .padding(.horizontal, 20)
-            .padding(.bottom, 22)
 
             primaryButton()
-                      .padding(.horizontal, 20)
-
+                .padding(.horizontal, 20)
         }
-        // 실패 시 경고
         .alert(item: $vm.alert) { a in
             Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
         }
 
-
-        // 성공 시 Home 
-
-        .fullScreenCover(isPresented: $vm.navigateHome) {
-            BaseTabHost(
-                selectedTab: $selectedTab,
-                isTabBarHidden: $isTabBarHidden
-            )
-
-            
-            // 성공 시 Home
-            .onChange(of: vm.navigateHome) { oldValue, newValue in
-                guard newValue else { return }
-                router.reset(to: .basetab)
-                
-            }
-
-        }
-    }
-    
-    // MARK: - BaseTabHost
-    private struct BaseTabHost: View {
-        @Binding var selectedTab: TabType
-        @Binding var isTabBarHidden: Bool
-        
-        @State private var router = NavigationRouter()
-        
-        var body: some View {
-            VStack(spacing: 0) {
-                // 콘텐츠 영역
-                BaseTabScreen(selectedTab: $selectedTab,  isTabBarHidden: $isTabBarHidden)
-                    .environment(router)
-                
-                // 탭바
-                if !isTabBarHidden {
-                    BaseTabView(
-                        selectedTab: $selectedTab,
-                        isTabBarHidden: $isTabBarHidden
-                    )
-                }
-            }
+        .onChange(of: vm.navigateHome) { _, go in
+            guard go, !didFinish else { return }
+            didFinish = true
+            OnboardingStateStore.shared.markAllCompleted()
+            onFinish?() 
         }
     }
 }

@@ -9,14 +9,28 @@ import SwiftUI
 
 struct GenderSelectionView: View {
     @StateObject private var vm: GenderSelectionViewModel
-    
     private let agreements: [OnboardingAgreement]
-    
-    init(nickname: String, agreements: [OnboardingAgreement]) {
+
+    // 통합 플로우 모드
+    var embeddedInFlow: Bool = false
+    var onSkip: (() -> Void)? = nil
+    var onNext: ((GenderCode?) -> Void)? = nil
+
+    init(
+        nickname: String,
+        agreements: [OnboardingAgreement],
+        embeddedInFlow: Bool = false,
+        onSkip: (() -> Void)? = nil,
+        onNext: ((GenderCode?) -> Void)? = nil
+    ) {
         _vm = StateObject(wrappedValue: GenderSelectionViewModel(nickname: nickname))
         self.agreements = agreements
+        self.embeddedInFlow = embeddedInFlow
+        self.onSkip = onSkip
+        self.onNext = onNext
     }
-    //보조 프로퍼티: VM의 선택값을 서버 코드로 변환
+
+    // VM 선택값 → 서버 코드
     private var selectedGenderCode: GenderCode? {
         switch vm.selected {
         case .some(.male):   return .M
@@ -24,19 +38,19 @@ struct GenderSelectionView: View {
         default:             return nil
         }
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            //상단 인디케이터 + 페이지 표시
-            ProgressIndicator(currentStep: 2, totalSteps: 5)
-            
+            if !embeddedInFlow {
+                ProgressIndicator(currentStep: 2, totalSteps: 5)
+            }
+
             (Text("1").foregroundStyle(Color.black100)+Text("/2").foregroundStyle(Color.gray900))
                 .fontName(.bodyMedium16)
                 .padding(.top, 17)
                 .padding(.horizontal, 32)
                 .frame(maxWidth: .infinity, alignment: .trailing)
-            
-            // 제목 / 부제
+
             VStack(alignment: .leading, spacing: 3) {
                 Text("먼저 성별을 선택해주세요")
                     .fontName(.titleBold24)
@@ -46,8 +60,7 @@ struct GenderSelectionView: View {
                     .foregroundStyle(Color.black100)
             }
             .padding(.horizontal, 32)
-            
-            // 옵션 버튼
+
             HStack(spacing: 9) {
                 ForEach(GenderOption.allCases) { option in
                     Button {
@@ -74,12 +87,16 @@ struct GenderSelectionView: View {
             }
             .padding(.horizontal, 30)
             .padding(.top, 55)
-            
+
             Spacer()
-            
-            // 하단 버튼
+
             VStack(spacing: 20) {
-                Button(action: vm.skip) {
+                Button {
+                    vm.skip()
+                    if vm.didTapSkip {
+                        onSkip?() // 통합 플로우 콜백
+                    }
+                } label: {
                     Text("건너뛰기")
                         .fontName(.bodyMedium16)
                         .foregroundStyle(Color.gray800)
@@ -90,8 +107,13 @@ struct GenderSelectionView: View {
                                 .stroke(Color.gray800, lineWidth: 1)
                         )
                 }
-                
-                Button(action: vm.next) {
+
+                Button {
+                    vm.next()
+                    if vm.didTapNext {
+                        onNext?(selectedGenderCode) // 통합 플로우 콜백
+                    }
+                } label: {
                     Text("다음")
                         .fontName(.bodyMedium16)
                         .frame(maxWidth: .infinity)
@@ -110,28 +132,6 @@ struct GenderSelectionView: View {
         .onAppear {
             print("DEBUG Gender →", agreements.map { "\($0.termsType)=\($0.isAgreed)" })
         }
-        // 스킵 → StartView (성별 없음, agreements 전달)
-        .fullScreenCover(isPresented: $vm.didTapSkip) {
-            StartView(
-                nickname: vm.nickname,
-                gender: .NONE,          // 성별 건너뛰기 NONE 사용
-                styleIds: [],           // 건너뛰기이므로 빈 배열
-                agreements: agreements  // 약관 그대로 릴레이
-            )
-        }
-        // 다음 → StyleSelection (선택 성별/agreements 전달)
-        .fullScreenCover(isPresented: $vm.didTapNext) {
-            StyleSelectionView(
-                nickname: vm.nickname,
-                gender: selectedGenderCode,
-                agreements: agreements
-            )
-        }
     }
 }
 
-
-/*#Preview {
- GenderSelectionView(nickname: "테스트")
- }
- */

@@ -20,6 +20,11 @@ struct weadyApp: App {
     @StateObject private var toastCenter = ToastCenter.shared
     @StateObject private var weadychiveVM = WeadychiveViewModel()
 
+    // 추가: 전역 유저 상태
+    @StateObject private var appState = AppState()
+    // 추가: 진입 시 내 정보 확보용
+    @State private var bootstrapUserService = UserService()
+
     init() {
         let kakaoNativeAppKey = (Bundle.main.infoDictionary?["KAKAO_NATIVE_APP_KEY"] as? String) ?? ""
         KakaoSDK.initSDK(appKey: kakaoNativeAppKey)
@@ -35,6 +40,17 @@ struct weadyApp: App {
                 .environment(weadyboardBridge)
                 .environmentObject(toastCenter)
                 .environmentObject(weadychiveVM)
+                .environmentObject(appState) // 주입
+
+                .onAppear {
+
+                    bootstrapUserService.attach(appState: appState)
+                    
+                    if AuthManager.shared.getAccessToken() != nil, appState.currentUser == nil {
+                        bootstrapUserService.ensureCurrentUserFromMyPage { _ in }
+                    }
+                }
+
                 .onOpenURL { url in
                     if AuthApi.isKakaoTalkLoginUrl(url) {
                         _ = AuthController.handleOpenUrl(url: url)

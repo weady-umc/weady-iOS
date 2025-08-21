@@ -24,50 +24,42 @@ enum HomeRoute: Hashable {
     
     case alarm
     case weadyboard
-
 }
 
 // MARK: - HomeRouter
 /// 홈 플로우의 NavigationPath와 push/pop/reset 제공
-@Observable
-final class HomeRouter {
+final class HomeRouter: ObservableObject {
     // MARK: Properties
-    var path = NavigationPath()
-    
+    @Published var path = NavigationPath()
+
     // MARK: Navigation Actions
     func push(_ route: HomeRoute) { path.append(route) }
     func pop() { if !path.isEmpty { path.removeLast() } }
-    func reset() { path = NavigationPath() }
+    func popToRoot() { path = NavigationPath() }
 }
 
-// MARK: - HomeFlowHost
-/// 홈 플로우 전용 NavigationStack
-/// 홈 관련 화면 전환은 여기에서 관리
 struct HomeFlowHost: View {
-    // MARK: Properties
-    @State private var router = HomeRouter()
+    @StateObject private var homeRouter = HomeRouter()
     @Binding var isTabBarHidden: Bool
 
-    // MARK: Body
     var body: some View {
-        @Bindable var router = router
-        NavigationStack(path: $router.path) {
-            HomeView()
-            
+        NavigationStack(path: $homeRouter.path) {
+            HomeEntryView()
                 .navigationDestination(for: HomeRoute.self) { route in
                     switch route {
                     case .home:
-                        HomeView()
-                    case .weatherhome(let initial):
-                        WeatherHomeView(initial: initial)
+                        HomeEntryView()
+
+                    case .weatherhome:
+                        WeatherHomeView()
                     case .weatheradd(let place, let weather):
                         WeatherLocationAddView(
                             viewModel: WeatherLocationAddViewModel(),
                             locationViewModel: WeatherLocationViewModel(),
                             selectedPlace: .constant(place),
                             onComplete: {
-                                router.reset()
-                                router.push(.weatherlocation)
+                                homeRouter.path = NavigationPath()
+                                homeRouter.path.append(HomeRoute.weatherlocation)
                             },
                             weather: weather
                         )
@@ -87,11 +79,23 @@ struct HomeFlowHost: View {
                         NotificationView()
                     case .weadyboard:
                         WeadyboardView()
-
                     }
                 }
+                .background(Color.white)
         }
-//         필요 시 하위 뷰에서 @Environment(HomeRouter.self)로 직접 push/pop 가능
-        .environment(router)
+        .environmentObject(homeRouter)
+        .background(Color.white)
+    }
+}
+
+/// 홈 진입을 위한 “안전판”
+private struct HomeEntryView: View {
+    var body: some View {
+        ZStack {
+            HomeView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.white)
+
+        }
     }
 }

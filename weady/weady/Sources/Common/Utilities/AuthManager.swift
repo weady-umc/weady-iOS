@@ -41,11 +41,4 @@ final class AuthManager {
         keychain.delete(accessTokenKey)
         keychain.delete(refreshTokenKey)
     }
-    
-    var hasValidSession: Bool {
-        let hasAccess = keychain.get("serverAccessToken") != nil
-        let hasRefresh = keychain.get("serverRefreshToken") != nil
-        let remembered = UserDefaults.standard.bool(forKey: "isLoggedIn")
-        return hasAccess && hasRefresh && remembered
-    }
 }

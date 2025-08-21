@@ -17,7 +17,7 @@ struct WeatherHomeView: View {
     }
        // 탭 세그먼트, 중기예보 상태를 관리
     private let shortData = ShortWeatherData.example              // API 실패 시 사용할 예시 데이터
-    @Environment(HomeRouter.self) var router                      // 라우팅(화면 전환) 환경 객체
+    @EnvironmentObject var homeRouter: HomeRouter
     @State private var fetchedShort: ShortWeatherData? = nil      // API로 받아온 단기예보 원본 캐시
 
     var body: some View {
@@ -46,18 +46,29 @@ struct WeatherHomeView: View {
             .zIndex(0)
             
         }
-        .navigationBarBackButtonHidden()
-        .edgeSwipeBack(topExclusion: 100 * .deviceScale) {
-                router.pop()
+
+        
+        .edgeSwipeBack(topExclusion: 100) {
+
             }
         .safeAreaInset(edge: .top) {
             VStack(spacing: 0) {
+
                 Spacer().frame(height: 20 * .deviceScale)
 
                 UnderlineSegmentedControl(
                     items: WeatherHomeModel.allCases,
                     selection: $viewModel.selectedSegment,
                     title: { $0.title }
+
+                Spacer().frame(height: 100)
+                CustomNavBar(
+                    viewTitle: "",
+                    showLogoButton: true,
+                    showAlarmButton: true,
+                    showBottomDivider: false,
+                    alarmAction: { homeRouter.push(.alarm) }
+
                 )
                 .padding(.horizontal, 0)
                 .background(Color.white)
@@ -131,6 +142,17 @@ struct WeatherHomeView: View {
                     // MARK: - 메인 카드(현재온도/최저·최고/아이콘 등)
                     WeatherMainCardView(weather: weather)
                         .padding(.bottom, 45 * .deviceScale)
+
+                    Button(action: {
+                        print("current router.path before push: \(homeRouter.path)")
+                        homeRouter.push(.weatherlocation) // 위치 선택 화면으로 이동
+                        print("current router.path after push: \(homeRouter.path)")
+                    }) {
+                        Image("downIcon")
+                            .padding(8)
+                    }
+                    .zIndex(2)
+
                     
                     
                     // MARK: - 시간별 예보
@@ -385,12 +407,12 @@ struct WeatherHomeView: View {
     }
 }
 
-#Preview {
-    WeatherHomeView()
-        .environment(HomeRouter()) // 단독 미리보기
-}
-
 //#Preview {
-//    HomeFlowHost(isTabBarHidden: .constant(false))
-//        .environment(HomeRouter()) // FlowHost에서의 미리보기
+//    WeatherHomeView()
+//        .environment(HomeRouter()) // 단독 미리보기
 //}
+//
+////#Preview {
+////    HomeFlowHost(isTabBarHidden: .constant(false))
+////        .environment(HomeRouter()) // FlowHost에서의 미리보기
+////}

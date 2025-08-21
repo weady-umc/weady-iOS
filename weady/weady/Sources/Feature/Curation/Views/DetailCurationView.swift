@@ -8,6 +8,7 @@
 
 
 import SwiftUI
+import UIKit
 
 
 struct DetailCurationView: View {
@@ -35,13 +36,14 @@ struct DetailCurationView: View {
     @StateObject private var scrapVm = WeadychiveViewModel()
     @State private var currentIndex: Int = 0
     @State private var isScrapped: Bool = false
+    @State private var currentAddress: String = ""
 
     var body: some View {
         ZStack(alignment: .top) {
             VStack(spacing: 25) {
                 DetailCurationImageCarousel(currentIndex: $currentIndex,
                                             imageURLs: vm.detail?.imageURLs ?? [])
-                DetailCurationMapButton()
+                DetailCurationMapButton(address: currentAddress, currentIndex: currentIndex)
                 Spacer()
             }
             .padding(.horizontal, 16)
@@ -73,6 +75,12 @@ struct DetailCurationView: View {
         }
         .onAppear { isTabBarHidden = true }
         .onDisappear { isTabBarHidden = false }
+        .onChange(of: currentIndex) { _, _ in
+            updateCurrentAddress()
+        }
+        .onChange(of: vm.detail?.images ?? [], initial: true) { _, _ in
+            updateCurrentAddress()
+        }
     }
        
 }
@@ -235,14 +243,79 @@ private struct DetailCurationImageCarousel: View {
     }
 }
 
-// MARK: - 네이버 지도 연결 버튼
+// MARK: - 네이버 지도 연결 버튼 (ContentView 스타일 로그 포함)
 private struct DetailCurationMapButton: View {
+    let address: String
+    let currentIndex: Int
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
+
     var body: some View {
-        Button(action: { /* TODO: - 네이버 지도로 연결 */ }) {
+        Button(action: onTap) {
             Image("goToNaverMap")
                 .resizable()
                 .scaledToFit()
                 .frame(width: UIScreen.main.bounds.width - 32, height: 50)
+        }
+        .alert("안내", isPresented: $showAlert, actions: { Button("확인", role: .cancel) {} }, message: { Text(alertMessage) })
+    }
+
+    private func onTap() {
+        print("[NaverMap] 🔹 tap. currentIndex=\(currentIndex), raw address='\(address)'")
+
+        // 표지(첫 장)는 길찾기 대상이 아님
+        if currentIndex == 0 {
+            alertMessage = "첫 번째 이미지는 표지입니다. 다음 이미지부터 길찾기를 이용할 수 있어요."
+            showAlert = true
+            print("[NaverMap] ℹ️ index 0 (표지) → 길찾기 차단")
+            return
+        }
+
+        let query = address.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty, query != "표지" else {
+            alertMessage = "주소 정보가 없어요. 다른 이미지를 선택해 주세요."
+            showAlert = true
+            print("[NaverMap] ℹ️ 빈 주소/표지 → 중단")
+            return
+        }
+
+        // 런타임 점검 로그: Info.plist와 LSApplicationQueriesSchemes, bundleID
+        let bundleID = Bundle.main.bundleIdentifier ?? "com.weady.Weady"
+        if let infoPath = Bundle.main.path(forResource: "Info", ofType: "plist") {
+            print("[NaverMap] ℹ️ Info.plist path =", infoPath)
+        } else {
+            print("[NaverMap] ℹ️ Info.plist path not found via Bundle.main")
+        }
+        print("[NaverMap] ℹ️ LSApplicationQueriesSchemes =", Bundle.main.infoDictionary?["LSApplicationQueriesSchemes"] ?? "nil")
+        print("[NaverMap] ℹ️ bundleID =", bundleID)
+
+        // 1) 검색어 인코딩
+        let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+
+        // 2) Naver Map 검색 URL (문서 규격)
+        //    nmap://search?query=<encoded>&appname=<bundleID>
+        let schemeString = "nmap://search?query=\(encoded)&appname=\(bundleID)"
+        guard let schemeURL = URL(string: schemeString) else {
+            print("[NaverMap] ❌ URL 생성 실패:", schemeString)
+            alertMessage = "주소 URL을 만들지 못했어요."
+            showAlert = true
+            return
+        }
+        print("[NaverMap] 🔍 schemeURL =", schemeURL.absoluteString)
+
+        // 3) App Store 폴백 URL (네이버 지도: id311867728)
+        let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id311867728")!
+
+        // 4) 바로 열어보고 실패 시 App Store로 폴백
+        print("[NaverMap] ▶️ open 시도")
+        UIApplication.shared.open(schemeURL, options: [:]) { ok in
+            print("[NaverMap] open 완료:", ok)
+            if !ok {
+                print("[NaverMap] ⚠️ open 실패 → App Store로 폴백:", appStoreURL.absoluteString)
+                UIApplication.shared.open(appStoreURL, options: [:]) { ok2 in
+                    print("[NaverMap] App Store open 완료:", ok2)
+                }
+            }
         }
     }
 }
@@ -279,6 +352,16 @@ extension DetailCurationView {
         } else {
             scrapVm.postCurationScrap(curationId: id)
             withAnimation { isScrapped = true }
+        }
+    }
+    
+    /// 현재 캐러셀 인덱스에 해당하는 이미지 주소를 `currentAddress`에 저장
+    fileprivate func updateCurrentAddress() {
+        let imgs = vm.detail?.images ?? []
+        if currentIndex >= 0 && currentIndex < imgs.count {
+            currentAddress = imgs[currentIndex].address
+        } else {
+            currentAddress = ""
         }
     }
     

@@ -15,8 +15,8 @@ struct ClothingRecommendationView: View {
     @StateObject private var vm: ClothingRecommendationViewModel
     //@State private var showLocationPicker = false
     //private enum Route: Hashable { case weadyboard }
-    @Environment(HomeRouter.self) private var router
-    
+
+    @EnvironmentObject var homeRouter: HomeRouter
     
     enum HelpStep: Hashable { case intro, details }
     @State private var showHelp = false
@@ -40,10 +40,54 @@ struct ClothingRecommendationView: View {
     }
     
     var body: some View {
-        
+        /*
+// 117 branch
         VStack(spacing:0){
             ZStack{
                 Image("backgroundImage")
+
+        ZStack(alignment: .top) {
+            Image("backgroundImage")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+            
+            VStack(alignment: .center, spacing: 0) {
+                // 주소
+                HStack {
+                    Image("mapIcon")
+                        .resizable()
+                        .frame(width: 12, height: 17)
+                        .padding(.trailing, 3)
+                    
+                    Text(vm.addressText)
+                        .fontName(.bodySemibold16)
+                        .foregroundStyle(.appwhite100)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .layoutPriority(1)
+                        .padding(.trailing, 3)
+                    
+                    Button {
+                        homeRouter.push(.weatherlocation)
+                    } label: {
+                        Image("clothesDownIcon")
+                            .resizable()
+                            .frame(width: 10, height: 4)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+                .frame(height: 24)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 144)
+
+                
+                // 추천 옷 이미지
+#if DEBUG
+                // Preview에서는 네트워크 호출 없이 바로 에셋 이미지를 보여주기
+                Image("teeShirt")
+// dev
                     .resizable()
                 //.scaledToFill()
                     .ignoresSafeArea()
@@ -70,6 +114,7 @@ struct ClothingRecommendationView: View {
                         
                         Spacer()
                     }
+// 117 branch
                     .padding(.horizontal, 120)
                     .padding(.top, 41)
                     /*
@@ -302,3 +347,61 @@ struct ClothingRecommendationView: View {
                      }
                      */
                 }}}}}
+// 여기부 dev
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.horizontal, 20)
+                .padding(.top, 13)
+                
+                WeadyboardCTA(
+                    title: "다른 사람들은 어떻게 입었는지 보러가기",
+                    images: ["howPic1","howPic2","howPic3"],
+                    onTap: { homeRouter.push(.weadyboard) }
+                )
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 13)
+                .padding(.bottom, 19)
+            }
+            
+            // 도움말 오버레이
+            HelpOverlay(
+                isPresented: $showHelp,
+                step: $helpStep,
+                onClose: { withAnimation(.easeOut(duration: 0.2)) { showHelp = false }}
+            )
+        }
+    }
+}
+        
+
+// MARK: - Preview & Mock
+extension ClothingRecommendationViewModel {
+    static var preview: ClothingRecommendationViewModel {
+        let vm = ClothingRecommendationViewModel()
+        vm.addressText = "서초구 양재1동"
+        vm.feelTemp = 19
+        vm.clothingName = "반팔"
+        vm.clothingImageUrl = Bundle.main.url(forResource: "shirt_icon", withExtension: "png")
+        vm.chartItems = (8...21).map { hour in
+            // 샘플 온도는 자유롭게
+            let samples = [24,26,27,29,30,31,32,31,31,30,28,26,25,24]
+            let t = samples[hour - 8]
+            return ChartItem(time: hour, feelTmp: Double(t),
+                             clothing: ClothingItem(name: "샘플", imageUrl: "teeShirt"))
+        }
+        return vm
+    }
+}
+
+struct ClothingRecommendationView_Previews: PreviewProvider {
+    static var previews: some View {
+        let router = HomeRouter()
+        NavigationStack {
+            ClothingRecommendationView(vm: .preview)
+        }
+        .environmentObject(router)
+        // .environment(\.router, router)
+    }
+}
+// dev
+      */

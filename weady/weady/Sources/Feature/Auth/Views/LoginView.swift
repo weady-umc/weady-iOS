@@ -15,9 +15,6 @@ import AuthenticationServices
 struct LoginView: View {
     @Environment(\.router) private var router
     @StateObject private var viewModel = LoginViewModel()
-    @State var appleviewModel: AppleLoginViewModel = .init()
-    
-    @AppStorage("didCompleteOnboarding") private var didCompleteOnboarding = false
 
     @State private var didRoute = false
     @State private var appearedAt = Date.distantPast
@@ -117,12 +114,13 @@ struct LoginView: View {
             .signInWithAppleButtonStyle(.whiteOutline)
             .cornerRadius(6)
             .onTapGesture {
-                Task {
-                    if let window = UIApplication.shared.connectedScenes
-                        .compactMap({ $0 as? UIWindowScene })
-                        .first?.windows.first {
-                        await appleviewModel.loginWithApple(presentationAnchor: window)
+                if let anchor = activePresentationAnchor() {
+                    viewModel.loginWithApple(presentationAnchor: anchor) { success in
+                        guard success else { return }
+                        routeAfterLoginOnce()
                     }
+                } else {
+                    viewModel.errorMessage = "로그인 창을 표시할 윈도우를 찾지 못했습니다."
                 }
             }
             
@@ -132,14 +130,29 @@ struct LoginView: View {
         .onAppear {
             appearedAt = Date()
         }
-        .task {
-            if AuthManager.shared.hasValidSession {
-                routeAfterLoginOnce()
-            }
+        .alert(item: Binding(
+            get: { viewModel.errorMessage.map { LocalAlertMessage(message: $0) } },
+            set: { _ in viewModel.errorMessage = nil }
+        )) { alert in
+            Alert(title: Text("로그인 오류"), message: Text(alert.message), dismissButton: .default(Text("확인")))
         }
     }
 
+    private func activePresentationAnchor() -> ASPresentationAnchor? {
+        guard let scene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { $0.activationState == .foregroundActive })
+        else { return nil }
+
+        // keyWindow가 있으면 우선 사용, 없으면 첫 번째 윈도우
+        if let keyWindow = scene.windows.first(where: { $0.isKeyWindow }) {
+            return keyWindow
+        }
+        return scene.windows.first
+    }
+
     /// 로그인 이후/이미 로그인 상태에서의 분기를 "한 번만" 수행
+    @MainActor
     private func routeAfterLoginOnce() {
         guard !didRoute else { return }
         didRoute = true
@@ -151,16 +164,21 @@ struct LoginView: View {
                 try? await Task.sleep(nanoseconds: UInt64(remain * 1_000_000_000))
             }
 
-            if (viewModel.isNewUser ?? false) == true {
-                didCompleteOnboarding = false
-                router.reset(to: .onboarding)
+            // 서버 로그인 결과 온보딩 상태 반영
+            OnboardingStateStore.shared.handleServerLogin(isNewUser: viewModel.isNewUser ?? false)
+
+            if (viewModel.isNewUser ?? false) {
+                router.path = [.onboarding]
             } else {
-                if didCompleteOnboarding {
-                    router.reset(to: .basetab)
-                } else {
-                    router.reset(to: .onboarding)
-                }
+                NotificationCenter.default.post(name: .showTabs, object: nil)
+                router.path = []
             }
         }
     }
+}
+
+// MARK: - 간단 Alert 바인딩용 Wrapper
+private struct LocalAlertMessage: Identifiable {
+    let id = UUID()
+    let message: String
 }

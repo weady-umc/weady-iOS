@@ -32,13 +32,13 @@ struct CurationByCurationIdResponseDto: Codable {
 struct ImgDto: Codable {
     let imgUrl: String
     let imgOrder: Int
-    //TODO: -아직 없음 반영 해야함
+    let imgAddress: String //이미지 주소
     //let imgAddress: String
 
     enum CodingKeys: String, CodingKey {
         case imgUrl
         case imgOrder
-        //case imgAddress
+        case imgAddress
     }
 }
 

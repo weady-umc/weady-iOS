@@ -178,8 +178,8 @@ struct CurationCard: Identifiable, Equatable {
 struct CurationDetailImage: Identifiable, Equatable {
     let id: Int // imgOrder
     let url: URL?
-    //TODO: - 추후 수정 ( 네이버 지도 연동 )
-    //let address: String?
+    /// 이미지 주소가 없을 경우 빈 문자열로 초기화
+    let address: String
 }
 
 struct CurationDetail: Equatable {
@@ -244,7 +244,7 @@ enum CurationMapper {
     static func toDetail(from dto: ApiResponseCurationByCurationIdResponseDto) -> CurationDetail {
         let images: [CurationDetailImage] = dto.data.imgs
             .sorted { $0.imgOrder < $1.imgOrder }
-            .map { CurationDetailImage(id: $0.imgOrder, url: URL(string: $0.imgUrl)) }
+            .map { CurationDetailImage(id: $0.imgOrder, url: URL(string: $0.imgUrl), address: $0.imgAddress) }
         return CurationDetail(id: dto.data.curationId, title: dto.data.curationTitle, images: images)
     }
 }

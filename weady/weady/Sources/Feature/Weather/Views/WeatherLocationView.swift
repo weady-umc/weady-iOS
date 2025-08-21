@@ -13,7 +13,7 @@ struct WeatherLocationView: View {
     @StateObject private var viewModel =  WeatherLocationViewModel()  // 즐겨찾기 목록/서버 통신 관리
     @Environment(\.dismiss) private var dismiss                       // 현재 화면 닫기
     @Environment(\.editMode) private var editMode                     // 편집 모드 토글
-    @Environment(HomeRouter.self) var router                          // 화면 전환 라우터
+    @EnvironmentObject var homeRouter: HomeRouter
     @State private var selectedPlace: AddressDocument? = nil          // 검색에서 선택된 장소(옵션)
 
     
@@ -68,8 +68,9 @@ struct WeatherLocationView: View {
                 viewModel.loadNowLocationCard()
             }
             .edgeSwipeBack(topExclusion: 100) {
-                    router.pop()
+                homeRouter.pop()
                 }
+
 
             .toolbar(.hidden, for: .navigationBar) // 시스템 네비바 숨김
             .safeAreaInset(edge: .top) {
@@ -82,8 +83,10 @@ struct WeatherLocationView: View {
                 .padding(.top, -15)
                 .background(Color.white100.ignoresSafeArea(edges: .top))
                 
+
+
             }
-            // MARK: - 상단 Divider
+
             
         }
     }
@@ -110,7 +113,7 @@ struct WeatherLocationView: View {
                 .fill(Color.white400)
         )
         .onTapGesture {
-            router.push(.weathersearch) // 검색 화면으로 이동
+            homeRouter.push(.weathersearch) // 검색 화면으로 이동
             print("📌 search bar tapped")
         }
     }
@@ -187,7 +190,9 @@ struct WeatherLocationView: View {
                                 viewModel.setDefaultFavoriteOnServer(favoriteId: favId) { ok in
                                     if ok {
                                         // 성공 시 홈 화면으로 이동 (서버의 기본위치 기준으로 로드)
-                                        router.push(.weatherhome(initial: .first))
+
+                                        homeRouter.push(.weatherhome)
+
                                     } else {
                                         // 실패 시 토스트/얼럿 넣고 싶으면 여기
                                     }
@@ -234,14 +239,14 @@ struct WeatherLocationView: View {
     }
 }
 
-#Preview {
-    // MARK: - 단독 프리뷰 (라우터/네비 환경 주입)
-    WeatherLocationView()
-        .environment(HomeRouter())
-        .environment(NavigationRouter())
-}
-
 //#Preview {
-//    // MARK: - Flow Host에서의 프리뷰
-//    HomeFlowHost(isTabBarHidden: .constant(false)) // 여기에 WeatherLocationView를 보여주는 루트
+//    // MARK: - 단독 프리뷰 (라우터/네비 환경 주입)
+//    WeatherLocationView()
+//        .environment(HomeRouter())
+//        .environment(NavigationRouter())
 //}
+//
+////#Preview {
+////    // MARK: - Flow Host에서의 프리뷰
+////    HomeFlowHost(isTabBarHidden: .constant(false)) // 여기에 WeatherLocationView를 보여주는 루트
+////}

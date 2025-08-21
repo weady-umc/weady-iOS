@@ -85,7 +85,7 @@ extension WeadychiveEndpoints: TargetType {
 //    var headers: [String: String]? {
 //        return [
 //            "Content-Type": "application/json",
-//            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTYyNTQyOH0.hl8a4nyq9IfYnwDKEKGJnOHOIu5WYwRp5znIQDwvl4oCsmFjdVwSfErVXBXXnVYyGxto8UzK5k_rFsfAS3nwDA"
+//            "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNiIsImVtYWlsIjoiZGFlaGNqZkBnbWFpbC5jb20iLCJwcm92aWRlciI6IkdPT0dMRSIsImV4cCI6MTc1NTcxOTgxM30.eONeXBT5Aoq1RCzI8VkpX9sfWozhsp2OC441TMZT_FAPpLVANsePMG8vZf6u1cSaSsriOO4WozGBJKCoKWtBww"
 //        ]
 //    }
 }
