@@ -20,9 +20,6 @@ struct ClothingRecommendationView: View {
     @Environment(\.homeRouter) private var router
     @Environment(AppTabController.self) private var tabController
 
-    // Top segment (.first = 날씨, .second = 옷차림, .third = 장소)
-    @State private var selectedSegment: WeatherHomeModel = .second
-
     // Help Overlay
     enum HelpStep: Hashable { case intro, details }
     @State private var showHelp = false
@@ -97,28 +94,6 @@ struct ClothingRecommendationView: View {
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
-        .safeAreaInset(edge: .top) {
-            // 화면 자체에서 올리는 상단 세그먼트 바 (날씨 | 옷차림 | 장소)
-            TopSegmentBar(
-                selected: selectedSegment,
-                onSelect: { seg in
-                    withAnimation { selectedSegment = seg }
-                    let route = route(for: seg)          // ① 라우트 계산
-                    router.path = NavigationPath()       // ② 필요하면 스택 초기화
-                    router.push(route)                   // ③ 결과 HomeRoute를 push
-                }
-            )
-        }
-        .onAppear { selectedSegment = .second }
-    }
-}
-
-// 세그먼트 → 라우트 매핑
-private func route(for seg: WeatherHomeModel) -> HomeRoute {
-    switch seg {
-    case .first:  return .weatherhome(initial: .first)
-    case .second: return .clothes
-    case .third:  return .curation   // 정책에 따라 .curation으로 교체 가능
     }
 }
 
@@ -237,41 +212,6 @@ private struct HelpButton: View {
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
         .padding(.horizontal, 20)
-    }
-}
-
-private struct TopSegmentBar: View {
-    let selected: WeatherHomeModel
-    let onSelect: (WeatherHomeModel) -> Void
-
-    var body: some View {
-        HStack(spacing: 0) {
-            // WeatherHomeModel이 Identifiable이 아닐 수 있으니 안전하게 self 사용
-            ForEach(WeatherHomeModel.allCases, id: \.self) { segment in
-                Button { onSelect(segment) } label: {
-                    VStack(spacing: 8) {
-                        Text(segment.title)
-                            .fontName(.headingSemibold20)
-                            .foregroundStyle(selected == segment ? Color.gray100 : Color.gray800)
-
-                        if selected == segment {
-                            Rectangle().fill(Color.gray100).frame(width: 59, height: 2)
-                        } else {
-                            Rectangle().fill(Color.gray800).frame(width: 59, height: 2)
-                        }
-                    }
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 24)
-        .padding(.top, 5)
-        .padding(.bottom, 0)
-        .background(Color.white.ignoresSafeArea(edges: .top))
-        .overlay(Divider(), alignment: .bottom)
-        .transaction { $0.disablesAnimations = true }
     }
 }
 
