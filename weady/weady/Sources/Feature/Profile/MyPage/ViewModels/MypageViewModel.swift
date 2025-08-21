@@ -11,7 +11,7 @@ final class MypageViewModel {
     var calendar: [CalendarThumbnailModel] = []
     
     var selectedDate: String? = nil
-    var selectedBoard: MypageBoardDetailModel? = nil
+    var selectedBoard: MypageBoardDetailModel? = nil // TODO: - 백엔드에 요청 : 게시물 2개 구현되도록 배열로 변경
     
     private let userService = UserService()
     
@@ -54,36 +54,39 @@ final class MypageViewModel {
         }
     }
     
-    // MARK: - 특정 날짜 게시물 조회 (캘린더 카드 클릭)
-    func fetchBoard(date: String, isPublic: Bool = true) {
+    // MARK: - 특정 날짜 게시물 조회 (캘린더 카드 클릭시)
+    func fetchBoard(date: String, isPublic: Bool = true, completion: (() -> Void)? = nil) {
         selectedDate = date
         userService.fetchBoard(date: date, isPublic: isPublic) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let data):
-                    if data.boardId == 0 { // 게시물 없음 (boardId==0)
+                    if data.boardId == 0 {
                         self?.selectedBoard = nil
                         print("해당 날짜의 게시물이 없습니다.")
                     } else {
-                        self?.mapBoardResponse(data)
+                        self?.selectedBoard = self?.mapBoardResponse(data) //TODO: - (추후수정) 일단 게시물 1개만 반환
                     }
                 case .failure(let error):
                     self?.selectedBoard = nil
-                    print("해당 날짜의 게시물이 없습니다.")
                     print(">>> 해당 날짜 게시물 조회 실패: \(error)")
                 }
+                completion?()
             }
         }
     }
     
-    // MARK: - DTO → UI 모델 변환
+    // MARK: - DTO → 마이페이지 모델 변환
     private func mapMyPageResponse(_ dto: GetMyPageResponse) {
+        
+        print(">>> calendar response: \(dto.calendar)") //TODO: - 사용자가 업로드한 게시물 확인용 메싲
+
         profile = MypageProfileModel(
             id: dto.userId,
             name: dto.name,
             profileImageUrl: dto.profileImageUrl
         )
-        
+
         calendar = dto.calendar.map {
             CalendarThumbnailModel(
                 date: $0.date,
@@ -94,8 +97,9 @@ final class MypageViewModel {
         }
     }
     
-    private func mapBoardResponse(_ dto: GetBoardInMyPageResponse) {
-        selectedBoard = MypageBoardDetailModel(
+    // MARK: - DTO → 마이페이지 상세정보 모델 변환
+    private func mapBoardResponse(_ dto: GetBoardInMyPageResponse) -> MypageBoardDetailModel {
+        return MypageBoardDetailModel(
             boardId: dto.boardId,
             createdAt: dto.createdAt,
             isPublic: dto.isPublic,
