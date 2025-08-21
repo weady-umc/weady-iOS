@@ -21,7 +21,7 @@ final class StartViewModel: ObservableObject {
     @Published var lastErrorMessage: String?
 
     private let service: OnboardingService
-    private var didRouteOnce = false
+    private var didRouteOnce = false 
 
     init(
         nickname: String,
@@ -38,7 +38,7 @@ final class StartViewModel: ObservableObject {
     }
 
     func startTapped() {
-        guard !isSubmitting, !navigateHome else { return }
+        guard !isSubmitting, !didRouteOnce else { return }
         isSubmitting = true
         Task { await postAndNavigate() }
     }
@@ -66,18 +66,23 @@ final class StartViewModel: ObservableObject {
 
         do {
             try await service.submit(body: body)
-            // 성공 시 한 번만 true
-            if !navigateHome { navigateHome = true }
+            routeHomeOnce()
         } catch let api as APIErrorResponse {
             // ✅ 닉네임 중복(400)만 예외적으로 통과
             if api.code == 400, api.message.contains("이미 사용 중") {
-                if !navigateHome { navigateHome = true }
+                routeHomeOnce()
                 return
             }
             self.lastErrorMessage = api.message
         } catch {
             self.lastErrorMessage = "요청 처리 실패(네트워크/디코딩 등)"
         }
+    }
+
+    private func routeHomeOnce() {
+        guard !didRouteOnce else { return }
+        didRouteOnce = true
+        navigateHome = true
     }
 
     private func requiredAgreed(_ a: [OnboardingAgreement]) -> Bool {

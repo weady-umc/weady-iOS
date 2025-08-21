@@ -14,7 +14,7 @@ struct StartView: View {
     @StateObject private var vm: StartViewModel
     
     var onFinish: (() -> Void)? = nil
-    @State private var didFinish = false
+    @State private var didFinish = false  
 
     init(
         nickname: String,
@@ -73,7 +73,7 @@ struct StartView: View {
                 .cornerRadius(10)
         }
         .disabled(vm.isSubmitting)
-        .allowsHitTesting(!vm.isSubmitting) 
+        .allowsHitTesting(!vm.isSubmitting)
         .padding(.bottom, 22)
     }
 
