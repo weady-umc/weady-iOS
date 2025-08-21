@@ -239,12 +239,14 @@ struct WeadyboardListView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             GeometryReader { proxy in
-                let spacing: CGFloat = 2
+                // Layout constants
                 let columnsCount = 3
-                // 좌우 패딩 2씩 + 컬럼 간격
-                let horizontalPadding: CGFloat = 4
-                let totalSpacing = spacing * CGFloat(columnsCount - 1) + horizontalPadding
-                let cell = floor((proxy.size.width - totalSpacing) / CGFloat(columnsCount))
+                let spacing: CGFloat = 2
+                let sidePadding: CGFloat = 2
+                // Compute available content width AFTER horizontal padding
+                let available = proxy.size.width - (sidePadding * 2)
+                let totalSpacing = spacing * CGFloat(columnsCount - 1)
+                let cell = floor((available - totalSpacing) / CGFloat(columnsCount))
                 let columns = Array(repeating: GridItem(.fixed(cell), spacing: spacing), count: columnsCount)
 
                 ScrollView {
@@ -254,32 +256,49 @@ struct WeadyboardListView: View {
                                 // TODO: - 해당 웨디보드 상세 화면으로 이동
                             }) {
                                 ZStack {
-                                    // Base placeholder to guarantee layout while images load
-                                    Color.gray.opacity(0.2)
+                                    // Placeholder to stabilize layout
+                                    Rectangle()
+                                        .fill(Color.gray.opacity(0.18))
 
-                                    if let urlStr = item.imgUrl, urlStr.hasPrefix("http"), let url = URL(string: urlStr) {
-                                        AsyncImage(url: url) { image in
-                                            image
-                                                .resizable()
-                                                .scaledToFill()
-                                        } placeholder: {
-                                            Color.gray.opacity(0.3)
+                                    // Remote
+                                    if let urlStr = item.imgUrl,
+                                       urlStr.hasPrefix("http"),
+                                       let url = URL(string: urlStr) {
+                                        AsyncImage(url: url) { phase in
+                                            switch phase {
+                                            case .success(let image):
+                                                image
+                                                    .resizable()
+                                                    .aspectRatio(1, contentMode: .fill) // fill the square
+                                                    .clipped()
+                                            case .failure(_):
+                                                Image(systemName: "photo")
+                                                    .font(.system(size: 22))
+                                                    .foregroundStyle(.gray)
+                                            case .empty:
+                                                ProgressView()
+                                            @unknown default:
+                                                EmptyView()
+                                            }
                                         }
+                                    // Local
                                     } else if let localName = item.imgUrl, !localName.isEmpty {
                                         Image(localName)
                                             .resizable()
-                                            .scaledToFill()
+                                            .aspectRatio(1, contentMode: .fill)
+                                            .clipped()
                                     }
                                 }
-                                .frame(width: cell, height: cell)  // 절대 정사각형 셀
-                                .clipped()
+                                .frame(width: cell, height: cell) // hard square
+                                .contentShape(Rectangle())
                             }
+                            .buttonStyle(.plain)
                         }
                     }
-                    .padding(.horizontal, 2)
+                    .padding(.horizontal, sidePadding)
                     .padding(.bottom, 0)
                 }
-                .ignoresSafeArea(.all, edges: .bottom)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
         }
     }

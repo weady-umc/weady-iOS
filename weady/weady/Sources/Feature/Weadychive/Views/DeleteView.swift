@@ -92,29 +92,61 @@ struct DeleteView: View {
     }
 
     private var gridView: some View {
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 2) {
-                let currentItems: [DeleteItem] = {
-                    switch type {
-                    case .curation:
-                        return viewModel.scrappedCurationItems.map { DeleteItem(id: $0.id, imageUrl: $0.firstImgUrl) }
-                    case .weadyboard:
-                        return viewModel.scrappedWeadyboardItems.map { DeleteItem(id: $0.id, imageUrl: $0.imgUrl ?? "") }
-                    }
-                }()
+        GeometryReader { proxy in
+            // Common spacing/padding values
+            let spacing: CGFloat = 2
+            let sidePadding: CGFloat = 2
 
-                ForEach(currentItems) { item in
-                    gridItemView(for: item)
+            // Build columns depending on type
+            let columns: [GridItem] = {
+                switch type {
+                case .curation:
+                    // Keep previous behavior: 2 flexible columns
+                    return [GridItem(.flexible(), spacing: spacing),
+                            GridItem(.flexible(), spacing: spacing)]
+                case .weadyboard:
+                    // Make 3 fixed columns with a computed square size
+                    let count = 3
+                    let totalSpacing = spacing * CGFloat(count - 1) + (sidePadding * 2)
+                    let cell = floor((proxy.size.width - totalSpacing) / CGFloat(count))
+                    return Array(repeating: GridItem(.fixed(cell), spacing: spacing), count: count)
                 }
+            }()
+
+            // Precompute cell length for weadyboard; nil for curation
+            let cellLength: CGFloat? = {
+                if case .weadyboard = type {
+                    let count = 3
+                    let totalSpacing = spacing * CGFloat(count - 1) + (sidePadding * 2)
+                    return floor((proxy.size.width - totalSpacing) / CGFloat(count))
+                }
+                return nil
+            }()
+
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: spacing) {
+                    let currentItems: [DeleteItem] = {
+                        switch type {
+                        case .curation:
+                            return viewModel.scrappedCurationItems.map { DeleteItem(id: $0.id, imageUrl: $0.firstImgUrl) }
+                        case .weadyboard:
+                            return viewModel.scrappedWeadyboardItems.map { DeleteItem(id: $0.id, imageUrl: $0.imgUrl ?? "") }
+                        }
+                    }()
+
+                    ForEach(currentItems) { item in
+                        gridItemView(for: item, cell: cellLength)
+                    }
+                }
+                .padding(.horizontal, sidePadding)
+                .padding(.bottom, 0)
             }
-            .padding(.horizontal, 2)
-            .padding(.bottom, 0)
+            .ignoresSafeArea(.all, edges: .bottom)
         }
-        .ignoresSafeArea(.all, edges: .bottom)
     }
 
     @ViewBuilder
-    private func gridItemView(for item: DeleteItem) -> some View {
+    private func gridItemView(for item: DeleteItem, cell: CGFloat?) -> some View {
         Button(action: {
             if selectedItems.contains(item.id) {
                 selectedItems.remove(item.id)
@@ -122,31 +154,41 @@ struct DeleteView: View {
                 selectedItems.insert(item.id)
             }
         }) {
-            Group {
+            ZStack {
+                // Base placeholder to stabilize layout
+                Rectangle()
+                    .fill(Color.gray.opacity(0.18))
+
                 if item.imageUrl.isEmpty {
-                    Color.gray.opacity(0.2)
-                        .frame(height: itemHeight)
-                        .clipped()
+                    // nothing; placeholder remains
                 } else if item.imageUrl.hasPrefix("http"), let url = URL(string: item.imageUrl) {
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: itemHeight)
-                            .clipped()
-                    } placeholder: {
-                        Color.gray.opacity(0.3)
-                            .frame(height: itemHeight)
-                            .clipped()
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: cell ?? nil, height: cell ?? itemHeight)
+                                .clipped()
+                        case .failure(_):
+                            Image(systemName: "photo")
+                                .font(.system(size: 22))
+                                .foregroundStyle(.gray)
+                        case .empty:
+                            ProgressView()
+                        @unknown default:
+                            EmptyView()
+                        }
                     }
                 } else {
                     Image(item.imageUrl)
                         .resizable()
                         .scaledToFill()
-                        .frame(height: itemHeight)
+                        .frame(width: cell ?? nil, height: cell ?? itemHeight)
                         .clipped()
                 }
             }
+            .frame(width: cell ?? nil, height: cell ?? itemHeight)
         }
         .contentShape(Rectangle())
         .buttonStyle(.plain)
