@@ -16,53 +16,78 @@ struct WeatherLocationView: View {
     @EnvironmentObject var homeRouter: HomeRouter
     @State private var selectedPlace: AddressDocument? = nil          // 검색에서 선택된 장소(옵션)
 
+    
     var body: some View {
         // MARK: - Root Layout
         ZStack(alignment: .top) {
             VStack{
-                Spacer().frame(height: 25)
+                Spacer().frame(height: 6)
                 
                 // MARK: - 검색바
                 searchBar
                 Spacer().frame(height: 25)
                 
                 // MARK: - 현재 위치 카드 (예시 데이터)
-                WeatherLocationCardView(data: WeatherLocationViewModel.example, isCurrentLocation: true, editMode: false)
+                Group {
+                   if let card = viewModel.nowLocationCard {
+                       WeatherLocationCardView(data: card, isCurrentLocation: true, editMode: false)
+                                  .contentShape(Rectangle())
+                                  .onTapGesture {
+                                      // 기본 위치(즐겨찾기) 해제 → 홈에서 현재 위치 기반으로 보이도록
+                                      viewModel.unsetDefaultFavoriteOnServer { ok in
+                                          if ok {
+                                              router.push(.weatherhome(initial: .first))
+                                          } else {
+                                              // TODO: 토스트/얼럿 노출 원하면 여기서 처리
+                                              print("⚠️ 기본 위치 해제 실패")
+                                          }
+                                      }
+                                  }
+                   } else {
+                       WeatherLocationCardView(data: WeatherLocationViewModel.example,
+                                               isCurrentLocation: true,
+                                               editMode: false)
+                           .redacted(reason: .placeholder) // 로딩/실패 시 플레이스홀더
+                   }
+                }
+                
                 Spacer().frame(height: 27)
                 
                 // MARK: - 즐겨찾기 섹션
                 favLocations
             }
             // MARK: - 내비게이션 설정
-            .navigationTitle("위치")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
+
             .onAppear {
-                // 토큰 세팅 및 즐겨찾기 로드
+                // 토큰 세팅 및 즐겨찾기 로드 
                 if let t = KeychainSwift().get("serverAccessToken") {
                         UserDefaults.standard.set(t, forKey: "accessToken")
                     }
 
                 viewModel.loadFavorites()
+                viewModel.loadNowLocationCard()
             }
             .edgeSwipeBack(topExclusion: 100) {
                 homeRouter.pop()
                 }
-            .toolbar {
-                // MARK: - 좌측 상단 뒤로가기
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        homeRouter.pop()
-                    }) {
-                        Image("backicon")
-                            .foregroundColor(.black)
-                    }
-                }
+
+
+            .toolbar(.hidden, for: .navigationBar) // 시스템 네비바 숨김
+            .safeAreaInset(edge: .top) {
+                CustomNavBar(
+                    viewTitle: "위치",
+                    showBackButton: true,
+                    showBottomDivider: true,
+                    backAction: { router.pop() }     // 혹은 dismiss() 사용 중이면 { dismiss() }
+                )
+                .padding(.top, -15)
+                .background(Color.white100.ignoresSafeArea(edges: .top))
+                
+
+
             }
+
             
-            // MARK: - 상단 Divider
-            Divider()
-                .frame(height: 1)
         }
     }
     
@@ -165,7 +190,9 @@ struct WeatherLocationView: View {
                                 viewModel.setDefaultFavoriteOnServer(favoriteId: favId) { ok in
                                     if ok {
                                         // 성공 시 홈 화면으로 이동 (서버의 기본위치 기준으로 로드)
+
                                         homeRouter.push(.weatherhome)
+
                                     } else {
                                         // 실패 시 토스트/얼럿 넣고 싶으면 여기
                                     }

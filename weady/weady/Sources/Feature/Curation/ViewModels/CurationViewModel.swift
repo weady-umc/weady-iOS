@@ -6,7 +6,7 @@ import KeychainSwift
 
 @MainActor
 final class CurationViewModel: ObservableObject {
-
+    
     // MARK: - Published  프로퍼티들!!
     // 헤더에 표시되는 날씨 및 위치 관련 문구
     @Published private(set) var headerText: WeatherHeaderText = .placeholder
@@ -20,7 +20,7 @@ final class CurationViewModel: ObservableObject {
     @Published private(set) var detail: CurationDetail? = nil
     // 날씨 문구 및 장소 칩(원) 테두리에 공용으로 사용하는 색상
     @Published private(set) var accentColor: Color = .primary
-
+    
     // 사용자에게 보여줄 공지 문구
     @Published var noticeText: String? = nil
     // 마지막 에러 발생 시 HTTP 상태 코드 저장
@@ -29,7 +29,7 @@ final class CurationViewModel: ObservableObject {
     @Published var isScrapped : Bool = false
     // 토스트 메시지 표시용 문자열
     @Published var toastMessage: String? = nil
-
+    
     
     // 로딩 상태를 나타내는 열거형 (대기, 로딩중, 성공, 실패)
     enum LoadState: Equatable { case idle, loading, success, failure(String) }
@@ -37,11 +37,13 @@ final class CurationViewModel: ObservableObject {
     @Published private(set) var listState: LoadState = .idle
     // 큐레이션 상세 로딩 상태
     @Published private(set) var detailState: LoadState = .idle
-
+    
     // MARK: - 서비스파일 연결
-  
+    
     private let service = CurationServices.shared
-
+    
+    
+    
     // MARK: - 에러 매핑 !!
     // 에러 객체에서 HTTP 상태 코드를 안전하게 추출하는 함수
     // - Parameter error: 발생한 에러 객체
@@ -55,7 +57,7 @@ final class CurationViewModel: ObservableObject {
                 if label == "code", let code = child.value as? Int { return code }
             }
         }
-      
+        
         for child in mirror.children {
             let subMirror = Mirror(reflecting: child.value)
             for sub in subMirror.children {
@@ -67,9 +69,9 @@ final class CurationViewModel: ObservableObject {
         }
         return nil
     }
-
+    
     // 에러 상태에 따라 사용자에게 보여줄 공지 메시지를 설정하는 함수
-   
+    
     private func setNotice(for error: Error) {
         let code = extractStatusCode(from: error)
         lastErrorStatusCode = code
@@ -83,23 +85,23 @@ final class CurationViewModel: ObservableObject {
             noticeText = "문제가 발생했어요. 잠시 후 다시 시도해 주세요"
         }
     }
-
+    
     // 공지 메시지 및 에러 상태 초기화 함수!
     private func clearNotice() {
         noticeText = nil
         lastErrorStatusCode = nil
     }
-
+    
     // MARK: : 최초 진입
     // 뷰모델 초기화 시 호출하여 기본 태그 목록 구성 및 내 주변 큐레이션 피드 로드
     func boot() async {
         // 칩 목록 구성 (고정) (id만 부여함!)
         tags = Self.fixedTags()
         selectedTag = .nearby
-
+        
         await loadNearbyFeed() // 기본: 내주변
     }
-
+    
     // MARK: - 사용자가 장소 칩 선택했을때 호출 하는 함수들
     
     func select(tag: LocationTag) async {
@@ -112,13 +114,13 @@ final class CurationViewModel: ObservableObject {
             await loadCategoryFeed(categoryId: tag.id)
         }
     }
-
+    
     // 큐레이션 상세 화면을 열기 위해 상세 데이터를 로드하는 함수
-   
+    
     func openDetail(curationId: Int64) async {
         await loadDetail(curationId: curationId)
     }
-
+    
     // 큐레이션 상세 화면을 닫고 상태를 초기화하는 함수
     func closeDetail() {
         detail = nil
@@ -126,8 +128,8 @@ final class CurationViewModel: ObservableObject {
     }
     
     
-
-   
+    
+    
     // 내 주변 위치 기반 큐레이션 피드를 비동기적으로 로드하는 함수
     private func loadNearbyFeed() async {
         listState = .loading
@@ -149,9 +151,9 @@ final class CurationViewModel: ObservableObject {
             setNotice(for: error)
         }
     }
-
+    
     // 특정 카테고리 기반 큐레이션 피드를 비동기적으로 로드하는 함수
-   
+    
     private func loadCategoryFeed(categoryId: Int64) async {
         listState = .loading
         do {
@@ -168,18 +170,29 @@ final class CurationViewModel: ObservableObject {
             cards = []
         }
     }
-
+    // 홈에서 그릴 간단 리스트 (이미지/텍스트 따로)
+    @Published private(set) var items: [Item] = []
     // API에서 받아온 큐레이션 피드 데이터를 뷰모델의 UI 출력 변수에 적용하는 함수
-   
+    
     private func apply(feed: CurationFeed) {
         headerText = feed.header
         cards = feed.cards
         accentColor = feed.tone.color   // SemanticColor → Color("assetName")
+        
+        // ⬇️ 홈용 아이템으로 변환 (이미지/텍스트 분리 제공)
+        items = feed.cards.map { card in
+            Item(
+                id: card.id,
+                title: card.title,
+                // ⬇️ 썸네일 필드명은 실제 모델명에 맞춰서!
+                thumb: card.bannerURL ?? card.backgroundURL // ← 여기!
+            )
+        }
     }
-
-   
+    
+    
     // 큐레이션 상세 데이터를 비동기적으로 로드하는 함수
-   
+    
     private func loadDetail(curationId: Int64) async {
         detailState = .loading
         do {
@@ -194,10 +207,10 @@ final class CurationViewModel: ObservableObject {
             setNotice(for: error)
         }
     }
-
- 
+    
+    
     // 고정된 위치 태그 목록을 반환하는 함수 (내 주변 + 7개 카테고리)
-   
+    
     private static func fixedTags() -> [LocationTag] {
         // 고정 칩: 내주변 + 1~7 카테고리
         var result: [LocationTag] = [.nearby]
@@ -216,9 +229,9 @@ final class CurationViewModel: ObservableObject {
         }
         return result
     }
-
+    
     // 콜백 기반 API 요청을 async/await 패턴으로 변환하는 헬퍼 함수
-   
+    
     private func requestAsync<T>(_ work: (@escaping (Result<T, CurationServices.APIError>) -> Void) -> Void) async throws -> T {
         try await withCheckedThrowingContinuation { cont in
             work { res in
@@ -229,5 +242,58 @@ final class CurationViewModel: ObservableObject {
             }
         }
     }
+    
+    // 홈 섹션에서 바로 쓸 수 있는 가벼운 아이템
+    struct Item: Identifiable, Equatable {
+        let id: Int64
+        let title: String
+        let thumb: URL?
+    }
+    
+
+    
 }
+  /*  @Published var items: [(id: Int64, title: String, thumb: URL?)] = []
+
+    func loadLocationRaw(locationId: Int64) async {
+            do {
+                let dto: ApiResponseCurationByLocationResponseDto = try await requestAsync { cont in
+                    self.service.getCurationsByLocation(locationId: locationId, completion: cont)
+                }
+                self.items = dto.data.curations.map {
+                    (id: $0.curationId,
+                     title: $0.curationTitle,
+                     thumb: URL(string: $0.backgroundImgUrl))
+                }
+                print("✅ location feed count:", items.count)
+            } catch { print("❌ location feed error:", error) }
+        }
+    
+    func loadDetailImages(_ curationId: Int64) async -> [URL] {
+        do {
+            let dto: ApiResponseCurationByCurationIdResponseDto = try await requestAsync { cont in
+                self.service.getCurationDetail(curationId: curationId, completion: cont)
+            }
+            return dto.data.imgs
+                .sorted { $0.imgOrder < $1.imgOrder }
+                .compactMap { URL(string: $0.imgUrl) } // <- compactMap: 실패(nil) 버리고 [URL]만
+        } catch {
+            return []
+        }
+    }
+    private func normalizeURL(_ raw: String) -> URL? {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        // 한번 디코드 (있으면)
+        let onceDecoded = trimmed.removingPercentEncoding ?? trimmed
+        // 그대로 시도
+        if let u = URL(string: onceDecoded) { return u }
+        // 재인코드
+        let allowed = CharacterSet.urlFragmentAllowed
+            .union(.urlPathAllowed).union(.urlQueryAllowed).union(.urlHostAllowed)
+        return onceDecoded.addingPercentEncoding(withAllowedCharacters: allowed)
+            .flatMap(URL.init(string:))
+    }
+
+
+}*/
 

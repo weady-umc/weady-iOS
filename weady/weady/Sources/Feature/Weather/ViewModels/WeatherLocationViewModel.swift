@@ -16,7 +16,10 @@ import Observation
 class WeatherLocationViewModel: ObservableObject {
     
     private let userFavoriteLocationServices = UserFavoriteLocationServices()
+    private let weather = WeatherServices.shared
     @Published var isSettingDefault = false
+    
+    @Published var nowLocationCard: WeatherData? = nil
     
     // MARK: - 샘플 카드(현재 위치 카드에 쓰는 예시 데이터)
     static let example = WeatherData(
@@ -69,6 +72,34 @@ class WeatherLocationViewModel: ObservableObject {
 
 // MARK: - Networking (즐겨찾기 목록/추가/삭제/대표설정)
 extension WeatherLocationViewModel {
+    
+    // 추가: 현재 위치 카드 로드 (GET /api/v1/users/favorites/nowLocations)
+    func loadNowLocationCard() {
+        userFavoriteLocationServices.fetchFavoriteNowLocation { [weak self] result in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let dto):
+                    // 주소 2~4 깊이만 붙여 카드 타이틀 구성 (빈 값 제외)
+                    let title = [dto.locationAddress2, dto.locationAddress3, dto.locationAddress4]
+                        .filter { !$0.isEmpty }
+                        .joined(separator: " ")
+                    
+                    self.nowLocationCard = WeatherData(
+                        favoriteId: nil,                                  // 현재 위치 카드는 즐겨찾기 아님
+                        location: title,
+                        temperature: String(Int(dto.currentTemp)),
+                        highTemperature: String(Int(dto.actualTmx)),
+                        lowTemperature: String(Int(dto.actualTmn)),
+                        backgroundImage: self.mapSkyStatusToImage("CLOUDY") // 서버에 sky 없으므로 기본값
+                    )
+                case .failure(let err):
+                    print("⛔️ nowLocations fetch fail:", err.localizedDescription)
+                    self.nowLocationCard = nil
+                }
+            }
+        }
+    }
 
     // MARK: - 서버 즐겨찾기 목록 조회 → WeatherData 매핑
     // - 서버 DTO를 화면용 WeatherData로 변환
@@ -88,8 +119,7 @@ extension WeatherLocationViewModel {
                 let mapped = list.map { dto in
                     WeatherData(
                         favoriteId: dto.favoriteId,
-                        location: [dto.locationAddress1,
-                                   dto.locationAddress2,
+                        location: [dto.locationAddress2,
                                    dto.locationAddress3,
                                    dto.locationAddress4]
                             .filter { !$0.isEmpty }
@@ -169,5 +199,18 @@ extension WeatherLocationViewModel {
             }
         }
     }
+    // MARK: - 대표 즐겨찾기 해제 (현재 위치 쓰기)
+    func unsetDefaultFavoriteOnServer(completion: @escaping (Bool) -> Void) {
+        userFavoriteLocationServices.unsetDefaultFavoriteLocation { result in
+            switch result {
+            case .success:
+                completion(true)
+            case .failure(let err):
+                print("❌ 기본 위치 해제 실패:", err.localizedDescription)
+                completion(false)
+            }
+        }
+    }
+
 
 }

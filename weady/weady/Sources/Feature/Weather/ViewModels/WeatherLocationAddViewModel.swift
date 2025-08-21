@@ -71,19 +71,21 @@ class WeatherLocationAddViewModel: ObservableObject {
         return WeatherAddData(
             weatherBackground: mapSkyStatusToBackground(data.skyStatus),                     // 상세 배경
             homeBackground: mapSkyStatusToHomeBackground(data.skyStatus),                    // 홈 카드 배경
-            place: "\(data.address1) \(data.address2) \(data.address3)",                    // 전체 주소 문자열
+            place: "\(data.address2) \(data.address3)",                    // 전체 주소 문자열
             temperature: Int(data.currentTmp),                                               // 현재 온도
             weatherIcon: mapSkyStatusToBigIcon(data.skyStatus),                              // 상단 대형 아이콘
             description: mapSkyStatusToKorean(data.skyStatus),                               // 한글 설명
             lowTemperature: Int(data.minTmp),                                                // 최저
             highTemperature: Int(data.maxTmp),                                               // 최고
             rainProbability: Int(data.hourlyPrecipitations.first?.probability ?? 0),         // 첫 시간대 강수확률 사용
-            windSpeed: Int(data.hourlyWinds.first?.speed ?? 0),                              // 첫 시간대 풍속 사용
+            windSpeed: Int(data.hourlyWinds.first?.speed ?? 0),
+            windDirectionText: data.hourlyWinds.first?.direction ?? "N",// 첫 시간대 풍속 사용
             hourlyWeather: data.hourlyForecasts.map {
                 HourlyWeather(
                     time: "\($0.time)시",                                                    // 예: 13 → "13시"
                     iconName: WeatherLocationAddViewModel.mapSkyStatusToIcon($0.skyStatus),  // 시간별 소형 아이콘
-                    temp: "\($0.tmp)"                                                        // 표기용 문자열
+                    temp: String(Int($0.tmp.rounded()))
+                        // 표기용 문자열
                 )
             }
         )

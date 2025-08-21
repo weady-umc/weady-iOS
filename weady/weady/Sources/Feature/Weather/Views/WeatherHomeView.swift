@@ -10,9 +10,11 @@ import KeychainSwift
 
 
 struct WeatherHomeView: View {
-    // MARK: - ViewModel & Env
-    @State private var selected: WeatherHomeModel = .first
-    @State private var viewModel = WeatherHomeViewModel()
+    @Bindable var viewModel: WeatherHomeViewModel
+    
+    init(initial: WeatherHomeModel = .first) {
+        self.viewModel = WeatherHomeViewModel(initial: initial)
+    }
        // 탭 세그먼트, 중기예보 상태를 관리
     private let shortData = ShortWeatherData.example              // API 실패 시 사용할 예시 데이터
     @EnvironmentObject var homeRouter: HomeRouter
@@ -44,13 +46,21 @@ struct WeatherHomeView: View {
             .zIndex(0)
             
         }
+
         
         .edgeSwipeBack(topExclusion: 100) {
-            homeRouter.pop()
+
             }
-        .toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .top) {
             VStack(spacing: 0) {
+
+                Spacer().frame(height: 20 * .deviceScale)
+
+                UnderlineSegmentedControl(
+                    items: WeatherHomeModel.allCases,
+                    selection: $viewModel.selectedSegment,
+                    title: { $0.title }
+
                 Spacer().frame(height: 100)
                 CustomNavBar(
                     viewTitle: "",
@@ -58,18 +68,14 @@ struct WeatherHomeView: View {
                     showAlarmButton: true,
                     showBottomDivider: false,
                     alarmAction: { homeRouter.push(.alarm) }
+
                 )
-                // 세그먼트 바로 이어서
-                SegmentView
-                    .padding(.horizontal, 10)
-                    .background(Color.white)              // 흰 바 유지
-                    .overlay(Divider(), alignment: .bottom)
+                .padding(.horizontal, 0)
+                .background(Color.white)
+                .overlay(Rectangle().fill(.clear).frame(height: 1), alignment: .bottom)
             }
             .background(Color.white.ignoresSafeArea(edges: .top))
-            .transaction { $0.disablesAnimations = true }
         }
-        
-        .zIndex(999)
 
 
         
@@ -96,25 +102,47 @@ struct WeatherHomeView: View {
     
     // MARK: - 날씨 탭 화면(배경 + 헤더 + 시간별 + 강수/풍속 + 중기예보)
     private func weatherView(weather: WeatherAddData) -> some View {
-        ZStack {
-            // MARK: - 날씨 배경
-            Image(weather.weatherBackground)
-                .resizable()
-                .ignoresSafeArea()
-                .allowsHitTesting(false)
-            
-            VStack {
-                // MARK: - 현재 위치 헤더(아이콘, 위치명, 위치 변경 버튼)
-                HStack {
-                    Image("placeIcon")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 11.95, height: 17.071)
+        ScrollView{
+            ZStack {
+                // MARK: - 날씨 배경
+                Image(weather.weatherBackground)
+                    .resizable()
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+                
+                VStack {
+                    // MARK: - 현재 위치 헤더(아이콘, 위치명, 위치 변경 버튼)
+                    HStack {
+                        Image("placeIcon")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 12 * .deviceScale, height: 17.14 * .deviceScale)
+                            .padding(5)
+                        
+                        Text(weather.place)
+                            .fontName(.bodySemibold16)
+                            .foregroundStyle(Color.white100)
+                            
+                        
+                        Button(action: {
+                            print("current router.path before push: \(router.path)")
+                            router.push(.weatherlocation) // 위치 선택 화면으로 이동
+                            print("current router.path after push: \(router.path)")
+                        }) {
+                            Image("downIcon")
+                                .padding(5 * .deviceScale)
+                        }
+                        .zIndex(2)
+                        
+                    }
+                    .padding(.top, 43 * .deviceScale)
                     
-                    Text(weather.place)
-                        .fontName(.bodySemibold16)
-                        .foregroundStyle(Color.white100)
+                    Spacer().frame(height: 30 * .deviceScale)
                     
+                    // MARK: - 메인 카드(현재온도/최저·최고/아이콘 등)
+                    WeatherMainCardView(weather: weather)
+                        .padding(.bottom, 45 * .deviceScale)
+
                     Button(action: {
                         print("current router.path before push: \(homeRouter.path)")
                         homeRouter.push(.weatherlocation) // 위치 선택 화면으로 이동
@@ -124,90 +152,58 @@ struct WeatherHomeView: View {
                             .padding(8)
                     }
                     .zIndex(2)
-                    
-                }
-                .padding(.top, 12)
-                
-                Spacer().frame(height: 24)
-                
-                // MARK: - 메인 카드(현재온도/최저·최고/아이콘 등)
-                WeatherMainCardView(weather: weather)
-                    .padding(.bottom, 45)
-                
-                
-                // MARK: - 시간별 예보
-                HourlyWeatherScrollView(hourlyWeatherList: weather.hourlyWeather)
-                    .padding(.horizontal, 60)
-                
-                Spacer().frame(height: 36)
-                
-                // MARK: - 강수 확률 / 풍속 요약
-                bigRainWind(weather: weather)
-                    .padding(.bottom, 25)
-                
-                //Spacer().frame(height: 40)
-                
-                // MARK: - 중기예보 리스트
-                MidTermSectionView(items: viewModel.midTermForecasts)
-                    .overlay {
-                        // MARK: - 중기예보 로딩/에러 표시
-                        if viewModel.isLoadingMid {
-                            ProgressView()
-                        } else if let msg = viewModel.midError {
-                            Text("중기예보 로드 실패: \(msg)")
-                                .font(.caption).foregroundStyle(.red)
-                        }
-                    }
-                    .task {
-                        // 리스트가 비어 있으면 보이는 시점에 로드 보장
-                        if viewModel.midTermForecasts.isEmpty {
-                            viewModel.loadMidTerm()
-                        }
-                    }
-            }
-        }
-        // MARK: - 화면 진입 시 중기예보 로드 트리거(중복 호출 가능성은 ViewModel에서 제어 가정)
-        .onAppear {
-            viewModel.loadMidTerm()
-        }
-    }
-    
-    // MARK: - 세그먼트(탭) 헤더
-     var SegmentView: some View {
-        HStack(spacing: 0) {
-            ForEach(WeatherHomeModel.allCases, id: \.id) { segment in
-                sheetSegment(segment: segment)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 24)
-        .padding(.top, 5)
-        .padding(.bottom, 0)
-    }
-    
-    // MARK: - 세그먼트 버튼(선택 상태에 따라 텍스트/언더라인 색상 변경)
-    func sheetSegment(segment: WeatherHomeModel) -> some View {
-        Button {
-            withAnimation { viewModel.selectedSegment = segment }
-        } label: {
-            VStack(spacing: 8) {
-                Text(segment.title)
-                    .foregroundStyle(viewModel.selectedSegment == segment ? Color.gray100 : Color.gray800)
-                    .fontName(.headingSemibold20)
-                if viewModel.selectedSegment == segment {
-                    Rectangle().fill(Color.gray100).frame(width: 59, height: 2)
-                } else {
-                    Rectangle().fill(Color.gray800).frame(width: 59, height: 2)
-                }
-            }
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-    }
 
+                    
+                    
+                    // MARK: - 시간별 예보
+                    HourlyWeatherHomeScrollView(hourlyWeatherList: weather.hourlyWeather)
+                        .padding(.horizontal, 10 * .deviceScale)
+                    
+                    Spacer().frame(height: 25 * .deviceScale)
+                    
+                    // MARK: - 강수 확률 / 풍속 요약
+                    bigRainWind(weather: weather)
+                        .padding(.bottom, 19 * .deviceScale)
+                    
+                    //Spacer().frame(height: 40)
+                    
+                    // MARK: - 중기예보 리스트
+                    MidTermSectionView(items: viewModel.midTermForecasts)
+                        .overlay {
+                            // MARK: - 중기예보 로딩/에러 표시
+                            if viewModel.isLoadingMid {
+                                ProgressView()
+                            } else if let msg = viewModel.midError {
+                                Text("중기예보 로드 실패: \(msg)")
+                                    .font(.caption).foregroundStyle(.red)
+                            }
+                        }
+                        .task {
+                            // 리스트가 비어 있으면 보이는 시점에 로드 보장
+                            if viewModel.midTermForecasts.isEmpty {
+                                viewModel.loadMidTerm()
+                            }
+                        }
+                }
+            }
+            // MARK: - 화면 진입 시 중기예보 로드 트리거(중복 호출 가능성은 ViewModel에서 제어 가정)
+            .onAppear {
+                viewModel.loadMidTerm()
+            }
+            
+        }
+    }
+    
     // MARK: - 강수/풍속 카드 2개 묶음
     struct bigRainWind :View {
         let weather: WeatherAddData
+        
+        private var rainLevel: RainLevel {
+            .init(probability: weather.rainProbability)
+        }
+        private var windDir: WindDirection {
+            .init(label: weather.windDirectionText)
+        }
         
         var body: some View {
             HStack{
@@ -215,15 +211,27 @@ struct WeatherHomeView: View {
                 ZStack{
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color.gray.opacity(0.1))
-                        .frame(width: 159, height: 73)
+                        .frame(width: 159 * .deviceScale, height: 73 * .deviceScale)
                     
-                    VStack{
-                        Text("강수 확률")
-                            .fontName(.captionSemibold14)
-                            .foregroundStyle(Color.white100)
-                        Text("\(weather.rainProbability)%")
-                            .fontName(.captionSemibold14)
-                            .foregroundStyle(Color.white100)
+                    HStack(spacing: 10 * .deviceScale){
+                        
+                        Image(rainLevel.imageName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20 * .deviceScale, height: 31 * .deviceScale)
+                            .padding(.trailing, 8 * .deviceScale)
+                            
+                        
+                        VStack{
+                            Text("강수 확률")
+                                .fontName(.captionSemibold14)
+                                .foregroundStyle(Color.white100)
+                            Spacer().frame(height: 1)
+                            
+                            Text("\(weather.rainProbability)%")
+                                .fontName(.captionSemibold14)
+                                .foregroundStyle(Color.white100)
+                        }
                     }
                 }
                 
@@ -233,16 +241,27 @@ struct WeatherHomeView: View {
                 ZStack{
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color.gray.opacity(0.1))
-                        .frame(width: 159, height: 73)
-                    
-                    VStack{
-                        Text("풍속")
-                            .fontName(.captionSemibold14)
-                            .foregroundStyle(Color.white100)
+                        .frame(width: 159 * .deviceScale, height: 73 * .deviceScale)
+                    HStack(spacing: 10 * .deviceScale){
                         
-                        Text("\(weather.windSpeed) ms")
-                            .fontName(.captionSemibold14)
-                            .foregroundStyle(Color.white100)
+                        Image(windDir.imageName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40 * .deviceScale, height: 40 * .deviceScale)
+                            
+                            
+                        
+                        VStack{
+                            Text("풍속")
+                                .fontName(.captionSemibold14)
+                                .foregroundStyle(Color.white100)
+                            Spacer().frame(height: 1)
+                            
+                            Text("\(weather.windSpeed) ms")
+                                .fontName(.captionSemibold14)
+                                .foregroundStyle(Color.white100)
+                        }
+                        .padding(.leading, 8 * .deviceScale)
                     }
                 }
             }
@@ -255,89 +274,105 @@ struct WeatherHomeView: View {
         var maxRows: Int = 7                  // 표시 개수 제한(기본 7개)
         
         var body: some View {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("일별예보")
+            VStack(alignment: .leading, spacing: 0) {
+                Text("일별 예보")
                     .fontName(.captionRegular14)
                     .foregroundStyle(Color.white100)
-                    .padding(.leading, 30)
+                    .padding(.leading, 78 * .deviceScale)
+                    .padding(.bottom, 12 * .deviceScale)
                 
                 VStack(spacing: 0) {
                     // MARK: - 세로 스크롤 리스트
                     ScrollView(.vertical, showsIndicators: false) {
-                        let rows = Array(items.prefix(maxRows))
-                        ForEach(rows.indices, id: \.self) { i in
-                            MidTermRowView(forecast: rows[i])
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                            
-                            if i < rows.count - 1 {
-                                Divider()
-                                    .overlay(Color.white100)
-                                    .padding(.horizontal, 12)
+                        LazyVStack(spacing: 2 * .deviceScale) {
+                            let rows = Array(items.prefix(maxRows))
+                            ForEach(rows.indices, id: \.self) { i in
+                                MidTermRowView(forecast: rows[i], isToday: i == 0)
+                                    .padding(.horizontal, 22 * .deviceScale)
+                                    //.padding(.vertical, 1)
+                                
+                                if i < rows.count  {
+                                    Divider()
+                                        .overlay(Color.white100)
+                                        .padding(.horizontal, 13 * .deviceScale)
+                                }
                             }
                         }
                     }
-                    .frame(height: 300)
+                    
+                    
                 }
+                
                 .background(
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: 10)
                         .fill(.white.opacity(0.05))
                 )
+                .frame(width: 335 * .deviceScale, height: 330 * .deviceScale)
+                .padding(.leading, 26 * .deviceScale)
+                .padding(.trailing, 30 * .deviceScale)
+                
+                .padding(.horizontal, 42 * .deviceScale)
             }
-            .padding(.horizontal, 24)
         }
     }
     
     // MARK: - 중기예보 한 줄(요일/오전·오후 아이콘/최저·최고 온도바)
     private struct MidTermRowView: View {
         let forecast: MidTermForecast
+        var isToday: Bool = false
         
         var body: some View {
-            HStack(spacing: 30) {
+            HStack(spacing: 0) {
                 // MARK: - 요일
-                Text(forecast.dayOfWeek)
+                Text(isToday ? "오늘" : "\(forecast.dayOfWeek)   ")
                     .fontName(.bodySemibold16)
                     .foregroundStyle(Color.white100)
-                    .frame(width: 36, alignment: .leading)
+                    .padding(.leading, 10 * .deviceScale)
+                    .padding(.trailing, 28 * .deviceScale)
                 
                 // MARK: - 오전/오후 하늘상태 아이콘
-                HStack(spacing: 24) {
-                    VStack(spacing: 2) {
+                HStack(spacing: 0) {
+                    VStack(spacing: 0) {
                         Text("오전")
                             .fontName(.metaRegular8)
                             .foregroundStyle(Color.white100.opacity(0.8))
+                            .offset(y: 4 * .deviceScale)
                         Image(WeatherLocationAddViewModel.mapSkyStatusToIcon(forecast.amSkyStatus))
                             .resizable().scaledToFit()
-                            .frame(width: 30, height: 30)
+                            .frame(width: 30 * .deviceScale, height: 30 * .deviceScale)
                     }
-                    VStack(spacing: 2) {
+                    .padding(.trailing, 15 * .deviceScale)
+                    
+                    VStack(spacing: 0) {
                         Text("오후")
                             .fontName(.metaRegular8)
                             .foregroundStyle(Color.white100.opacity(0.8))
+                            .offset(y: 4 * .deviceScale)
                         Image(WeatherLocationAddViewModel.mapSkyStatusToIcon(forecast.pmSkyStatus))
                             .resizable().scaledToFit()
-                            .frame(width: 30, height: 30)
+                            .frame(width: 30 * .deviceScale, height: 30 * .deviceScale)
                     }
                 }
-                Spacer().frame(width: 13)
+                Spacer().frame(width: 13 * .deviceScale)
                 
                 // MARK: - 최저/최고 온도 + 바 시각화
-                HStack(spacing: 8) {
+                HStack(spacing: 8 * .deviceScale) {
                     Text("\(Int(forecast.minTemp))º")
-                        .fontName(.captionMedium14)
+                        .fontName(.captionRegular13)
                         .foregroundStyle(Color.white100)
                     
                     TempBar(low: forecast.minTemp, high: forecast.maxTemp)
-                        .frame(height: 6)
-                        .frame(maxWidth: .infinity)
+                        .frame(width: 77 * .deviceScale, height: 5 * .deviceScale)
+                        
                     
                     Text("\(Int(forecast.maxTemp))º")
-                        .fontName(.captionMedium14)
+                        .fontName(.captionRegular13)
                         .foregroundStyle(Color.white100)
                 }
-                .frame(width: 91)
+                .frame(width: 160 * .deviceScale)
+                .padding(.trailing, 0)
             }
-            .frame(width: 335, height: 17)
+            .frame(width: 335 * .deviceScale, height: 44 * .deviceScale)
         }
     }
     
@@ -345,7 +380,7 @@ struct WeatherHomeView: View {
     private struct TempBar: View {
         let low: Double
         let high: Double
-        private let globalMin: Double = 10   // 전체 스케일 최소값
+        private let globalMin: Double = 20   // 전체 스케일 최소값
         private let globalMax: Double = 40    // 전체 스케일 최대값
 
         // 주어진 값 v 를 전체 스케일로 정규화하여 width 내 위치 반환
@@ -361,13 +396,13 @@ struct WeatherHomeView: View {
                 let barW = Swift.max(8.0, e - s)            // 최소 가시폭 보장
 
                 ZStack(alignment: .leading) {
-                    Capsule().fill(.white.opacity(0.15))     // 베이스 트랙
+                    Capsule().fill(Color.white400)     // 베이스 트랙
                     Capsule().fill(Color.login300)           // 실제 구간
                         .frame(width: barW)
                         .offset(x: s)
                 }
             }
-            .frame(width: 77, height: 5)
+            .frame(width: 77 * .deviceScale, height: 5 * .deviceScale)
         }
     }
 }

@@ -20,44 +20,51 @@ struct WeatherSearchView: View {
     @StateObject private var locationViewModel = WeatherLocationViewModel() // 위치 즐겨찾기/상태 관리(옵션)
     @StateObject private var addViewModel = WeatherLocationAddViewModel()   // 변환 뷰모델(옵션)
     @State private var shouldGoToWeatherLocation = false                // 네비게이션 플래그(옵션)
+    @State private var didSearch = false
 
     var body: some View {
         // MARK: - Root Layout
         VStack {
-            Spacer().frame(height: 13)
-            
-            Divider()
-                .frame(height: 1)
+
             
             // MARK: - Search Bar
             searchBar
             
             // MARK: - Results Area
-            if viewModel.filteredResults.isEmpty {
-                Text("🔍 검색 결과가 없습니다.")
-            } else {
-                searchResultsList
+            Group {
+                if viewModel.isLoading {
+                    ProgressView().padding(.top, 40)
+                } else if didSearch && viewModel.filteredResults.isEmpty {
+                    // 검색했는데 비었을 때만 표시
+                    Text("검색 결과가 없습니다.")
+                        .foregroundColor(.gray)
+                        .padding(.top, 40)
+                } else if !viewModel.filteredResults.isEmpty {
+                    searchResultsList
+                } else {
+                    // 초기 상태(검색 전) → 아무 것도 안 보여주거나 안내 문구
+                    EmptyView()
+                }
             }
-            
             Spacer()
         }
         // MARK: - Navigation Bar
-        .navigationTitle("위치")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
         .edgeSwipeBack(topExclusion: 100) {
             homeRouter.pop()
-            }
-        .toolbar {
-            // 좌측 상단 뒤로가기
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    Image("backicon")
-                        .foregroundColor(.black)
-                }
-            }
+        }
+        .toolbar(.hidden, for: .navigationBar) // 시스템 네비바 숨김
+        .safeAreaInset(edge: .top) {
+            CustomNavBar(
+                viewTitle: "위치",
+                showBackButton: true,
+                showBottomDivider: true,
+                backAction: { router.pop() }     // 혹은 dismiss() 사용 중이면 { dismiss() }
+            )
+            .padding(.top, -15)
+            .background(Color.white100.ignoresSafeArea(edges: .top))
+            
+            
+
         }
         // MARK: - Token Setup
         .onAppear {
@@ -88,6 +95,24 @@ struct WeatherSearchView: View {
                 .font(AppTextStyle.captionRegular14.font)
                 .foregroundStyle(Color.gray200)
                 .multilineTextAlignment(.leading)
+                .submitLabel(.search)         // 키보드에 '검색' 표시
+                .onSubmit {
+                    didSearch = true                 //  검색 시도 플래그
+                    viewModel.search(address: viewModel.searchText)    //  즉시 검색
+                }
+
+                            // 클리어 버튼
+            if !viewModel.searchText.isEmpty {
+                Button {
+                    viewModel.clearAll()         // 텍스트/결과/로딩 모두 초기화
+                    didSearch = false            //  '검색 결과 없음' 숨김
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(Color.gray300)
+            }
+            .padding(.trailing, 10)
+                }
             }
             .frame(width: 335, height: 40)
             .background(RoundedRectangle(cornerRadius: 5).fill(Color.white400))
@@ -102,7 +127,7 @@ struct WeatherSearchView: View {
             if viewModel.searchResults.isEmpty {
                 Spacer().frame(height: 40)
                 Text("🔍 검색 결과가 없습니다.")
-                    .foregroundColor(.gray300)
+                    .foregroundColor(.clear)
             } else {
                 // 필터링된 결과 목록
                 List(viewModel.filteredResults, id: \.id) { place in
@@ -123,18 +148,23 @@ struct WeatherSearchView: View {
                         }
                     }) {
                         // 한 줄 아이템 UI
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 14) {
                             Text("\(place.address.region1depthName) \(place.address.region2depthName) \(place.address.region3depthName)")
-                                .font(.body)
+                                .fontName(.captionRegular14)
                                 .foregroundColor(.black)
-                            Text("법정동 코드: \(place.address.bCode)")
-                                .font(.caption)
-                                .foregroundColor(.gray)
+                            
                         }
                         .padding(.vertical, 6)
                     }
+                    
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.white)
+                    
+                    
                 }
                 .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .background(Color.white)
                 .frame(width: 335)
             }
         }

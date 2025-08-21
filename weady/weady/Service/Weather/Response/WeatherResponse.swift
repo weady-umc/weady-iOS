@@ -84,3 +84,5 @@ struct NowLocationResponse: Decodable {
     let address3: String
     let address4: String?   // 일부 환경에서 없을 수 있으니 옵셔널
 }
+
+

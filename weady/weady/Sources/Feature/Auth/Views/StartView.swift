@@ -8,6 +8,12 @@
 import SwiftUI
 
 struct StartView: View {
+
+    
+    
+    @Environment(\.router) private var router
+    
+
     @StateObject private var vm: StartViewModel
     @Environment(\.router) private var router
     
@@ -29,6 +35,7 @@ struct StartView: View {
                 agreements: agreements
             )
         )
+
         self.onFinish = onFinish
     }
 
@@ -74,18 +81,21 @@ struct StartView: View {
         .padding(.bottom, 22)
     }
 
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Spacer().frame(height: 39)
             titleBlock()
                 .padding(.horizontal, 32)
             Spacer()
+
             primaryButton()
                 .padding(.horizontal, 20)
         }
         .alert(item: $vm.alert) { a in
             Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
         }
+
         .onChange(of: vm.navigateHome) { _, go in
             guard go, !didFinish else { return }
             didFinish = true

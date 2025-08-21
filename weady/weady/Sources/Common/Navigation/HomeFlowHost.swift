@@ -16,7 +16,7 @@ enum HomeRoute: Hashable {
     case weathersearch
     case weatherlocation
 
-    case weatherhome
+    case weatherhome(initial: WeatherHomeModel)
     case clothes
 
     case curationdetail(curationId: Int64)

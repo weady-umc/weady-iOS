@@ -11,6 +11,7 @@ struct CurationView: View {
 //MARK: -뷰 바디
     var body: some View {
 
+        Spacer().frame(height:14)
         
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
