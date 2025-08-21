@@ -197,7 +197,7 @@ struct UploadView: View {
                                 .fontName(.bodyMedium16)
                                 .background(isFormValid ? Color.black100 : Color.gray800)
                                 .foregroundStyle(Color.white100)
-                                .cornerRadius(8)
+                                .cornerRadius(10)
                         }
                     }
                     .disabled(!isFormValid || isUploading)
@@ -208,25 +208,44 @@ struct UploadView: View {
                 .padding(.horizontal, geometry.size.width * 0.05)
                 .padding(.bottom, geometry.size.height * 0.03)
             }
-            .navigationTitle(mode == .create ? "새 게시물" : "게시물 수정")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image("backicon")
-                            .resizable()
-                            .frame(width: 9, height: 16)
-                    }
+            // MARK: - caution 배너 (3초 동안 표시)
+            if showCautionBanner {
+                VStack {
+                    Spacer().frame(height: geometry.size.height * 0.37)
+                    
+                    OverlayBanner(
+                        imgName: "bannerCautionIcon",
+                        text: "하루 최대 '공유중' & '보관중' 게시물 1개씩 업로드 가능해요"
+                    )
+                    
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .transition(.opacity)
+                .animation(.easeInOut(duration: 0.3), value: showCautionBanner)
+            }
+        }
+        .navigationTitle(mode == .create ? "새 게시물" : "게시물 수정")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { dismiss() }) {
+                    Image("backicon")
+                        .resizable()
+                        .frame(width: 9, height: 16)
                 }
             }
-            .onAppear {
-                viewModel.mode = mode
-                if !didPrefill {
-                    prefillIfNeeded()
-                    contentProxy = viewModel.content
-                    didPrefill = true
-                }
+        }
+        .onAppear {
+            viewModel.mode = mode
+            if !didPrefill {
+                prefillIfNeeded()
+                contentProxy = viewModel.content
+                didPrefill = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                withAnimation { showCautionBanner = false }
             }
         }
     }
