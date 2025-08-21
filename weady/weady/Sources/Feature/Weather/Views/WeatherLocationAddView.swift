@@ -99,7 +99,7 @@ struct WeatherLocationAddView: View {
                                     locationViewModel.addFavorite(from: place, with: weatherData)
                                     // 3. 성공 시 화면 이동
                                     DispatchQueue.main.async {
-                                        router.push(.weatherlocation)
+                                        homeRouter.push(.weatherlocation)
                                     }
                                 } else {
                                     print("❌ 서버 즐겨찾기 추가 실패")
@@ -178,7 +178,7 @@ struct WeatherLocationAddView: View {
                     viewTitle: "위치",
                     showBackButton: true,
                     showBottomDivider: false,
-                    backAction: { router.pop() }// 혹은 dismiss() 사용 중이면 { dismiss() }
+                    backAction: { homeRouter.pop() }// 혹은 dismiss() 사용 중이면 { dismiss() }
                     
                 )
                 .padding(.bottom, 20)
@@ -200,7 +200,7 @@ struct WeatherLocationAddView: View {
             }
         }
     }
-}
+
     
 // MARK: - 메인 카드: 현재 기온/아이콘/설명/최저·최고
 struct WeatherMainCardView: View {

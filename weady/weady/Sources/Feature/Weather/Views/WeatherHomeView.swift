@@ -59,7 +59,7 @@ struct WeatherHomeView: View {
                 UnderlineSegmentedControl(
                     items: WeatherHomeModel.allCases,
                     selection: $viewModel.selectedSegment,
-                    title: { $0.title }
+                    title: { $0.title })
 
                 Spacer().frame(height: 100)
                 CustomNavBar(
@@ -125,9 +125,9 @@ struct WeatherHomeView: View {
                             
                         
                         Button(action: {
-                            print("current router.path before push: \(router.path)")
-                            router.push(.weatherlocation) // 위치 선택 화면으로 이동
-                            print("current router.path after push: \(router.path)")
+                            print("current router.path before push: \(homeRouter.path)")
+                            homeRouter.push(.weatherlocation) // 위치 선택 화면으로 이동
+                            print("current router.path after push: \(homeRouter.path)")
                         }) {
                             Image("downIcon")
                                 .padding(5 * .deviceScale)
