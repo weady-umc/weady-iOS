@@ -14,6 +14,7 @@ import AuthenticationServices
 
 struct LoginView: View {
     @Environment(\.router) private var router
+    @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel = LoginViewModel()
 
     @State private var didRoute = false
@@ -70,10 +71,10 @@ struct LoginView: View {
                         Spacer()
                     }
                     Text("카카오로 시작")
-                        .fontName(.metaMedium12)
+                        .fontName(.bodyRegular16)
                         .foregroundColor(.black)
                 }
-                .frame(width: 315, height: 44)
+                .frame(width: 315 * .deviceScale, height: 44 * .deviceScale)
                 .background(Color.login100)
                 .cornerRadius(6)
             }
@@ -94,10 +95,10 @@ struct LoginView: View {
                         Spacer()
                     }
                     Text("구글로 시작")
-                        .fontName(.metaMedium12)
+                        .fontName(.bodyRegular16)
                         .foregroundColor(.black)
                 }
-                .frame(width: 315, height: 44)
+                .frame(width: 315 * .deviceScale, height: 44 * .deviceScale)
                 .background(Color.white)
                 .overlay(
                     RoundedRectangle(cornerRadius: 6)
@@ -110,8 +111,8 @@ struct LoginView: View {
                 onRequest: { _ in },
                 onCompletion: { _ in }
             )
-            .frame(width: 315, height: 44)
-            .signInWithAppleButtonStyle(.whiteOutline)
+            .frame(width: 315 * .deviceScale, height: 44 * .deviceScale)
+            .signInWithAppleButtonStyle(.black)
             .cornerRadius(6)
             .onTapGesture {
                 if let anchor = activePresentationAnchor() {
@@ -128,7 +129,7 @@ struct LoginView: View {
         }
         .padding(.horizontal, 24)
         .onAppear {
-            appearedAt = Date()
+            viewModel.attach(appState: appState)
         }
         .alert(item: Binding(
             get: { viewModel.errorMessage.map { LocalAlertMessage(message: $0) } },
