@@ -23,6 +23,7 @@ struct OnboardingFlowView: View {
     @State private var nickname: String = ""
     @State private var gender: GenderCode? = nil
     @State private var styleIds: [Int64] = []
+    @AppStorage("nickname") private var storedNickname: String = ""
 
     var onFinished: (() -> Void)? = nil
 

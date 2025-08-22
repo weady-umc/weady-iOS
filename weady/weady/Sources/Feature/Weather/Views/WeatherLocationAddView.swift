@@ -119,7 +119,7 @@ struct WeatherLocationAddView: View {
                             }
                             
                         }
-                      Spacer().frame(height: 44)
+                      Spacer()
 
                     }
                     
