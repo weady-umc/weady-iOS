@@ -40,8 +40,8 @@ final class ClothingRecommendationViewModel: ObservableObject {
                 case .success(let dto):
                     // ✅ DTO 직접 사용 (옵셔널 주소 안전 처리)
                     let d = dto
-                    let a1: String? = d.address1                     
-                    let addressString = [a1, d.address2, d.address3, d.address4]
+                    let a2: String? = d.address2
+                    let addressString = [a2, d.address3, d.address4]
                         .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
                         .filter { !$0.isEmpty }
                         .joined(separator: " ")
