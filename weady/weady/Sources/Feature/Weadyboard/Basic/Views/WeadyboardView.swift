@@ -24,6 +24,11 @@ struct WeadyboardView: View {
         viewModel.posts.enumerated().compactMap { $0.offset % 2 == 1 ? $0.element : nil }
     }
 
+    // 하단 여백 확보 코드
+    private var bottomContentInset: CGFloat {
+        (83 + 20) * .deviceScale
+    }
+
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
@@ -69,6 +74,10 @@ struct WeadyboardView: View {
                     }
                     .padding(.horizontal, 5 * .deviceScale)
                     .padding(.top, 5 * .deviceScale)
+                }
+                // 하단 여백 확보 코드 
+                .safeAreaInset(edge: .bottom) {
+                    Color.clear.frame(height: bottomContentInset)
                 }
             }
             
@@ -122,9 +131,13 @@ struct WeadyboardView: View {
             ZStack(alignment: .topTrailing) {
                 KFImage(url)
                     .placeholder {
-                        Color.gray100
-                            .frame(width: cardWidthScaled, height: height)
-                            .cornerRadius(8)
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.white100)
+                                .frame(width: cardWidthScaled, height: height)
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                        }
                     }
                     .onSuccess { result in
                         viewModel.setHeight(
@@ -152,4 +165,8 @@ struct WeadyboardView: View {
         }
         .buttonStyle(.plain)
     }
+}
+
+#Preview {
+    WeadyboardView()
 }
