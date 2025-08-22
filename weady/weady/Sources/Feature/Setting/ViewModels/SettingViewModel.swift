@@ -57,27 +57,33 @@ class SettingViewModel: ObservableObject {
     }
     
     func requestLogout() {
-            guard !isLoggingOut else { return }
-            isLoggingOut = true
-            logoutErrorMessage = nil
-            
-            authService.logout { [weak self] result in
-                guard let self else { return }
-                switch result {
-                case .success:
-                    AuthManager.shared.clearTokens()
-                    ToastCenter.shared.showSuccess("로그아웃 되었습니다.")
-                    self.isLoggingOut = false
-                    self.didLogout = true   // 뷰에서 onChange로 dismiss
-
-                case .failure:
-                    self.isLoggingOut = false
-                    // serverError 파싱은 필수 아님. 간단 공통 문구만 사용.
-                    // 필요 시, NetworkError가 .serverError(code,data,_)일 때 data를 메시지로 꺼내면 됨.
-                    let message = "로그아웃에 실패했습니다. 네트워크 상태를 확인하고 다시 시도해주세요."
-                    self.logoutErrorMessage = message
-                    ToastCenter.shared.showError(message)
-                }
+        guard !isLoggingOut else { return }
+        isLoggingOut = true
+        logoutErrorMessage = nil
+        
+        authService.logout { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success:
+                // 토큰/세션 정리
+                AuthManager.shared.clearTokens()
+                
+                // UX 피드백
+                ToastCenter.shared.showSuccess("로그아웃 되었습니다.")
+                
+                // 상태 업데이트
+                self.isLoggingOut = false
+                self.didLogout = true
+                
+                // 앱 전역으로 루트 재설정 브로드캐스트
+                NotificationCenter.default.post(name: .appDidLogout, object: nil)
+                
+            case .failure:
+                self.isLoggingOut = false
+                let message = "로그아웃에 실패했습니다. 네트워크 상태를 확인하고 다시 시도해주세요."
+                self.logoutErrorMessage = message
+                ToastCenter.shared.showError(message)
             }
         }
     }
+}

@@ -18,15 +18,10 @@ final class StartViewModel: ObservableObject {
     // 상태
     @Published var isSubmitting = false
     @Published var navigateHome = false
-    @Published var alert: AlertState?
+    @Published var lastErrorMessage: String?
 
     private let service: OnboardingService
-
-    struct AlertState: Identifiable {
-        let id = UUID()
-        let title: String
-        let message: String
-    }
+    private var didRouteOnce = false 
 
     init(
         nickname: String,
@@ -43,17 +38,18 @@ final class StartViewModel: ObservableObject {
     }
 
     func startTapped() {
+        guard !isSubmitting, !didRouteOnce else { return }
+        isSubmitting = true
         Task { await postAndNavigate() }
     }
 
     // 버튼 시점에만 POST
     private func postAndNavigate() async {
+        defer { isSubmitting = false }
+
         // 1) 약관 검증 (필수 3개)
         guard let agreements, requiredAgreed(agreements) else {
-            alert = .init(
-                title: "약관 확인",
-                message: "필수 약관 동의가 누락되었습니다. (만 14세 · 서비스 · 개인정보)"
-            )
+            self.lastErrorMessage = "필수 약관 동의 누락(만 14세 · 서비스 · 개인정보)"
             return
         }
 
@@ -68,31 +64,25 @@ final class StartViewModel: ObservableObject {
             agreements: agreements
         )
 
-        isSubmitting = true
-        defer { isSubmitting = false }
-
         do {
-            // ✅ 서비스가 비정상(비-2xx)에서 throw 한다는 가정
-            _ = try await service.submit(body: body)
-            // ✅ 성공(2xx)일 때만 이동 신호
-            navigateHome = true
+            try await service.submit(body: body)
+            routeHomeOnce()
         } catch let api as APIErrorResponse {
             // ✅ 닉네임 중복(400)만 예외적으로 통과
             if api.code == 400, api.message.contains("이미 사용 중") {
-                navigateHome = true
+                routeHomeOnce()
                 return
             }
-            
-            // ❌ 500 포함 그 외 모든 에러: 이동 금지 + 얼럿
-            alert = .init(title: "온보딩 실패", message: api.message)
-            
+            self.lastErrorMessage = api.message
         } catch {
-            // ❌ 네트워크/디코딩 등 기타 예외: 이동 금지 + 얼럿
-            alert = .init(
-                title: "온보딩 실패",
-                message: "요청 처리에 실패했습니다. 네트워크 상태를 확인해 주세요."
-            )
+            self.lastErrorMessage = "요청 처리 실패(네트워크/디코딩 등)"
         }
+    }
+
+    private func routeHomeOnce() {
+        guard !didRouteOnce else { return }
+        didRouteOnce = true
+        navigateHome = true
     }
 
     private func requiredAgreed(_ a: [OnboardingAgreement]) -> Bool {

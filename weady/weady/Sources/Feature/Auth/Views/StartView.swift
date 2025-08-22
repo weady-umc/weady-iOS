@@ -8,17 +8,13 @@
 import SwiftUI
 
 struct StartView: View {
-
-    
-    
     @Environment(\.router) private var router
-    
-
-    @StateObject private var vm: StartViewModel
     @EnvironmentObject var homeRouter: HomeRouter
     
+    @StateObject private var vm: StartViewModel
+    
     var onFinish: (() -> Void)? = nil
-    @State private var didFinish = false
+    @State private var didFinish = false  
 
     init(
         nickname: String,
@@ -35,7 +31,6 @@ struct StartView: View {
                 agreements: agreements
             )
         )
-
         self.onFinish = onFinish
     }
 
@@ -78,9 +73,9 @@ struct StartView: View {
                 .cornerRadius(10)
         }
         .disabled(vm.isSubmitting)
+        .allowsHitTesting(!vm.isSubmitting)
         .padding(.bottom, 22)
     }
-
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -92,15 +87,11 @@ struct StartView: View {
             primaryButton()
                 .padding(.horizontal, 20)
         }
-        .alert(item: $vm.alert) { a in
-            Alert(title: Text(a.title), message: Text(a.message), dismissButton: .default(Text("확인")))
-        }
-
         .onChange(of: vm.navigateHome) { _, go in
             guard go, !didFinish else { return }
             didFinish = true
             OnboardingStateStore.shared.markAllCompleted()
-            onFinish?() 
+            onFinish?()
         }
     }
 }

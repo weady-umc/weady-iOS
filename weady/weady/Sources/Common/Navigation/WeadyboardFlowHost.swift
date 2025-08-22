@@ -58,7 +58,7 @@ struct WeadyboardFlowHost: View {
                             reportViewModel: reportVM
                         )
                     case .weadyboardUpload:
-                        UploadView()
+                        UploadView(isTabBarHidden: $isTabBarHidden)
                     }
                 }
         }
