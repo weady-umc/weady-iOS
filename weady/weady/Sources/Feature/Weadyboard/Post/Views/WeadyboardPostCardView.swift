@@ -10,6 +10,19 @@ import SwiftUI
 struct WeadyboardPostCardView: View {
     @ObservedObject var viewModel: WeadyboardPostViewModel
 
+    // 의류 스타일 카테고리(id -> name) 매핑 저장
+    @State private var styleMap: [Int: String] = [:]
+    @State private var isLoadingStyleMap: Bool = false
+    @State private var styleMapError: String?
+
+    private let tagService: TagServiceProtocol
+
+    init(viewModel: WeadyboardPostViewModel, tagService: TagServiceProtocol = TagService()) {
+        self.viewModel = viewModel
+        self.tagService = tagService
+    }
+
+    // MARK: - Weather Mappers
     private func weatherIcon(for id: Int?) -> (name: String, size: CGSize) {
         guard let id else { return ("filter_sunny", CGSize(width: 27 * .deviceScale, height: 27 * .deviceScale)) }
         switch id {
@@ -52,8 +65,35 @@ struct WeadyboardPostCardView: View {
     }
 
     private func resolvedStyleNames(from dto: BoardDetailResponseDTO) -> [String] {
+        return dto.styleIdList.map { id in
+            if let name = styleMap[id] {
+                return name
+            } else {
+                return "스타일 \(id)"
+            }
+        }
+    }
 
-        return dto.styleIdList.map { "스타일 \($0)" }
+    private func ensureStyleMapLoaded() {
+        guard styleMap.isEmpty, !isLoadingStyleMap else { return }
+        isLoadingStyleMap = true
+        styleMapError = nil
+
+        tagService.getClothesStyleCategories { result in
+            DispatchQueue.main.async {
+                self.isLoadingStyleMap = false
+                switch result {
+                case .success(let categories):
+                    var map: [Int: String] = [:]
+                    for item in categories {
+                        map[Int(item.id)] = item.name
+                    }
+                    self.styleMap = map
+                case .failure(let error):
+                    self.styleMapError = error.localizedDescription
+                }
+            }
+        }
     }
 
     var body: some View {
@@ -64,6 +104,7 @@ struct WeadyboardPostCardView: View {
                 placeholder
             }
         }
+        .onAppear { ensureStyleMapLoaded() }
         .padding(.vertical, 16 * .deviceScale)
         .background(Color.white300)
         .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -117,6 +158,8 @@ struct WeadyboardPostCardView: View {
                                 }
                             }
                         }
+                        // 가로 길이 길게 고정으로 하고싶은 경우
+//                        .frame(width: 115 * .deviceScale, height: 85 * .deviceScale)
                         .frame(height: 85 * .deviceScale)
                         .padding(.horizontal, 14.5 * .deviceScale)
                         .background(Color.white100)
@@ -155,6 +198,8 @@ struct WeadyboardPostCardView: View {
                                 }
                             }
                         }
+                        // 가로 길이 길게 고정으로 하고싶은 경우
+//                        .frame(width: 125 * .deviceScale, height: 85 * .deviceScale)
                         .frame(height: 85 * .deviceScale)
                         .padding(.horizontal, 14.5 * .deviceScale)
                         .background(Color.white100)

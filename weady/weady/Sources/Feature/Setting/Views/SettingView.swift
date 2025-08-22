@@ -47,7 +47,6 @@ struct SettingView: View {
         }
         .onChange(of: viewModel.didLogout) { _, newValue in
             guard newValue else { return }
-            // TODO: - 일단 로그아웃 시 바로 전 화면으로 전환되도록 설정. 추후 초기화면으로 연결 필요
             dismiss()
         }
         .alert("알림", isPresented: .constant(viewModel.logoutErrorMessage != nil)) {

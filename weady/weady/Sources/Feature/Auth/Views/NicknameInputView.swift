@@ -104,11 +104,13 @@ struct NicknameInputView: View {
             Spacer()
 
             Button {
-                let name = vm.nickname.trimmingCharacters(in: .whitespacesAndNewlines)
-                storedNickname = name
-                vm.next()
-                if vm.shouldNavigateNext {
-                    onNext?(vm.nickname) // 통합 플로우 콜백
+                Task {
+                    let trimmed = vm.nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+                    vm.nickname = trimmed
+                    storedNickname = trimmed
+
+                    let ok = await vm.next()
+                    if ok { onNext?(vm.nickname) }      
                 }
             } label: {
                 Text("다음")
@@ -119,6 +121,7 @@ struct NicknameInputView: View {
                     .foregroundStyle(Color.white100)
                     .cornerRadius(10)
             }
+            .disabled(vm.isChecking)
             .padding(.horizontal, 20)
             .padding(.bottom, 22)
         }

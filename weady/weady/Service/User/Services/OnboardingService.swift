@@ -1,5 +1,5 @@
 //
-//  OnboardingServices.swift
+//  OnboardingService.swift
 //  weady
 //
 //  Created by 김영택 on 2025/08/13
