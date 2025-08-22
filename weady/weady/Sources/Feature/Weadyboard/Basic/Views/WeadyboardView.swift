@@ -78,7 +78,11 @@ struct WeadyboardView: View {
                     .padding(.horizontal, 5 * .deviceScale)
                     .padding(.top, 5 * .deviceScale)
                 }
-                // 하단 여백 확보 코드 
+                .refreshable {
+                    viewModel.fetchBoards()
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                }
+                // 하단 여백 확보 코드
                 .safeAreaInset(edge: .bottom) {
                     Color.clear.frame(height: bottomContentInset)
                 }
