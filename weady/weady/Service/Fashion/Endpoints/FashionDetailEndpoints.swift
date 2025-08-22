@@ -11,14 +11,13 @@ import Moya
 /// /api/v1/fashion/detail 전용 Endpoints
 enum FashionDetailEndpoints {
     /// GET /api/v1/fashion/detail
-    /// - locationId가 있으면 쿼리로 전달 (?locationId=357)
+    /// - locationId 가 있으면 ?locationId=... 로 전달 (서버에서 지원할 때만 사용)
     case getDetail(locationId: Int? = nil)
 }
 
 extension FashionDetailEndpoints: TargetType {
-    // NOTE: Domain.fashionURL 타입에 맞춰 한 줄만 사용하세요.
-    // var baseURL: URL { Domain.fashionURL }                        // URL 타입인 경우
-    var baseURL: URL { URL(string: Domain.fashionURL)! }            // String 타입인 경우
+    // NOTE: Domain.fashionURL 이 String 형태이므로 현재 프로젝트 패턴을 따릅니다.
+    var baseURL: URL { URL(string: Domain.fashionURL)! }
 
     var path: String {
         switch self {
@@ -32,17 +31,14 @@ extension FashionDetailEndpoints: TargetType {
         }
     }
 
-    var sampleData: Data { Data() }
-
     var task: Task {
         switch self {
         case .getDetail(let id):
-            return id != nil
-            ? .requestParameters(parameters: ["locationId": id!], encoding: URLEncoding.queryString)
-            : .requestPlain
+            if let id { return .requestParameters(parameters: ["locationId": id],
+                                                  encoding: URLEncoding.queryString) }
+            return .requestPlain
         }
     }
-    
 
     var headers: [String : String]? {
         var headers: [String: String] = [
@@ -55,5 +51,6 @@ extension FashionDetailEndpoints: TargetType {
         return headers
     }
 
-    var validationType: ValidationType { .successCodes } // 2xx만 성공
+    /// 200~299 만 성공
+    var validationType: ValidationType { .successCodes }
 }

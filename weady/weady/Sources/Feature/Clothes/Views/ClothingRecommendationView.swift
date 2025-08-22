@@ -17,7 +17,7 @@ struct ClothingRecommendationView: View {
     @StateObject private var vm: ClothingRecommendationViewModel
 
     // Routing / Tabs
-    @Environment(\.homeRouter) private var router
+    @EnvironmentObject var homeRouter: HomeRouter
     @Environment(AppTabController.self) private var tabController
 
     // Help Overlay
@@ -26,9 +26,21 @@ struct ClothingRecommendationView: View {
     @State private var helpStep: HelpStep = .intro
 
     // Initializers (기존 시그니처 유지)
-    init() { _vm = StateObject(wrappedValue: ClothingRecommendationViewModel()) }
-    init(token: String) { _vm = StateObject(wrappedValue: ClothingRecommendationViewModel()) }
-    init(vm: ClothingRecommendationViewModel) { _vm = StateObject(wrappedValue: vm) }
+    init() {
+        _vm = StateObject(wrappedValue: ClothingRecommendationViewModel(
+            service: FashionDetailService()
+        ))
+    }
+    
+    init(token: String) {
+        _vm = StateObject(wrappedValue: ClothingRecommendationViewModel(
+            service: FashionDetailService()
+        ))
+    }
+    
+    init(vm: ClothingRecommendationViewModel) {
+        _vm = StateObject(wrappedValue: vm)
+    }
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -45,7 +57,7 @@ struct ClothingRecommendationView: View {
                 // 1) 주소 행
                 AddressRow(
                     text: vm.addressText,
-                    onTapChevron: { router.push(HomeRoute.weatherlocation) }
+                    onTapChevron: { homeRouter.push(.weatherlocation) }
                 )
                 .padding(.top, 41)
 
@@ -218,21 +230,6 @@ private struct HelpButton: View {
     }
 }
 
-
-// MARK: - EnvironmentKey for HomeRouter (키패스 기반 주입)
-
-private struct HomeRouterKey: EnvironmentKey {
-    static let defaultValue: HomeRouter = HomeRouter()
-}
-
-extension EnvironmentValues {
-    var homeRouter: HomeRouter {
-        get { self[HomeRouterKey.self] }
-        set { self[HomeRouterKey.self] = newValue }
-    }
-}
-
-
 // MARK: - Preview
 
 #if DEBUG
@@ -247,7 +244,7 @@ struct ClothingRecommendationView_Previews: PreviewProvider {
             // 또는 ② 명시적으로 생성
             // ClothingRecommendationView(vm: ClothingRecommendationViewModel())
         }
-        .environment(\.homeRouter, router) // 커스텀 키패스 주입
+        .environmentObject(router)   
         .environment(tabs)                 // AppTabController typed env
     }
 }

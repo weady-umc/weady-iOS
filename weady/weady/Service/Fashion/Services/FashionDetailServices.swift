@@ -8,16 +8,14 @@
 import Foundation
 import Moya
 
-/// /fashion/detail 전용 Service
 final class FashionDetailService: NetworkManager {
 
-    // MARK: - NetworkManager 요구사항
+    // 프로토콜 요구: 연관타입 Endpoint
     typealias Endpoint = FashionDetailEndpoints
 
-    /// 프로토콜이 요구하는 provider
+    // 프로토콜 요구: provider 타입 시그니처 일치
     let provider: MoyaProvider<FashionDetailEndpoints>
 
-    /// 기본 플러그인(로그)과 함께 provider 구성
     init(provider: MoyaProvider<FashionDetailEndpoints>? = nil) {
         let plugins: [PluginType] = [
             NetworkLoggerPlugin(configuration: .init(logOptions: .verbose))
@@ -25,12 +23,17 @@ final class FashionDetailService: NetworkManager {
         self.provider = provider ?? MoyaProvider<FashionDetailEndpoints>(plugins: plugins)
     }
 
-    // FashionService
-    public func getFashionDetail(locationId: Int? = nil,
-        completion: @escaping (Result<FashionDetailResponseDTO, NetworkError>) -> Void) {
-        request(target: .getDetail(locationId: locationId),
-                decodingType: FashionDetailResponseDTO.self,
-                completion: completion)
+    /// GET /api/v1/fashion/detail
+    /// - Parameter locationId: 선택 위치. nil 이면 서버의 now/default 위치를 사용.
+    /// - Returns: `Result<FashionDetailResponseDTO, NetworkError>`
+    public func getFashionDetail(
+        locationId: Int? = nil,
+        completion: @escaping (Result<FashionDetailResponseDTO, NetworkError>) -> Void
+    ) {
+        request(
+            target: .getDetail(locationId: locationId),
+            decodingType: FashionDetailResponseDTO.self,
+            completion: completion
+        )
     }
-
 }
