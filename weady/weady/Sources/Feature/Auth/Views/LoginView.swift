@@ -70,10 +70,10 @@ struct LoginView: View {
                         Spacer()
                     }
                     Text("카카오로 시작")
-                        .fontName(.metaMedium12)
+                        .fontName(.bodyRegular16)
                         .foregroundColor(.black)
                 }
-                .frame(width: 315, height: 44)
+                .frame(width: 315 * .deviceScale, height: 44 * .deviceScale)
                 .background(Color.login100)
                 .cornerRadius(6)
             }
@@ -94,10 +94,10 @@ struct LoginView: View {
                         Spacer()
                     }
                     Text("구글로 시작")
-                        .fontName(.metaMedium12)
+                        .fontName(.bodyRegular16)
                         .foregroundColor(.black)
                 }
-                .frame(width: 315, height: 44)
+                .frame(width: 315 * .deviceScale, height: 44 * .deviceScale)
                 .background(Color.white)
                 .overlay(
                     RoundedRectangle(cornerRadius: 6)
@@ -110,8 +110,8 @@ struct LoginView: View {
                 onRequest: { _ in },
                 onCompletion: { _ in }
             )
-            .frame(width: 315, height: 44)
-            .signInWithAppleButtonStyle(.whiteOutline)
+            .frame(width: 315 * .deviceScale, height: 44 * .deviceScale)
+            .signInWithAppleButtonStyle(.black)
             .cornerRadius(6)
             .onTapGesture {
                 if let anchor = activePresentationAnchor() {
