@@ -53,7 +53,7 @@ struct WeatherHomeView: View {
             
             VStack(spacing: 0) {
 
-                Spacer().frame(height: 20 * .deviceScale)
+                Spacer().frame(height: 23 * .deviceScale)
 
                 UnderlineSegmentedControl(
                     items: WeatherHomeModel.allCases,

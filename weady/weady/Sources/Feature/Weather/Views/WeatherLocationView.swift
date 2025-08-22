@@ -19,9 +19,9 @@ struct WeatherLocationView: View {
     
     var body: some View {
         // MARK: - Root Layout
-        ZStack(alignment: .top) {
-            VStack{
-                Spacer().frame(height: 6 * .deviceScale)
+       
+            VStack(spacing: 0){
+                Spacer().frame(height: 14 * .deviceScale)
                 
                 // MARK: - 검색바
                 searchBar
@@ -88,7 +88,7 @@ struct WeatherLocationView: View {
             }
 
             
-        }
+        
     }
     
     // MARK: - 검색 바 UI (탭 시 검색 화면으로 이동)
@@ -156,6 +156,7 @@ struct WeatherLocationView: View {
                         .fontName(.captionRegular14)
                         .foregroundStyle(Color.black100)
                 }
+                Spacer()
             } else {
                 // MARK: - 즐겨찾기 리스트
                 List {

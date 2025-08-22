@@ -47,13 +47,13 @@ struct ClothingRecommendationView: View {
             GeometryReader { proxy in
                 Image("backgroundImage")
                     .resizable()
-                    .frame(width: 375 * .deviceScale , height: 810 * .deviceScale)
+                    .frame(width: 375 * .deviceScale , height: 810 * .deviceHeightScale)
                     .scaledToFill()
                     .ignoresSafeArea()
+                    
                    // .ignoresSafeArea(edges: .bottom)
                     //.padding(.top, 5)
-                    .clipped()
-                    //.ignoresSafeArea()
+                    //.clipped()
             }
 
             VStack(alignment: .center, spacing: 0) {
