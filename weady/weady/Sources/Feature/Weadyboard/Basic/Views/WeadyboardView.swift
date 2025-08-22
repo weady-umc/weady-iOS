@@ -28,7 +28,7 @@ struct WeadyboardView: View {
 
     // 하단 여백 확보 코드
     private var bottomContentInset: CGFloat {
-        (83 + 20) * .deviceScale
+        44 * .deviceScale
     }
 
     var body: some View {
