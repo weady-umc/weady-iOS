@@ -191,10 +191,10 @@ struct CurationListView: View {
 
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 2) {
-                    ForEach(items) { item in
-                        Button(action: {
-                            // TODO: - 해당 큐레이션 상세 화면으로 이동
-                        }) {
+                    ForEach(items, id: \.id) { (item: CurationItem) in
+                        NavigationLink(
+                            destination: DetailCurationView(curationId: Int64(Int(item.id)), isTabBarHidden: Binding.constant(false))
+                        ) {
                             if item.firstImgUrl.starts(with: "http"), let url = URL(string: item.firstImgUrl) {
                                 AsyncImage(url: url) { image in
                                     image
@@ -216,8 +216,8 @@ struct CurationListView: View {
                                 Color.gray.opacity(0.2)
                                     .frame(height: 300)
                             }
-                            
                         }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.horizontal, 2)
@@ -251,10 +251,10 @@ struct WeadyboardListView: View {
 
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: spacing) {
-                        ForEach(items) { item in
-                            Button(action: {
-                                // TODO: - 해당 웨디보드 상세 화면으로 이동
-                            }) {
+                        ForEach(items, id: \.id) { (item: WeadyboardItem) in
+                            NavigationLink(
+                                destination: WeadyboardPostView(boardId: Int(item.id), isTabBarHidden: Binding.constant(false))
+                            ) {
                                 ZStack {
                                     // Placeholder to stabilize layout
                                     Rectangle()
