@@ -68,10 +68,12 @@ struct MypageBoardDetailView: View {
                 TabView(selection: $currentIndex) {
                     ForEach(board.imageList.indices, id: \.self) { index in
                         let image = board.imageList[index]
+                        
+                        // 이미지 클릭시, 실제 게시물뷰로 이동
                         NavigationLink(
                             destination: WeadyboardPostView(boardId: board.boardId, isTabBarHidden: .constant(false))
-                        ) {
-                            AsyncImage(url: URL(string: image.imgUrl)) { phase in
+                        )
+                        { AsyncImage(url: URL(string: image.imgUrl)) { phase in
                                 switch phase {
                                 case .empty:
                                     ProgressView()
