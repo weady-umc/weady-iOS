@@ -7,7 +7,6 @@
 
 import SwiftUI
 import Combine
-import Charts
 
 final class ClothingRecommendationViewModel: ObservableObject {
     @Published var addressText: String = "위치 불러오는 중..."
@@ -15,87 +14,69 @@ final class ClothingRecommendationViewModel: ObservableObject {
     @Published var clothingName: String = ""
     @Published var subjectParticle: String = "이"
     @Published var clothingImageUrl: URL?
-    @Published var chartItems: [ChartItem] = []
-    @Published var tags: Tags = .init(
-        season: .init(id: 0, name: ""),
-        weather: .init(id: 0, name: ""),
-        temperature: .init(id: 0, name: "")
-    )
+    @Published var chartItems: [ChartItem] = []      // 도메인 모델 유지
+    @Published var tags: Tags?                       // 도메인 모델 유지
 
-    private let service: FashionService
+    private let service: FashionDetailService
 
-    // MARK: - Init
-    init(service: FashionService = FashionService()) {
+    init(service: FashionDetailService = FashionDetailService()) {
         self.service = service
-        // 초기: 서버 기본 로직(혹은 서버가 정한 위치)으로 호출
-        fetchFashionDetail(locationId: nil)
+        fetchFashionDetail() // 앱 진입 시 현재(now) 위치 기준
     }
 
-    // MARK: - API
-    func fetchFashionDetail(locationId: Int?) {
-        service.getFashionDetail(locationId: locationId) { [weak self] result in
+    // 외부에서 위치가 바뀌었을 때 호출 (주소를 미리 넘겨주면 UX 즉시 반영)
+    func updateLocation(locationId: Int, address: String? = nil) {
+        if let address { self.addressText = address }
+        // 서버는 /fashion/detail이 현재 위치(now) 기준이라면, locationId를 쿼리로 요구하지 않습니다.
+        // 만약 locationId 쿼리를 붙이는 버전을 쓰고 싶다면 Service/Endpoint에 쿼리 추가 후 여기서 호출하세요.
+        fetchFashionDetail()
+    }
+
+    // /fashion/detail 불러오기
+    func fetchFashionDetail() {
+        service.getFashionDetail { [weak self] result in
             DispatchQueue.main.async {
-                guard let self else { return }
                 switch result {
                 case .success(let dto):
-                    let d = dto.data
-
-                    // 주소
-                    self.addressText = [d.address1, d.address2, d.address3, d.address4]
+                    // ✅ DTO 직접 사용 (옵셔널 주소 안전 처리)
+                    let d = dto
+                    let a1: String? = d.address1                     
+                    let addressString = [a1, d.address2, d.address3, d.address4]
+                        .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
                         .filter { !$0.isEmpty }
                         .joined(separator: " ")
-
-                    // 추천(체감온도/의상명/이미지)
-                    self.feelTemp = Int(d.recommendation.feelTmp.rounded())
-                    self.clothingName = d.recommendation.clothing.name
-                    self.subjectParticle = self.subjectParticle(for: d.recommendation.clothing.name)
-                    self.clothingImageUrl = URL(string: d.recommendation.clothing.imageUrl)
-
-                    // 차트: 서버 time(0,100,…,2300) → 시간(0~23)로 정규화
-                    self.chartItems = d.chart.map { item in
-                        ChartItem(
-                            time: Self.normalizeHour(item.time),
-                            feelTmp: item.feelTmp,
-                            clothing: ClothingItem(
-                                name: item.clothing.name,
-                                imageUrl: item.clothing.imageUrl
-                            )
-                        )
+                    self?.addressText = addressString.isEmpty ? "위치정보를 찾을 수 없어요" : addressString
+                    
+                    // 체감온도/추천 문구/이미지
+                    self?.feelTemp = Int(d.recommendation.feelTmp.rounded())
+                    self?.clothingName = d.recommendation.clothing.name
+                    self?.subjectParticle = self?.subjectParticle(for: d.recommendation.clothing.name) ?? "이"
+                    self?.clothingImageUrl = URL(string: d.recommendation.clothing.imageUrl)
+                    
+                    // 차트/태그: 기존 도메인 모델에 맵핑
+                    self?.chartItems = d.chart.map { item in
+                        ChartItem(time: item.time, feelTmp: item.feelTmp, clothing: ClothingItem(name: item.clothing.name, imageUrl: item.clothing.imageUrl))
                     }
-
-                    // 태그
-                    self.tags = Tags(
+                    self?.tags = Tags(
                         season: Tag(id: d.tags.season.id, name: d.tags.season.name),
                         weather: Tag(id: d.tags.weather.id, name: d.tags.weather.name),
                         temperature: Tag(id: d.tags.temperature.id, name: d.tags.temperature.name)
                     )
-
-                case .failure:
-                    self.addressText = "위치 정보를 확인할 수 없어요"
+                    
+                case .failure(let error):
+                    print("패션 디테일 로드 실패:", error)
+                    self?.addressText = "위치 정보를 확인할 수 없어요"
                 }
             }
         }
     }
 
-    /// 위치 변경 시 실제로 /fashion/detail?locationId=... 호출
-    func updateLocation(locationId: Int, address: String? = nil) {
-        if let address { self.addressText = address }
-        fetchFashionDetail(locationId: locationId)
-    }
-
-    // MARK: - Helpers
-
-    private static func normalizeHour(_ apiTime: Int) -> Int {
-        // 서버 0,100,…,2300 -> 0~23
-        max(0, min(23, apiTime / 100))
-    }
-
+    // MARK: - 조사 선택 ('이/가')
     private func subjectParticle(for word: String) -> String {
         let trimmed = word.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let lastScalar = trimmed.unicodeScalars.last else { return "이" }
-
         let v = lastScalar.value
-        guard (0xAC00...0xD7A3).contains(v) else { return "이" } // 한글 음절만 처리
+        guard (0xAC00...0xD7A3).contains(v) else { return "이" }
         let index = v - 0xAC00
         let jong = index % 28
         return (jong == 0) ? "가" : "이"
