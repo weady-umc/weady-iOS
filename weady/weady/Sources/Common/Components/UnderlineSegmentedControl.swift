@@ -14,6 +14,7 @@ struct UnderlineSegmentedControl<Item: Hashable>: View {
     var title: (Item) -> String
 
     var body: some View {
+        
         HStack(spacing: 0) {
             ForEach(items, id: \.self) { item in
                 Button {
@@ -34,9 +35,13 @@ struct UnderlineSegmentedControl<Item: Hashable>: View {
                 .buttonStyle(.plain)
             }
             Spacer().frame(width: 193 * .deviceScale)
-            .frame(maxWidth: .infinity)
+            //Spacer(minLength: 0)
+            
+               // .frame(maxWidth: .infinity, alignment: .leading)
+            
         }
+        //.frame(maxWidth: .infinity, alignment: .leading)
         .padding(.leading, 0)
-        .padding(.top, 5 * .deviceScale)
+        .padding(.top, 7 * .deviceScale)
     }
 }

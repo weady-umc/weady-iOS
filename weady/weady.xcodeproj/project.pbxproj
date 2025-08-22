@@ -26,6 +26,7 @@
 		CDC1AB1F2E4CBC6200F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDC1B6A42E4E468200F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDC1D3672E578B8900F8629F /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
+		CDC6A2292E58623B0076E140 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDE727542E4C94AC005F67E7 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 		CDF98D1B2E29549500446374 /* weady.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = weady.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -35,6 +36,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Resources/Config/Secrets.xcconfig,
 			);
 			target = 808ED0FA2E1D9EFF00442DA8 /* weady */;
 		};
@@ -101,6 +103,11 @@
 			sourceTree = "<group>";
 		};
 		CDC1D3692E578B8900F8629F /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CDC6A22B2E58623B0076E140 /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -200,6 +207,10 @@
 				{
 					ProductGroup = CDF98D1D2E29549500446374 /* Products */;
 					ProjectRef = CDF98D1B2E29549500446374 /* weady.xcodeproj */;
+				},
+				{
+					ProductGroup = CDC6A22B2E58623B0076E140 /* Products */;
+					ProjectRef = CDC6A2292E58623B0076E140 /* weady.xcodeproj */;
 				},
 				{
 					ProductGroup = CDC1B6A62E4E468200F8629F /* Products */;
