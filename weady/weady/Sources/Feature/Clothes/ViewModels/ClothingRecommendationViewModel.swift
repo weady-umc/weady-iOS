@@ -8,13 +8,14 @@
 import SwiftUI
 import Combine
 import Charts
+import Foundation
 
 final class ClothingRecommendationViewModel: ObservableObject {
     @Published var addressText: String = "위치 불러오는 중..."
     @Published var feelTemp: Int = 0
     @Published var clothingName: String = ""
     @Published var subjectParticle: String = "이"
-    @Published var clothingImageUrl: URL?
+    @Published var clothingImageUrl: URL?      // URL 파싱 실패 허용(nil)
     @Published var chartItems: [ChartItem] = []
     @Published var tags: Tags = .init(
         season: .init(id: 0, name: ""),
@@ -38,18 +39,20 @@ final class ClothingRecommendationViewModel: ObservableObject {
                 guard let self = self else { return }
                 switch result {
                 case .success(let dto):
-                    let d = dto.data   // ← toDomain() 쓰지 않음
+                    let d = dto.data   // DTO 그대로 사용
 
-                    // 주소
+                    // 주소: nil/빈문자 제거 후 공백 조합
                     self.addressText = [d.address1, d.address2, d.address3, d.address4]
-                        .filter { !$0.isEmpty }
+                        .compactMap { $0 }                // nil 제거
+                        .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                        .filter { !$0.isEmpty }           // 빈 문자열 제거
                         .joined(separator: " ")
 
                     // 추천(체감온도/의상명/이미지)
                     self.feelTemp = Int(d.recommendation.feelTmp.rounded())
                     self.clothingName = d.recommendation.clothing.name
                     self.subjectParticle = self.subjectParticle(for: d.recommendation.clothing.name)
-                    self.clothingImageUrl = URL(string: d.recommendation.clothing.imageUrl)
+                    self.clothingImageUrl = URL(string: d.recommendation.clothing.imageUrl) // 실패시 nil
 
                     // 차트: 서버 time(0,100,…,2300) → 시간(0~23)로 정규화
                     self.chartItems = d.chart.map { item in
@@ -79,7 +82,11 @@ final class ClothingRecommendationViewModel: ObservableObject {
 
     /// 위치 변경 시 실제로 /fashion/detail?locationId=... 호출
     func updateLocation(locationId: Int, address: String? = nil) {
-        if let address { self.addressText = address }
+        // 주소 문자열: 공백/개행 제거 → 비어있지 않으면 UI에 반영
+        if let trimmed = address?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty {
+            self.addressText = trimmed
+        }
+        // 네트워크 호출
         fetchFashionDetail(locationId: locationId)
     }
 
