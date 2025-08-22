@@ -48,10 +48,9 @@ struct WeatherHomeView: View {
         }
 
         .navigationBarBackButtonHidden(true)
-        .edgeSwipeBack(topExclusion: 100 * .deviceScale) {
-            homeRouter.pop()
-            }
+        //.edgeSwipeBack(topExclusion: 100 * .deviceScale) {homeRouter.pop()}
         .safeAreaInset(edge: .top) {
+            
             VStack(spacing: 0) {
 
                 Spacer().frame(height: 20 * .deviceScale)
@@ -62,10 +61,11 @@ struct WeatherHomeView: View {
                     title: { $0.title })
 
                 //Spacer().frame(height: 100)
-
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal, 0)
                 .background(Color.white)
                 .overlay(Rectangle().fill(.clear).frame(height: 1), alignment: .bottom)
+                
             }
             .background(Color.white.ignoresSafeArea(edges: .top))
             
@@ -96,14 +96,14 @@ struct WeatherHomeView: View {
     
     // MARK: - 날씨 탭 화면(배경 + 헤더 + 시간별 + 강수/풍속 + 중기예보)
     private func weatherView(weather: WeatherAddData) -> some View {
-        ScrollView{
+        
             ZStack {
                 // MARK: - 날씨 배경
                 Image(weather.weatherBackground)
                     .resizable()
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
-                
+                ScrollView{
                 VStack {
                     // MARK: - 현재 위치 헤더(아이콘, 위치명, 위치 변경 버튼)
                     HStack {

@@ -172,7 +172,7 @@ struct CurationCard: Identifiable, Equatable {
     let backgroundURL: URL?          // ✅ 추가
 
     // 하위 호환: 기존 thumbnailURL 참조 코드가 있으면 그대로 동작
-    var thumbnailURL: URL? { bannerURL ?? backgroundURL }
+    var thumbnailURL: URL? { backgroundURL ?? bannerURL}
 }
 
 struct CurationDetailImage: Identifiable, Equatable {
