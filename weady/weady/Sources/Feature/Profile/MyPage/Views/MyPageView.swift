@@ -77,7 +77,7 @@ struct MyPageView: View {
                         }
                         .padding(.horizontal, 10)
                     }
-                    .frame(height: usableHeight * 0.44)
+                    .frame(height: max(usableHeight * 0.55, 400))
                     .padding(.top, usableHeight * 0.01)
 
                     Spacer()
