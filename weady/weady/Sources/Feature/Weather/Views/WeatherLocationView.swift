@@ -19,9 +19,9 @@ struct WeatherLocationView: View {
     
     var body: some View {
         // MARK: - Root Layout
-       
+        
             VStack(spacing: 0){
-                Spacer().frame(height: 14 * .deviceScale)
+                Spacer().frame(height: 14)
                 
                 // MARK: - 검색바
                 searchBar
