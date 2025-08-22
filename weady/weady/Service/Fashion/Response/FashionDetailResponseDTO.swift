@@ -1,5 +1,5 @@
 //
-//  FashionResponseDTOs.swift
+//  FashionDetailResponseDTO.swift
 //  weady
 //
 //  Created by 김영택 on 8/11/25.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-// MARK: - 서버 응답 DTO (서버 JSON 스키마 1:1)
+// MARK: - /fashion/detail 서버 응답 DTO (서버 JSON 스키마 1:1)
 
 struct FashionDetailResponseDTO: Decodable {
     let code: Int
@@ -56,7 +56,3 @@ struct TagDTO: Decodable {
     let id: Int
     let name: String
 }
-
-// MARK: - Summary DTO
-
-

@@ -22,23 +22,23 @@ final class ClothingRecommendationViewModel: ObservableObject {
         temperature: .init(id: 0, name: "")
     )
 
-    private let service: FashionService
+    private let service: FashionDetailService
 
     // MARK: - Init
-    init(service: FashionService = FashionService()) {
+    init(service: FashionDetailService = FashionDetailService()) {
         self.service = service
         // 초기: 서버 기본 로직(혹은 서버가 정한 위치)으로 호출
         fetchFashionDetail(locationId: nil)
     }
 
     // MARK: - API
-    func fetchFashionDetail(locationId: Int?) {
+    func fetchFashionDetail(locationId: Int? = nil) {
         service.getFashionDetail(locationId: locationId) { [weak self] result in
             DispatchQueue.main.async {
-                guard let self else { return }
+                guard let self = self else { return }
                 switch result {
                 case .success(let dto):
-                    let d = dto.data
+                    let d = dto.data   // ← toDomain() 쓰지 않음
 
                     // 주소
                     self.addressText = [d.address1, d.address2, d.address3, d.address4]
@@ -54,7 +54,7 @@ final class ClothingRecommendationViewModel: ObservableObject {
                     // 차트: 서버 time(0,100,…,2300) → 시간(0~23)로 정규화
                     self.chartItems = d.chart.map { item in
                         ChartItem(
-                            time: Self.normalizeHour(item.time),
+                            time: self.normalizeHour(item.time),
                             feelTmp: item.feelTmp,
                             clothing: ClothingItem(
                                 name: item.clothing.name,
@@ -63,7 +63,7 @@ final class ClothingRecommendationViewModel: ObservableObject {
                         )
                     }
 
-                    // 태그
+                    // 태그 매핑
                     self.tags = Tags(
                         season: Tag(id: d.tags.season.id, name: d.tags.season.name),
                         weather: Tag(id: d.tags.weather.id, name: d.tags.weather.name),
@@ -85,7 +85,7 @@ final class ClothingRecommendationViewModel: ObservableObject {
 
     // MARK: - Helpers
 
-    private static func normalizeHour(_ apiTime: Int) -> Int {
+    private func normalizeHour(_ apiTime: Int) -> Int {
         // 서버 0,100,…,2300 -> 0~23
         max(0, min(23, apiTime / 100))
     }

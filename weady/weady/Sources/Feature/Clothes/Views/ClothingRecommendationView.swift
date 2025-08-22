@@ -218,6 +218,7 @@ private struct HelpButton: View {
     }
 }
 
+
 // MARK: - EnvironmentKey for HomeRouter (키패스 기반 주입)
 
 private struct HomeRouterKey: EnvironmentKey {
@@ -230,6 +231,7 @@ extension EnvironmentValues {
         set { self[HomeRouterKey.self] = newValue }
     }
 }
+
 
 // MARK: - Preview
 
