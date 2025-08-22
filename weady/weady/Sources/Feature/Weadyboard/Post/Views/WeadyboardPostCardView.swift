@@ -118,6 +118,15 @@ struct WeadyboardPostCardView: View {
         let places = dto.placeDtoList
         let styles = resolvedStyleNames(from: dto)
 
+        let brandProducts: [String] = dto.brandDtoList.map { brandDTO in
+            let brand = brandDTO.brand.trimmingCharacters(in: .whitespacesAndNewlines)
+            let product = brandDTO.product.trimmingCharacters(in: .whitespacesAndNewlines)
+            if brand.isEmpty, product.isEmpty { return "" }
+            if brand.isEmpty { return product }
+            if product.isEmpty { return brand }
+            return "\(brand) | \(product)"
+        }.filter { !$0.isEmpty }
+        
         return VStack(alignment: .leading, spacing: 12 * .deviceScale) {
             Text("웨디와 함께한 \(userName)님의 하루")
                 .fontName(.metaMedium12)
@@ -183,15 +192,15 @@ struct WeadyboardPostCardView: View {
                     }
                     
                     // MARK: - 스타일 박스
-                    if !styles.isEmpty {
+                    if !brandProducts.isEmpty {
                         VStack(alignment: .leading, spacing: 8 * .deviceScale) {
-                            ForEach(styles, id: \.self) { style in
+                            ForEach(brandProducts, id: \.self) { item in
                                 HStack(spacing: 4 * .deviceScale) {
                                     Image("brandicon")
                                         .resizable()
                                         .frame(width: 12.81 * .deviceScale, height: 12.81 * .deviceScale)
                                         .frame(width: 15 * .deviceScale, height: 15 * .deviceScale)
-                                    Text(style)
+                                    Text(item)
                                         .fontName(.metaMedium8)
                                         .foregroundColor(.appblack100)
                                         .fixedSize(horizontal: false, vertical: true)
