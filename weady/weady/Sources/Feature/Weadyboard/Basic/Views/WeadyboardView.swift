@@ -17,6 +17,8 @@ struct WeadyboardView: View {
 
     private var cardWidthScaled: CGFloat { 177 * .deviceScale }
 
+    private let navBarNudge: CGFloat = -3 * . deviceHeightScale
+
     private var leftColumn: [BoardPreviewDTO] {
         viewModel.posts.enumerated().compactMap { $0.offset % 2 == 0 ? $0.element : nil }
     }
@@ -32,13 +34,14 @@ struct WeadyboardView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                CustomNavBar(
-                    viewTitle: "",
-                    showLogoButton: true,
-                    showAlarmButton: true,
-                    showBottomDivider: false
-                )
-
+//                CustomNavBar(
+//                    viewTitle: "",
+//                    showLogoButton: true,
+//                    showAlarmButton: true,
+//                    showBottomDivider: false
+//                )
+//                // 홈 뷰랑 네비바 위치 달라서 맞춤
+//                .padding(.top, -5 * .deviceHeightScale)
                 HStack {
                     Spacer()
                     Button {
@@ -105,6 +108,19 @@ struct WeadyboardView: View {
             }
         }
         .background(Color.white100)
+        .toolbar(.hidden, for: .navigationBar)
+        .safeAreaInset(edge: .top) {
+            CustomNavBar(
+                viewTitle: "",
+                showLogoButton: true,
+                showAlarmButton: true,
+                showBottomDivider: false,
+                alarmAction: { }
+            )
+            .padding(.top, navBarNudge)
+            .background(Color.white100.ignoresSafeArea(edges: .top))
+        }
+        .zIndex(999)
         .sheet(isPresented: $isFilterPresented) {
             WeadyboardFilterSheet(
                 onApply: { criteria in
