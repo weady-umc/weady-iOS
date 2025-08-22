@@ -14,7 +14,7 @@ import UIKit
 struct DetailCurationView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var isTabBarHidden: Bool
-    @EnvironmentObject private var homeRouter: HomeRouter
+    
     
 
     let curationId: Int64
@@ -57,9 +57,7 @@ struct DetailCurationView: View {
         .safeAreaInset(edge: .top) {
             DetailTopBar(
                 title: titleTwoLinesAuto(vm.detail?.title ?? ""),
-                onBack: {
-                    homeRouter.push(.weatherhome(initial: .third))
-                },
+                onBack: { dismiss() },
                 isScrapped: isScrapped,
                 onToggleScrap: { toggleScrap() }
             )
