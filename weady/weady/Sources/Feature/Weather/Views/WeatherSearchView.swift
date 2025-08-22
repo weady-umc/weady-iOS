@@ -25,7 +25,6 @@ struct WeatherSearchView: View {
     var body: some View {
         // MARK: - Root Layout
         VStack {
-            Spacer().frame(height: 9 * .deviceScale)
             
             // MARK: - Search Bar
             searchBar
