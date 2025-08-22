@@ -14,6 +14,7 @@ import AuthenticationServices
 
 struct LoginView: View {
     @Environment(\.router) private var router
+    @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel = LoginViewModel()
 
     @State private var didRoute = false
@@ -128,7 +129,7 @@ struct LoginView: View {
         }
         .padding(.horizontal, 24)
         .onAppear {
-            appearedAt = Date()
+            viewModel.attach(appState: appState)
         }
         .alert(item: Binding(
             get: { viewModel.errorMessage.map { LocalAlertMessage(message: $0) } },
