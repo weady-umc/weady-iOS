@@ -8,37 +8,55 @@ import SwiftUI
 
 struct NotificationView: View {
     @StateObject private var viewModel = NotificationViewModel()
-    
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
         if viewModel.notifications.isEmpty {
-            EmptyNotificationView()
-                .navigationTitle("알림")
-                .navigationBarBackButtonHidden(true)
-        } else {
-            List {
-                ForEach(viewModel.notifications, id: \.id) { notification in
-                    VStack(spacing: 0) {
-                        NotificationRow(
-                            notification: notification,
-                            onDelete: {
-                                viewModel.deleteNotification(notification.id)
-                            },
-                            onTap: {
-                                viewModel.markAsRead(notification.id)
-                            }
-                        )
-                        Divider()
-                            .frame(height: 0.7)
-                            .background(Color.gray600)
+            VStack(spacing: 0) {
+                CustomNavBar(
+                    viewTitle: "알림",
+                    showBackButton: true,
+                    showBottomDivider: true,
+                    backAction: {
+                        dismiss()
                     }
-                    .listRowInsets(EdgeInsets())
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(notification.isRead ? Color.white : Color(UIColor.systemGray6))
-                }
+                )
+                EmptyNotificationView()
             }
-            .listStyle(PlainListStyle())
-            
-            .navigationTitle("알림")
+            .navigationBarBackButtonHidden(true)
+        } else {
+            VStack(spacing: 0) {
+                CustomNavBar(
+                    viewTitle: "알림",
+                    showBackButton: true,
+                    showBottomDivider: true,
+                    backAction: {
+                        dismiss()
+                    }
+                )
+                List {
+                    ForEach(viewModel.notifications, id: \.id) { notification in
+                        VStack(spacing: 0) {
+                            NotificationRow(
+                                notification: notification,
+                                onDelete: {
+                                    viewModel.deleteNotification(notification.id)
+                                },
+                                onTap: {
+                                    viewModel.markAsRead(notification.id)
+                                }
+                            )
+                            Divider()
+                                .frame(height: 0.7)
+                                .background(Color.gray600)
+                        }
+                        .listRowInsets(EdgeInsets())
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(notification.isRead ? Color.white : Color(UIColor.systemGray6))
+                    }
+                }
+                .listStyle(PlainListStyle())
+            }
             .navigationBarBackButtonHidden(true)
         }
     }
