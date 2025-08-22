@@ -13,6 +13,7 @@ struct NotificationView: View {
         if viewModel.notifications.isEmpty {
             EmptyNotificationView()
                 .navigationTitle("알림")
+                .navigationBarBackButtonHidden(true)
         } else {
             List {
                 ForEach(viewModel.notifications, id: \.id) { notification in
@@ -38,6 +39,7 @@ struct NotificationView: View {
             .listStyle(PlainListStyle())
             
             .navigationTitle("알림")
+            .navigationBarBackButtonHidden(true)
         }
     }
 }
