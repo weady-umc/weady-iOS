@@ -25,7 +25,7 @@ struct WeatherLocationAddView: View {
     var body: some View {
         VStack{
             
-            Spacer().frame(height: 43 * .deviceScale)
+            Spacer().frame(height: 30 * .deviceScale)
             
             ZStack{
                 // MARK: - 배경: 변환된 날씨가 준비되면 해당 배경 표시
@@ -117,8 +117,10 @@ struct WeatherLocationAddView: View {
                                     .fontName(.captionSemibold14)
                                     .foregroundStyle(Color.black100)
                             }
+                            
                         }
-                        Spacer()
+                      Spacer().frame(height: 44)
+
                     }
                     
                     
@@ -198,6 +200,7 @@ struct WeatherLocationAddView: View {
                 }
                 
             }
+        
         }
     }
 
