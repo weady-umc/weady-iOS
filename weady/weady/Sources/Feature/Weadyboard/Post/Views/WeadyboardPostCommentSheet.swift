@@ -85,12 +85,13 @@ struct WeadyboardPostCommentSheet: View {
                 }
                 .listStyle(.plain)
             }
-
-            inputBar
-                .padding(.bottom, max(12, keyboard.height))
-                .background(Color.white.ignoresSafeArea(edges: .bottom))
         }
-        .onReceive(keyboard.$height) { _ in }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .safeAreaInset(edge: .bottom) {
+            inputBar
+                .padding(.bottom, 10)
+                .background(Color.white)
+        }
         .onAppear {
             viewModel.fetch(size: 20)
         }
