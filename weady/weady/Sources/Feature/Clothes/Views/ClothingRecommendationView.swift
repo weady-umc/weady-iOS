@@ -122,7 +122,7 @@ private struct AddressRow: View {
     let onTapChevron: () -> Void
 
     var body: some View {
-        HStack(spacing: 3) {
+        HStack(spacing: 10) {
             Image("mapIcon")
                 .resizable()
                 .frame(width: 12, height: 17)
