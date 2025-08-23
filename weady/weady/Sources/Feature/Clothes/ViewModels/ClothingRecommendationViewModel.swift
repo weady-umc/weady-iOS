@@ -54,9 +54,13 @@ final class ClothingRecommendationViewModel: ObservableObject {
                     self?.clothingImageUrl = URL(string: d.recommendation.clothing.imageUrl)
                     
                     // 차트/태그: 기존 도메인 모델에 맵핑
-                    self?.chartItems = d.chart.map { item in
-                        ChartItem(time: item.time, feelTmp: item.feelTmp, clothing: ClothingItem(name: item.clothing.name, imageUrl: item.clothing.imageUrl))
-                    }
+                    self?.chartItems = d.chart
+                        .map { item in
+                            ChartItem(time: max(0, min(23, item.time / 100)),   // ✅ 0~23로 정규화
+                                      feelTmp: item.feelTmp,
+                                      clothing: ClothingItem(name: item.clothing.name, imageUrl: item.clothing.imageUrl))
+                        }
+                        .sorted { $0.time < $1.time }
                     self?.tags = Tags(
                         season: Tag(id: d.tags.season.id, name: d.tags.season.name),
                         weather: Tag(id: d.tags.weather.id, name: d.tags.weather.name),
